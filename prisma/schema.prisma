@@ -68,14 +68,15 @@ model Location {
 }
 
 model Lunch {
-  id String @id @default(cuid())
+  id   String   @id @default(cuid())
+  date DateTime
 
   group   Group  @relation(fields: [groupId], references: [id])
   groupId String
 
   scores Score[]
 
-  Location   Location @relation(fields: [locationId], references: [id])
+  location   Location @relation(fields: [locationId], references: [id])
   locationId String
 
   choosenBy User   @relation(fields: [userId], references: [id])
@@ -92,5 +93,5 @@ model Score {
   lunch   Lunch  @relation(fields: [lunchId], references: [id])
   lunchId String
 
-  comment String
+  comment String?
 }

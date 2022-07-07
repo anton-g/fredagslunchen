@@ -26,20 +26,86 @@ async function seed() {
     },
   });
 
+  const user2 = await prisma.user.create({
+    data: {
+      email: "teko@cool.se",
+      name: "Tessan",
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  });
+
   const location = await prisma.location.create({
     data: {
       lat: "59.331582",
       lon: "18.0664337",
-      name: "Wokhouse",
+      name: "WokHouse",
+      address: "Regeringsgatan 1337",
       discoveredById: user.id,
     },
   });
 
-  const group = await prisma.group.create({
+  const location2 = await prisma.location.create({
+    data: {
+      lat: "59.3339128",
+      lon: "18.0564237",
+      name: "Franzén",
+      address: "Klara Norra 1337",
+      discoveredById: user.id,
+    },
+  });
+
+  await prisma.group.create({
     data: {
       name: "OGs",
       users: {
-        create: [{ userId: user.id, role: "ADMIN" }],
+        create: [
+          { user: { connect: { id: user.id } }, role: "ADMIN" },
+          { user: { connect: { id: user2.id } } },
+        ],
+      },
+      lunches: {
+        create: [
+          {
+            date: new Date(),
+            choosenBy: { connect: { id: user.id } },
+            location: { connect: { id: location.id } },
+            scores: {
+              create: [
+                {
+                  user: { connect: { id: user2.id } },
+                  score: 4,
+                },
+                {
+                  user: { connect: { id: user.id } },
+                  score: 7,
+                  comment: "Seed comment",
+                },
+              ],
+            },
+          },
+          {
+            date: new Date(),
+            choosenBy: { connect: { id: user2.id } },
+            location: { connect: { id: location2.id } },
+            scores: {
+              create: [
+                {
+                  user: { connect: { id: user2.id } },
+                  score: 10,
+                },
+                {
+                  user: { connect: { id: user.id } },
+                  score: 2,
+                  comment: "sämst",
+                },
+              ],
+            },
+          },
+        ],
       },
     },
   });
