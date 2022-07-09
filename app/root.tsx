@@ -13,11 +13,10 @@ import {
   ScrollRestoration,
 } from "@remix-run/react";
 
-import tailwindStylesheetUrl from "./styles/tailwind.css";
 import { getUser } from "./session.server";
 
 export const links: LinksFunction = () => {
-  return [{ rel: "stylesheet", href: tailwindStylesheetUrl }];
+  return [];
 };
 
 export const meta: MetaFunction = () => ({
@@ -38,12 +37,13 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export default function App() {
   return (
-    <html lang="en" className="h-full">
+    <html lang="en">
       <head>
         <Meta />
         <Links />
+        {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
-      <body className="h-full">
+      <body>
         <Outlet />
         <ScrollRestoration />
         <Scripts />

@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { getGroup } from "~/models/group.server";
@@ -35,10 +35,10 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <h3 className="text-2xl font-bold">{data.group.name}</h3>
-      <hr className="my-4" />
+      <h3>{data.group.name}</h3>
+      <hr />
       <p>{data.group.users.map((user) => user.user.name)}</p>
-      <hr className="my-4" />
+      <hr />
       <table>
         <thead>
           <tr>
@@ -54,7 +54,10 @@ export default function GroupDetailsPage() {
               <td>{new Date(lunch.date).toLocaleDateString()}</td>
               <td>{lunch.location.name}</td>
               <td>{lunch.choosenBy.name}</td>
-              <td>{0}</td>
+              <td>
+                {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
+                  lunch.scores.length}
+              </td>
             </tr>
           ))}
         </tbody>
