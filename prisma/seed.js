@@ -1,3 +1,4 @@
+// @ts-check
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 
@@ -8,9 +9,12 @@ async function seed() {
   const name = "Bass Labb";
 
   // cleanup the existing database
-  await prisma.user.delete({ where: { email } }).catch(() => {
-    // no worries if it doesn't exist yet
-  });
+  await prisma.score.delete({ where: {} }).catch(() => {});
+  await prisma.lunch.delete({ where: {} }).catch(() => {});
+  await prisma.groupLocation.delete({ where: {} }).catch(() => {});
+  await prisma.location.delete({ where: {} }).catch(() => {});
+  // await prisma.user.delete({ where: {} }).catch(() => {});
+  // await prisma.user.delete({ where: {} }).catch(() => {});
 
   const hashedPassword = await bcrypt.hash("woopwoop", 10);
 
@@ -44,7 +48,6 @@ async function seed() {
       lon: "18.0664337",
       name: "WokHouse",
       address: "Regeringsgatan 1337",
-      discoveredById: user.id,
     },
   });
 
@@ -54,7 +57,6 @@ async function seed() {
       lon: "18.0564237",
       name: "Franzén",
       address: "Klara Norra 1337",
-      discoveredById: user.id,
     },
   });
 
@@ -67,40 +69,54 @@ async function seed() {
           { user: { connect: { id: user2.id } } },
         ],
       },
-      lunches: {
+      locations: {
         create: [
           {
-            date: new Date(),
-            choosenBy: { connect: { id: user.id } },
             location: { connect: { id: location.id } },
-            scores: {
+            discoveredBy: { connect: { id: user.id } },
+            lunches: {
               create: [
                 {
-                  user: { connect: { id: user2.id } },
-                  score: 4,
-                },
-                {
-                  user: { connect: { id: user.id } },
-                  score: 7,
-                  comment: "Seed comment",
+                  date: new Date(),
+                  choosenBy: { connect: { id: user.id } },
+                  scores: {
+                    create: [
+                      {
+                        user: { connect: { id: user2.id } },
+                        score: 4,
+                      },
+                      {
+                        user: { connect: { id: user.id } },
+                        score: 7,
+                        comment: "Seed comment",
+                      },
+                    ],
+                  },
                 },
               ],
             },
           },
           {
-            date: new Date(),
-            choosenBy: { connect: { id: user2.id } },
             location: { connect: { id: location2.id } },
-            scores: {
+            discoveredBy: { connect: { id: user.id } },
+            lunches: {
               create: [
                 {
-                  user: { connect: { id: user2.id } },
-                  score: 10,
-                },
-                {
-                  user: { connect: { id: user.id } },
-                  score: 2,
-                  comment: "sämst",
+                  date: new Date(),
+                  choosenBy: { connect: { id: user2.id } },
+                  scores: {
+                    create: [
+                      {
+                        user: { connect: { id: user2.id } },
+                        score: 10,
+                      },
+                      {
+                        user: { connect: { id: user.id } },
+                        score: 2,
+                        comment: "sämst",
+                      },
+                    ],
+                  },
                 },
               ],
             },

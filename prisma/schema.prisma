@@ -8,9 +8,9 @@ generator client {
 }
 
 model User {
-  id    String @id @default(cuid())
-  email String @unique
-  name  String
+  id    String  @id @default(cuid())
+  email String  @unique
+  name  String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -19,8 +19,8 @@ model User {
 
   groups              UsersInGroups[]
   scores              Score[]
-  discoveredLocations Location[]
   choosenLunches      Lunch[]
+  discoveredLocations GroupLocation[]
 }
 
 model Password {
@@ -36,8 +36,8 @@ model Group {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users   UsersInGroups[]
-  lunches Lunch[]
+  users     UsersInGroups[]
+  locations GroupLocation[]
 }
 
 model UsersInGroups {
@@ -54,6 +54,21 @@ model UsersInGroups {
   @@id([userId, groupId])
 }
 
+model GroupLocation {
+  group   Group  @relation(fields: [groupId], references: [id])
+  groupId String
+
+  location   Location @relation(fields: [locationId], references: [id])
+  locationId String
+
+  lunches Lunch[]
+
+  discoveredBy   User   @relation(fields: [discoveredById], references: [id])
+  discoveredById String
+
+  @@id([locationId, groupId])
+}
+
 model Location {
   id      String @id @default(cuid())
   name    String
@@ -61,23 +76,18 @@ model Location {
   lat     String
   address String
 
-  discoveredBy   User   @relation(fields: [discoveredById], references: [id])
-  discoveredById String
-
-  lunches Lunch[]
+  groupLocation GroupLocation[]
 }
 
 model Lunch {
   id   String   @id @default(cuid())
   date DateTime
 
-  group   Group  @relation(fields: [groupId], references: [id])
-  groupId String
-
   scores Score[]
 
-  location   Location @relation(fields: [locationId], references: [id])
-  locationId String
+  location        GroupLocation @relation(fields: [locationId, locationGroupId], references: [locationId, groupId])
+  locationId      String
+  locationGroupId String
 
   choosenBy User   @relation(fields: [userId], references: [id])
   userId    String

@@ -49,17 +49,19 @@ export default function GroupDetailsPage() {
           </tr>
         </thead>
         <tbody>
-          {data.group.lunches.map((lunch) => (
-            <tr key={lunch.id}>
-              <td>{new Date(lunch.date).toLocaleDateString()}</td>
-              <td>{lunch.location.name}</td>
-              <td>{lunch.choosenBy.name}</td>
-              <td>
-                {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                  lunch.scores.length}
-              </td>
-            </tr>
-          ))}
+          {data.group.locations.flatMap((loc) =>
+            loc.lunches.map((lunch) => (
+              <tr key={lunch.id}>
+                <td>{new Date(lunch.date).toLocaleDateString()}</td>
+                <td>{loc.location.name}</td>
+                <td>{lunch.choosenBy.name}</td>
+                <td>
+                  {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
+                    lunch.scores.length}
+                </td>
+              </tr>
+            ))
+          )}
         </tbody>
       </table>
     </div>

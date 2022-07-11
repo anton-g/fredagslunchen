@@ -23,7 +23,11 @@ export async function getFullUserById(id: User["id"]) {
         include: {
           lunch: {
             include: {
-              location: true,
+              location: {
+                include: {
+                  location: true,
+                },
+              },
             },
           },
         },
