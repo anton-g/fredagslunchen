@@ -12,12 +12,12 @@ export function getGroup({
   return prisma.group.findUnique({
     where: { id },
     include: {
-      locations: {
+      groupLocations: {
         include: {
           location: true,
           lunches: {
             include: {
-              location: true,
+              groupLocation: true,
               choosenBy: true,
               scores: true,
             },

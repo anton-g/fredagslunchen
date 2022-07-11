@@ -42,7 +42,7 @@ export default function GroupDetailsPage() {
           {data.user.scores.map((score) => (
             <tr key={score.id}>
               <td>{new Date(score.lunch.date).toLocaleDateString()}</td>
-              <td>{score.lunch.location.location.name}</td>
+              <td>{score.lunch.groupLocation.location.name}</td>
               <td>{score.score}</td>
             </tr>
           ))}

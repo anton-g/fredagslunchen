@@ -49,7 +49,7 @@ export default function GroupDetailsPage() {
           </tr>
         </thead>
         <tbody>
-          {data.group.locations.flatMap((loc) =>
+          {data.group.groupLocations.flatMap((loc) =>
             loc.lunches.map((lunch) => (
               <tr key={lunch.id}>
                 <td>{new Date(lunch.date).toLocaleDateString()}</td>

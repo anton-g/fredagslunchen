@@ -8,13 +8,12 @@ async function seed() {
   const email = "bassman@nosegrove.com";
   const name = "Bass Labb";
 
-  // cleanup the existing database
-  await prisma.score.delete({ where: {} }).catch(() => {});
-  await prisma.lunch.delete({ where: {} }).catch(() => {});
-  await prisma.groupLocation.delete({ where: {} }).catch(() => {});
-  await prisma.location.delete({ where: {} }).catch(() => {});
-  // await prisma.user.delete({ where: {} }).catch(() => {});
-  // await prisma.user.delete({ where: {} }).catch(() => {});
+  // TODO cleanup the existing database
+  // await prisma.score.deleteMany().catch(() => {});
+  // await prisma.lunch.deleteMany().catch(() => {});
+  // await prisma.groupLocation.deleteMany().catch(() => {});
+  // await prisma.location.deleteMany().catch(() => {});
+  // await prisma.user.deleteMany().catch(() => {});
 
   const hashedPassword = await bcrypt.hash("woopwoop", 10);
 
@@ -69,7 +68,7 @@ async function seed() {
           { user: { connect: { id: user2.id } } },
         ],
       },
-      locations: {
+      groupLocations: {
         create: [
           {
             location: { connect: { id: location.id } },

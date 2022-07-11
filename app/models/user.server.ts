@@ -23,7 +23,7 @@ export async function getFullUserById(id: User["id"]) {
         include: {
           lunch: {
             include: {
-              location: {
+              groupLocation: {
                 include: {
                   location: true,
                 },

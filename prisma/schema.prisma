@@ -36,8 +36,8 @@ model Group {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users     UsersInGroups[]
-  locations GroupLocation[]
+  users          UsersInGroups[]
+  groupLocations GroupLocation[]
 }
 
 model UsersInGroups {
@@ -85,8 +85,8 @@ model Lunch {
 
   scores Score[]
 
-  location        GroupLocation @relation(fields: [locationId, locationGroupId], references: [locationId, groupId])
-  locationId      String
+  groupLocation   GroupLocation @relation(fields: [groupLocationId, locationGroupId], references: [locationId, groupId])
+  groupLocationId String        @map("locationId")
   locationGroupId String
 
   choosenBy User   @relation(fields: [userId], references: [id])
