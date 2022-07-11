@@ -5,23 +5,22 @@ import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getGroup } from "~/models/group.server";
+import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
-import { Link } from "react-router-dom";
 
 type LoaderData = {
-  group: NonNullable<Prisma.PromiseReturnType<typeof getGroup>>;
+  user: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
+  await requireUserId(request);
+  invariant(params.userId, "userId not found");
 
-  const group = await getGroup({ userId, id: params.groupId });
-  if (!group) {
+  const user = await getFullUserById(params.userId);
+  if (!user) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ group });
+  return json<LoaderData>({ user });
 };
 
 export default function GroupDetailsPage() {
@@ -29,35 +28,22 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <h3>{data.group.name}</h3>
-      <hr />
-      <ul>
-        {data.group.users.map((user) => (
-          <li key={user.userId}>
-            <Link to={`/users/${user.userId}`}>{user.user.name}</Link>
-          </li>
-        ))}
-      </ul>
+      <h3>{data.user.name}</h3>
       <hr />
       <table>
         <thead>
           <tr>
             <th>Date</th>
             <th>Location</th>
-            <th>Choosen by</th>
-            <th>Average score</th>
+            <th>Your score</th>
           </tr>
         </thead>
         <tbody>
-          {data.group.lunches.map((lunch) => (
-            <tr key={lunch.id}>
-              <td>{new Date(lunch.date).toLocaleDateString()}</td>
-              <td>{lunch.location.name}</td>
-              <td>{lunch.choosenBy.name}</td>
-              <td>
-                {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                  lunch.scores.length}
-              </td>
+          {data.user.scores.map((score) => (
+            <tr key={score.id}>
+              <td>{new Date(score.lunch.date).toLocaleDateString()}</td>
+              <td>{score.lunch.location.name}</td>
+              <td>{score.score}</td>
             </tr>
           ))}
         </tbody>

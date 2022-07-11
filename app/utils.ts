@@ -69,3 +69,11 @@ export function useUser(): User {
 export function validateEmail(email: unknown): email is string {
   return typeof email === "string" && email.length > 3 && email.includes("@");
 }
+
+export type RecursivelyConvertDatesToStrings<T> = T extends Date
+  ? string
+  : T extends Array<infer U>
+  ? RecursivelyConvertDatesToStrings<U>[]
+  : T extends object
+  ? { [K in keyof T]: RecursivelyConvertDatesToStrings<T[K]> }
+  : T;

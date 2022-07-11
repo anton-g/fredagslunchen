@@ -5,6 +5,33 @@ import { prisma } from "~/db.server";
 
 export type { User } from "@prisma/client";
 
+export async function getFullUserById(id: User["id"]) {
+  return prisma.user.findUnique({
+    where: { id },
+    include: {
+      groups: {
+        include: {
+          group: {
+            select: {
+              id: true,
+              name: true,
+            },
+          },
+        },
+      },
+      scores: {
+        include: {
+          lunch: {
+            include: {
+              location: true,
+            },
+          },
+        },
+      },
+    },
+  });
+}
+
 export async function getUserById(id: User["id"]) {
   return prisma.user.findUnique({ where: { id } });
 }
