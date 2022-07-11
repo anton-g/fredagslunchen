@@ -28,8 +28,8 @@ export function getGroup({
   });
 }
 
-export function getAllGroups() {
-  return prisma.group.findMany();
+export function getUserGroups({ userId }: { userId: User["id"] }) {
+  return prisma.group.findMany({ where: { users: { some: { userId } } } });
 }
 
 export function createGroup({

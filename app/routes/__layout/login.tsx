@@ -10,6 +10,7 @@ import * as React from "react";
 import { createUserSession, getUserId } from "~/session.server";
 import { verifyLogin } from "~/models/user.server";
 import { safeRedirect, validateEmail } from "~/utils";
+import { Stack } from "~/components/Stack";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -28,7 +29,7 @@ export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/groups");
+  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
   const remember = formData.get("remember");
 
   if (!validateEmail(email)) {
@@ -77,7 +78,7 @@ export const meta: MetaFunction = () => {
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") || "/groups";
+  const redirectTo = searchParams.get("redirectTo") || "/";
   const actionData = useActionData() as ActionData;
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
@@ -94,63 +95,65 @@ export default function LoginPage() {
     <div>
       <div>
         <Form method="post">
-          <div>
-            <label htmlFor="email">Email address</label>
+          <Stack gap={8}>
             <div>
-              <input
-                ref={emailRef}
-                id="email"
-                required
-                autoFocus={true}
-                name="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
-              />
-              {actionData?.errors?.email && (
-                <div id="email-error">{actionData.errors.email}</div>
-              )}
+              <label htmlFor="email">Email address</label>
+              <div>
+                <input
+                  ref={emailRef}
+                  id="email"
+                  required
+                  autoFocus={true}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  aria-invalid={actionData?.errors?.email ? true : undefined}
+                  aria-describedby="email-error"
+                />
+                {actionData?.errors?.email && (
+                  <div id="email-error">{actionData.errors.email}</div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="password">Password</label>
             <div>
-              <input
-                id="password"
-                ref={passwordRef}
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
-                aria-describedby="password-error"
-              />
-              {actionData?.errors?.password && (
-                <div id="password-error">{actionData.errors.password}</div>
-              )}
+              <label htmlFor="password">Password</label>
+              <div>
+                <input
+                  id="password"
+                  ref={passwordRef}
+                  name="password"
+                  type="password"
+                  autoComplete="current-password"
+                  aria-invalid={actionData?.errors?.password ? true : undefined}
+                  aria-describedby="password-error"
+                />
+                {actionData?.errors?.password && (
+                  <div id="password-error">{actionData.errors.password}</div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <button type="submit">Log in</button>
-          <div>
+            <input type="hidden" name="redirectTo" value={redirectTo} />
+            <button type="submit">Log in</button>
             <div>
-              <input id="remember" name="remember" type="checkbox" />
-              <label htmlFor="remember">Remember me</label>
+              <div>
+                <input id="remember" name="remember" type="checkbox" />
+                <label htmlFor="remember">Remember me</label>
+              </div>
+              <div>
+                Don't have an account?{" "}
+                <Link
+                  to={{
+                    pathname: "/join",
+                    search: searchParams.toString(),
+                  }}
+                >
+                  Sign up
+                </Link>
+              </div>
             </div>
-            <div>
-              Don't have an account?{" "}
-              <Link
-                to={{
-                  pathname: "/join",
-                  search: searchParams.toString(),
-                }}
-              >
-                Sign up
-              </Link>
-            </div>
-          </div>
+          </Stack>
         </Form>
       </div>
     </div>

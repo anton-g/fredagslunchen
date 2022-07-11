@@ -11,6 +11,7 @@ import { getUserId, createUserSession } from "~/session.server";
 
 import { createUser, getUserByEmail } from "~/models/user.server";
 import { safeRedirect, validateEmail } from "~/utils";
+import { Stack } from "~/components/Stack";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -105,78 +106,80 @@ export default function Join() {
     <div>
       <div>
         <Form method="post">
-          <div>
-            <label htmlFor="email">Email address</label>
+          <Stack gap={8}>
             <div>
-              <input
-                ref={emailRef}
-                id="email"
-                required
-                autoFocus={true}
-                name="email"
-                type="email"
-                autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
-              />
-              {actionData?.errors?.email && (
-                <div id="email-error">{actionData.errors.email}</div>
-              )}
+              <label htmlFor="email">Email address</label>
+              <div>
+                <input
+                  ref={emailRef}
+                  id="email"
+                  required
+                  autoFocus={true}
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  aria-invalid={actionData?.errors?.email ? true : undefined}
+                  aria-describedby="email-error"
+                />
+                {actionData?.errors?.email && (
+                  <div id="email-error">{actionData.errors.email}</div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="name">Name</label>
             <div>
-              <input
-                ref={nameRef}
-                id="name"
-                required
-                name="name"
-                type="name"
-                autoComplete="name"
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-describedby="name-error"
-              />
-              {actionData?.errors?.name && (
-                <div id="name-error">{actionData.errors.name}</div>
-              )}
+              <label htmlFor="name">Name</label>
+              <div>
+                <input
+                  ref={nameRef}
+                  id="name"
+                  required
+                  name="name"
+                  type="name"
+                  autoComplete="name"
+                  aria-invalid={actionData?.errors?.name ? true : undefined}
+                  aria-describedby="name-error"
+                />
+                {actionData?.errors?.name && (
+                  <div id="name-error">{actionData.errors.name}</div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <label htmlFor="password">Password</label>
             <div>
-              <input
-                id="password"
-                ref={passwordRef}
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
-                aria-describedby="password-error"
-              />
-              {actionData?.errors?.password && (
-                <div id="password-error">{actionData.errors.password}</div>
-              )}
+              <label htmlFor="password">Password</label>
+              <div>
+                <input
+                  id="password"
+                  ref={passwordRef}
+                  name="password"
+                  type="password"
+                  autoComplete="new-password"
+                  aria-invalid={actionData?.errors?.password ? true : undefined}
+                  aria-describedby="password-error"
+                />
+                {actionData?.errors?.password && (
+                  <div id="password-error">{actionData.errors.password}</div>
+                )}
+              </div>
             </div>
-          </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
-          <button type="submit">Create Account</button>
-          <div>
+            <input type="hidden" name="redirectTo" value={redirectTo} />
+            <button type="submit">Create Account</button>
             <div>
-              Already have an account?{" "}
-              <Link
-                to={{
-                  pathname: "/login",
-                  search: searchParams.toString(),
-                }}
-              >
-                Log in
-              </Link>
+              <div>
+                Already have an account?{" "}
+                <Link
+                  to={{
+                    pathname: "/login",
+                    search: searchParams.toString(),
+                  }}
+                >
+                  Log in
+                </Link>
+              </div>
             </div>
-          </div>
+          </Stack>
         </Form>
       </div>
     </div>

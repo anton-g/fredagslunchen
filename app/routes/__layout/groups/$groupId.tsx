@@ -37,7 +37,11 @@ export default function GroupDetailsPage() {
     <div>
       <h3>{data.group.name}</h3>
       <hr />
-      <p>{data.group.users.map((user) => user.user.name)}</p>
+      <ul>
+        {data.group.users.map((user) => (
+          <li key={user.userId}>{user.user.name}</li>
+        ))}
+      </ul>
       <hr />
       <table>
         <thead>
