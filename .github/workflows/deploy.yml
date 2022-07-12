@@ -103,7 +103,7 @@ jobs:
           useLockFile: false
 
       - name: 🛠 Setup Database
-        run: npx prisma migrate reset --force
+        run: npm run reset-db
 
       - name: ⚙️ Build
         run: npm run build
