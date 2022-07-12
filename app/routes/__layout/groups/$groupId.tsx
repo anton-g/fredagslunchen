@@ -53,7 +53,13 @@ export default function GroupDetailsPage() {
             loc.lunches.map((lunch) => (
               <tr key={lunch.id}>
                 <td>{new Date(lunch.date).toLocaleDateString()}</td>
-                <td>{loc.location.name}</td>
+                <td>
+                  <Link
+                    to={`/groups/${data.group.id}/locations/${loc.locationId}`}
+                  >
+                    {loc.location.name}
+                  </Link>
+                </td>
                 <td>{lunch.choosenBy.name}</td>
                 <td>
                   {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /

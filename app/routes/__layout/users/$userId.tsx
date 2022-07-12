@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { getFullUserById } from "~/models/user.server";
@@ -42,7 +42,13 @@ export default function GroupDetailsPage() {
           {data.user.scores.map((score) => (
             <tr key={score.id}>
               <td>{new Date(score.lunch.date).toLocaleDateString()}</td>
-              <td>{score.lunch.groupLocation.location.name}</td>
+              <td>
+                <Link
+                  to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
+                >
+                  {score.lunch.groupLocation.location.name}
+                </Link>
+              </td>
               <td>{score.score}</td>
             </tr>
           ))}
