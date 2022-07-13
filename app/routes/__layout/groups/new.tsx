@@ -2,6 +2,9 @@ import type { ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
+import { Button } from "~/components/Button";
+import { Input } from "~/components/Input";
+import { Stack } from "~/components/Stack";
 
 import { createGroup } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
@@ -50,26 +53,30 @@ export default function NewGroupPage() {
         width: "100%",
       }}
     >
-      <div>
-        <label>
-          <span>Name: </span>
-          <input
-            ref={nameRef}
-            name="name"
-            aria-invalid={actionData?.errors?.name ? true : undefined}
-            aria-errormessage={
-              actionData?.errors?.name ? "name-error" : undefined
-            }
-          />
-        </label>
-        {actionData?.errors?.name && (
-          <div id="name-error">{actionData.errors.name}</div>
-        )}
-      </div>
+      <Stack gap={16}>
+        <div>
+          <label>
+            <span>Name</span>
+            <Input
+              ref={nameRef}
+              name="name"
+              aria-invalid={actionData?.errors?.name ? true : undefined}
+              aria-errormessage={
+                actionData?.errors?.name ? "name-error" : undefined
+              }
+            />
+          </label>
+          {actionData?.errors?.name && (
+            <div id="name-error">{actionData.errors.name}</div>
+          )}
+        </div>
 
-      <div>
-        <button type="submit">Save</button>
-      </div>
+        <div>
+          <Button style={{ marginLeft: "auto" }} type="submit">
+            Save
+          </Button>
+        </div>
+      </Stack>
     </Form>
   );
 }
