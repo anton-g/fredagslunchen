@@ -14,6 +14,7 @@ import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
 import styled from "styled-components";
 import { Input } from "~/components/Input";
+import { Checkbox } from "~/components/Checkbox";
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request);
@@ -136,8 +137,8 @@ export default function LoginPage() {
         </div>
 
         <input type="hidden" name="redirectTo" value={redirectTo} />
-        <div>
-          <input id="remember" name="remember" type="checkbox" />
+        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+          <Checkbox id="remember" name="remember" />
           <label htmlFor="remember">Remember me</label>
         </div>
         <SubmitButton type="submit">Log in</SubmitButton>

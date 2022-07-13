@@ -1,4 +1,4 @@
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 
 const Input = styled.input`
   background-color: white;
@@ -8,6 +8,8 @@ const Input = styled.input`
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  font-size: 16px;
+  padding: 2px;
 `;
 
 export { Input };

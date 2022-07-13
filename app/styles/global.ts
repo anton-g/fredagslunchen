@@ -18,4 +18,9 @@ export default createGlobalStyle`
   * {
     box-sizing: border-box;
   }
+
+  svg {
+    display: block;
+    overflow: visible;
+  }
 `;
