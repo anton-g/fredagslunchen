@@ -14,18 +14,18 @@ const Checkbox: FC<ComponentProps<typeof StyledCheckbox>> = (props) => {
 };
 
 const StyledCheckbox = styled(CheckboxPrimitive.Root)`
-  background-color: white;
+  background-color: ${({ theme }) => theme.colors.secondary};
   width: 22px;
   height: 22px;
   border-radius: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2px solid black;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
 `;
 
 const StyledIndicator = styled(CheckboxPrimitive.Indicator)`
-  color: black;
+  color: ${({ theme }) => theme.colors.primary}; ;
 `;
 
 export { Checkbox };

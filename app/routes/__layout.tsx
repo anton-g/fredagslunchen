@@ -49,8 +49,8 @@ const Header = styled.header`
 
 const Logo = styled.h1`
   a {
-    color: white;
-    background-color: black;
+    color: ${({ theme }) => theme.colors.secondary};
+    background-color: ${({ theme }) => theme.colors.primary};
     padding: 8px 48px;
     text-decoration: none;
   }
@@ -82,8 +82,8 @@ const Content = styled.main`
 `;
 
 const StyledLink = styled(Link)`
-  background-color: black;
-  color: white;
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.secondary};
   padding: 2px 4px;
 
   transform: rotateZ(2deg);

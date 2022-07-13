@@ -28,6 +28,7 @@
   ],
   "dependencies": {
     "@prisma/client": "^4.0.0",
+    "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-checkbox": "^0.1.5",
     "@radix-ui/react-icons": "^1.1.1",
     "@remix-run/node": "^1.6.3",

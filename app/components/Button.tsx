@@ -3,8 +3,8 @@ import styled, { css } from "styled-components";
 type ButtonVariant = "normal" | "round";
 
 const Button = styled.button<{ variant?: ButtonVariant }>`
-  background-color: white;
-  border: 2px solid black;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: ${({ variant }) => (variant === "normal" ? "4px" : "50%")};
   position: relative;
   transform: translate(0.15rem, -0.15em);
@@ -13,6 +13,7 @@ const Button = styled.button<{ variant?: ButtonVariant }>`
   display: flex;
   align-items: center;
   width: fit-content;
+  font-size: 16px;
 
   ${({ variant }) =>
     variant === "round" &&
@@ -29,7 +30,7 @@ const Button = styled.button<{ variant?: ButtonVariant }>`
     inset: -2px;
     width: calc(100% + 4px);
     height: calc(100% + 4px);
-    background-color: black;
+    background-color: ${({ theme }) => theme.colors.primary};
     transform: translate3d(-0.15rem, 0.15rem, -1em);
     border: inherit;
     border-radius: inherit;

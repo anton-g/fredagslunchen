@@ -1,8 +1,8 @@
 import styled from "styled-components";
 
 const Input = styled.input`
-  background-color: white;
-  border: 2px solid black;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 4px;
   position: relative;
   box-sizing: border-box;
