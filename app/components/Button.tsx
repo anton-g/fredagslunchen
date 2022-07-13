@@ -24,9 +24,9 @@ const Button = styled.button<{ variant?: ButtonVariant }>`
   transition: transform 75ms ease-in-out;
 
   ::before {
+    content: "";
     box-sizing: border-box;
     position: absolute;
-    content: "";
     inset: -2px;
     width: calc(100% + 4px);
     height: calc(100% + 4px);
