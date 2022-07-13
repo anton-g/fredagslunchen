@@ -38,6 +38,14 @@ const Button = styled.button<{ variant?: ButtonVariant }>`
     transition: inherit;
   }
 
+  &:hover {
+    transform: translate(0.11rem, -0.11rem);
+
+    ::before {
+      transform: translate3d(-0.11rem, 0.11rem, -1em);
+    }
+  }
+
   &:active {
     transform: translate(0rem, 0rem);
 
