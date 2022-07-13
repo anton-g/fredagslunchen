@@ -34,7 +34,10 @@ export function getGroup({
 }
 
 export function getUserGroups({ userId }: { userId: User["id"] }) {
-  return prisma.group.findMany({ where: { users: { some: { userId } } } });
+  return prisma.group.findMany({
+    where: { users: { some: { userId } } },
+    include: { users: { include: { user: { select: { name: true } } } } },
+  });
 }
 
 export function createGroup({

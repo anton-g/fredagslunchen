@@ -1,6 +1,10 @@
 import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { Link, NavLink, useLoaderData } from "@remix-run/react";
+import { NavLink, useLoaderData } from "@remix-run/react";
+import styled from "styled-components";
+import { Link } from "~/components/Button";
+import { Card } from "~/components/Card";
+import { Spacer } from "~/components/Spacer";
 
 import { getUserGroups } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
@@ -19,23 +23,45 @@ export default function GroupsPage() {
   const data = useLoaderData() as LoaderData;
 
   return (
-    <div>
-      <main>
-        <div>
-          {data.groups.length === 0 ? (
-            <p>No groups yet</p>
-          ) : (
-            <ol>
-              {data.groups.map((group) => (
-                <li key={group.id}>
-                  <NavLink to={`/groups/${group.id}`}>{group.name}</NavLink>
-                </li>
-              ))}
-            </ol>
-          )}
-        </div>
-        <Link to="new">+ New group</Link>
-      </main>
-    </div>
+    <main>
+      <div>
+        {data.groups.length === 0 ? (
+          <p>No groups yet</p>
+        ) : (
+          <GroupList>
+            {data.groups.map((group) => (
+              <li key={group.id}>
+                <NavLink to={`/groups/${group.id}`}>
+                  <Card>
+                    <GroupTitle>{group.name}</GroupTitle>
+                    {group.users.map((u) => u.user.name).join(", ")}
+                  </Card>
+                </NavLink>
+              </li>
+            ))}
+          </GroupList>
+        )}
+      </div>
+      <Spacer size={24} />
+      <NewGroupLink to="new">+ New group</NewGroupLink>
+    </main>
   );
 }
+
+const GroupList = styled.ul`
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  min-width: 450px;
+`;
+
+const GroupTitle = styled.h2`
+  margin: 0;
+`;
+
+const NewGroupLink = styled(Link)`
+  margin-left: auto;
+`;
