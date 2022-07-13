@@ -15,15 +15,15 @@ export default function Index() {
         <NavBar>
           {user ? (
             <>
-              <Link to={"/groups"}>groups</Link> -{" "}
+              <StyledLink to={"/groups"}>groups</StyledLink>
               <StyledForm action="/logout" method="post">
                 <LinkButton type="submit">logout</LinkButton>
               </StyledForm>
             </>
           ) : (
             <>
-              <Link to={"/join"}>register</Link> -{" "}
-              <Link to={"/login"}>login</Link>
+              <StyledLink to={"/join"}>register</StyledLink>
+              <StyledLink to={"/login"}>login</StyledLink>
             </>
           )}
         </NavBar>
@@ -56,10 +56,15 @@ const Logo = styled.h1`
   }
 `;
 
-const NavBar = styled.nav``;
+const NavBar = styled.nav`
+  display: flex;
+  gap: 16px;
+`;
 
 const StyledForm = styled(Form)`
-  display: inline;
+  position: absolute;
+  right: 16px;
+  top: 16px;
 `;
 
 const LinkButton = styled.button`
@@ -74,4 +79,16 @@ const LinkButton = styled.button`
 
 const Content = styled.main`
   margin-top: 24px;
+`;
+
+const StyledLink = styled(Link)`
+  background-color: black;
+  color: white;
+  padding: 2px 4px;
+
+  transform: rotateZ(2deg);
+
+  &:nth-child(even) {
+    transform: rotateZ(-2deg);
+  }
 `;
