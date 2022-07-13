@@ -4,11 +4,11 @@ type Axis = "horizontal" | "vertical";
 
 export const Stack = styled.div<{ gap: number; axis?: Axis }>`
   display: flex;
-  flex-direction: ${({ dir }) => (dir === "horizontal" ? "row" : "column")};
+  flex-direction: ${({ axis }) => (axis === "horizontal" ? "row" : "column")};
 
   > *:not(:last-child) {
-    ${({ dir, gap }) =>
-      dir === "horizontal"
+    ${({ axis, gap }) =>
+      axis === "horizontal"
         ? css`
             margin-right: ${gap}px;
           `
