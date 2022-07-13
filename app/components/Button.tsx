@@ -1,17 +1,8 @@
-import type { FC } from "react";
 import styled, { css } from "styled-components";
 
 type ButtonVariant = "normal" | "round";
 
-type ButtonProps = {
-  variant?: ButtonVariant;
-};
-
-export const Button: FC<ButtonProps> = ({ children, variant = "normal" }) => {
-  return <StyledButton variant={variant}>{children}</StyledButton>;
-};
-
-const StyledButton = styled.button<{ variant: ButtonVariant }>`
+const Button = styled.button<{ variant?: ButtonVariant }>`
   background-color: white;
   border: 2px solid black;
   border-radius: ${({ variant }) => (variant === "normal" ? "4px" : "50%")};
@@ -21,6 +12,7 @@ const StyledButton = styled.button<{ variant: ButtonVariant }>`
   box-sizing: border-box;
   display: flex;
   align-items: center;
+  width: fit-content;
 
   ${({ variant }) =>
     variant === "round" &&
@@ -53,3 +45,9 @@ const StyledButton = styled.button<{ variant: ButtonVariant }>`
     }
   }
 `;
+
+Button.defaultProps = {
+  variant: "normal",
+};
+
+export { Button };

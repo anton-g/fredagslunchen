@@ -12,11 +12,19 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+import GlobalStyle from "./styles/global";
 
 import { getUser } from "./session.server";
 
 export const links: LinksFunction = () => {
-  return [];
+  return [
+    { rel: "preconnect", href: "https://fonts.googleapis.com" },
+    // { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: true },
+    {
+      rel: "stylesheet",
+      href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap",
+    },
+  ];
 };
 
 export const meta: MetaFunction = () => ({
@@ -48,6 +56,7 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+        <GlobalStyle />
       </body>
     </html>
   );

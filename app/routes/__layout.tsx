@@ -9,9 +9,9 @@ export default function Index() {
   return (
     <Wrapper>
       <Header>
-        <h1>
+        <Logo>
           <Link to={"/"}>fredagslunchen</Link>
-        </h1>
+        </Logo>
         <NavBar>
           {user ? (
             <>
@@ -45,6 +45,15 @@ const Header = styled.header`
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+
+const Logo = styled.h1`
+  a {
+    color: white;
+    background-color: black;
+    padding: 8px 48px;
+    text-decoration: none;
+  }
 `;
 
 const NavBar = styled.nav``;
