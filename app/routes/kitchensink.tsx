@@ -1,8 +1,8 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons";
 import type { MetaFunction } from "@remix-run/node";
 import type { FC } from "react";
-import { Link as RemixLink } from "@remix-run/react";
-import { Button, Link } from "~/components/Button";
+import { Link } from "@remix-run/react";
+import { Button, LinkButton } from "~/components/Button";
 import { Card } from "~/components/Card";
 import { Checkbox } from "~/components/Checkbox";
 import { Input } from "~/components/Input";
@@ -45,7 +45,7 @@ export default function Join() {
               <tr>
                 <Table.Cell>Last Friday</Table.Cell>
                 <Table.Cell>
-                  <RemixLink to="/kitchensink">Franzén</RemixLink>
+                  <Link to="/kitchensink">Franzén</Link>
                 </Table.Cell>
                 <Table.Cell numeric>3</Table.Cell>
                 <Table.Cell>Very bad</Table.Cell>
@@ -53,7 +53,7 @@ export default function Join() {
               <tr>
                 <Table.Cell>2022-04-02</Table.Cell>
                 <Table.Cell>
-                  <RemixLink to="/kitchensink">WokHouse</RemixLink>
+                  <Link to="/kitchensink">WokHouse</Link>
                 </Table.Cell>
                 <Table.Cell numeric>3</Table.Cell>
                 <Table.Cell>The best restaurant in town</Table.Cell>
@@ -61,7 +61,7 @@ export default function Join() {
               <tr>
                 <Table.Cell>2021-06-23</Table.Cell>
                 <Table.Cell>
-                  <RemixLink to="/kitchensink">Franzén</RemixLink>
+                  <Link to="/kitchensink">Franzén</Link>
                 </Table.Cell>
                 <Table.Cell numeric>3</Table.Cell>
                 <Table.Cell>Meh :/</Table.Cell>
@@ -120,7 +120,7 @@ export default function Join() {
             <Button variant="round">
               <CubeIcon />
             </Button>
-            <Link to="/kitchensink">As link</Link>
+            <LinkButton to="/kitchensink">As link</LinkButton>
           </Stack>
         </Component>
         <Component title="Stack">

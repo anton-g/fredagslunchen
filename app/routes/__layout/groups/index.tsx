@@ -2,7 +2,7 @@ import type { LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
-import { Link } from "~/components/Button";
+import { LinkButton } from "~/components/Button";
 import { Card } from "~/components/Card";
 import { Spacer } from "~/components/Spacer";
 
@@ -62,6 +62,6 @@ const GroupTitle = styled.h2`
   margin: 0;
 `;
 
-const NewGroupLink = styled(Link)`
+const NewGroupLink = styled(LinkButton)`
   margin-left: auto;
 `;

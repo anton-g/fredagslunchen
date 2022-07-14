@@ -63,12 +63,12 @@ Button.defaultProps = {
   variant: "normal",
 };
 
-const Link = styled(RemixLink)<{ variant?: ButtonVariant }>`
+const LinkButton = styled(RemixLink)<{ variant?: ButtonVariant }>`
   ${styles}
 `;
 
-Link.defaultProps = {
+LinkButton.defaultProps = {
   variant: "normal",
 };
 
-export { Button, Link };
+export { Button, LinkButton };
