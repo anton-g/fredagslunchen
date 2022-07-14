@@ -1,12 +1,14 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons";
 import type { MetaFunction } from "@remix-run/node";
 import type { FC } from "react";
+import { Link as RemixLink } from "@remix-run/react";
 import { Button, Link } from "~/components/Button";
 import { Card } from "~/components/Card";
 import { Checkbox } from "~/components/Checkbox";
 import { Input } from "~/components/Input";
 import { Spacer } from "~/components/Spacer";
 import { Stack } from "~/components/Stack";
+import { Table } from "~/components/Table";
 
 export const meta: MetaFunction = () => {
   return {
@@ -18,8 +20,50 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Table">
+          <Table>
+            <Table.Head>
+              <tr>
+                <Table.Heading>Date</Table.Heading>
+                <Table.Heading>Location</Table.Heading>
+                <Table.Heading numeric>Score</Table.Heading>
+                <Table.Heading>Comment</Table.Heading>
+              </tr>
+            </Table.Head>
+            <tbody>
+              <tr>
+                <Table.Cell>Last Friday</Table.Cell>
+                <Table.Cell>
+                  <RemixLink to="/kitchensink">Franzén</RemixLink>
+                </Table.Cell>
+                <Table.Cell numeric>3</Table.Cell>
+                <Table.Cell>Very bad</Table.Cell>
+              </tr>
+              <tr>
+                <Table.Cell>2022-04-02</Table.Cell>
+                <Table.Cell>
+                  <RemixLink to="/kitchensink">WokHouse</RemixLink>
+                </Table.Cell>
+                <Table.Cell numeric>3</Table.Cell>
+                <Table.Cell>The best restaurant in town</Table.Cell>
+              </tr>
+              <tr>
+                <Table.Cell>2021-06-23</Table.Cell>
+                <Table.Cell>
+                  <RemixLink to="/kitchensink">Franzén</RemixLink>
+                </Table.Cell>
+                <Table.Cell numeric>3</Table.Cell>
+                <Table.Cell>Meh :/</Table.Cell>
+              </tr>
+            </tbody>
+          </Table>
+        </Component>
         <Component title="Card">
-          <Stack gap={24} axis="horizontal">
+          <Stack
+            gap={24}
+            axis="horizontal"
+            style={{ alignItems: "flex-start" }}
+          >
             <Card>
               Hello hello hello hello <br />
               Hello hello hello hello hello hello <br />
@@ -29,6 +73,17 @@ export default function Join() {
               Hello hello hello hello <br />
               Hello hello hello hello hello hello <br />
               hello hello
+            </Card>
+            <Card>
+              <Card>
+                <Card>
+                  <Card>
+                    <Card>
+                      <Card>:)</Card>
+                    </Card>
+                  </Card>
+                </Card>
+              </Card>
             </Card>
           </Stack>
         </Component>

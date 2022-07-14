@@ -4,10 +4,15 @@ import styled, { css } from "styled-components";
 type CardProps = {
   variant?: "normal" | "inverted";
   children: ReactNode;
+  className: string;
 };
 
-const Card = ({ variant = "normal", children }: CardProps) => {
-  return <Wrapper inverted={variant === "inverted"}>{children}</Wrapper>;
+const Card = ({ variant = "normal", children, className }: CardProps) => {
+  return (
+    <Wrapper className={className} inverted={variant === "inverted"}>
+      {children}
+    </Wrapper>
+  );
 };
 
 const Wrapper = styled.div<{ inverted: boolean }>`

@@ -42,7 +42,7 @@ export default function GroupsPage() {
           </GroupList>
         )}
       </div>
-      <Spacer size={24} />
+      <Spacer size={48} />
       <NewGroupLink to="new">+ New group</NewGroupLink>
     </main>
   );

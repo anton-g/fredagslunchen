@@ -49,6 +49,8 @@ const Header = styled.header`
 `;
 
 const Logo = styled.h1`
+  margin-bottom: 28px;
+
   a {
     color: ${({ theme }) => theme.colors.secondary};
     background-color: ${({ theme }) => theme.colors.primary};
@@ -79,7 +81,7 @@ const LinkButton = styled.button`
 `;
 
 const Content = styled.main`
-  margin-top: 24px;
+  margin-top: 48px;
 `;
 
 const StyledLink = styled(Link)`
