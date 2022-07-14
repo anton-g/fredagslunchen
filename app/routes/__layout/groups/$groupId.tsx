@@ -12,6 +12,7 @@ import styled from "styled-components";
 import { Table } from "~/components/Table";
 import { SeedAvatar } from "~/components/Avatar";
 import { Spacer } from "~/components/Spacer";
+import { LinkButton } from "~/components/Button";
 
 type LoaderData = {
   group: NonNullable<Prisma.PromiseReturnType<typeof getGroup>>;
@@ -44,7 +45,12 @@ export default function GroupDetailsPage() {
           </li>
         ))}
       </UsersList>
-      <Spacer size={36} />
+      <Spacer size={8} />
+      <ActionBar>
+        <LinkButton to="/">Add user</LinkButton>
+        <LinkButton to="/">New lunch</LinkButton>
+      </ActionBar>
+      <Spacer size={8} />
       <Table>
         <Table.Head>
           <tr>
@@ -59,7 +65,9 @@ export default function GroupDetailsPage() {
             loc.lunches.map((lunch) => (
               <tr key={lunch.id}>
                 <Table.Cell>
-                  {new Date(lunch.date).toLocaleDateString()}
+                  <Link to={`/groups/${data.group.id}/lunches/${lunch.id}`}>
+                    {new Date(lunch.date).toLocaleDateString()}
+                  </Link>
                 </Table.Cell>
                 <Table.Cell>
                   <Link
@@ -112,5 +120,11 @@ const UsersList = styled.ul`
   margin: 0;
   padding: 0;
   display: flex;
+  gap: 16px;
+`;
+
+const ActionBar = styled.div`
+  display: flex;
+  justify-content: flex-end;
   gap: 16px;
 `;

@@ -24,14 +24,14 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     groupId: params.groupId,
     id: params.locationId,
   });
-  console.log("test");
+
   if (!groupLocation) {
     throw new Response("Not Found", { status: 404 });
   }
   return json<LoaderData>({ groupLocation });
 };
 
-export default function GroupDetailsPage() {
+export default function LocationDetailsPage() {
   const { groupLocation } =
     useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
 
