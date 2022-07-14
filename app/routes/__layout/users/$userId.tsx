@@ -1,81 +1,134 @@
 import type { Prisma } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderFunction } from "@remix-run/server-runtime";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
-import { json } from "@remix-run/node";
-import { Link, useCatch, useLoaderData } from "@remix-run/react";
-import invariant from "tiny-invariant";
-
+import { useLoaderData, Link as RemixLink } from "@remix-run/react";
+import { json } from "@remix-run/server-runtime";
+import styled from "styled-components";
+import { Spacer } from "~/components/Spacer";
+import { Table } from "~/components/Table";
 import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
-import styled from "styled-components";
+import { useOptionalUser } from "~/utils";
+import invariant from "tiny-invariant";
 
 type LoaderData = {
-  user: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
+  details: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
+  isYou: boolean;
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  await requireUserId(request);
+  const userId = await requireUserId(request);
   invariant(params.userId, "userId not found");
 
-  const user = await getFullUserById(params.userId);
-  if (!user) {
+  const details = await getFullUserById(params.userId);
+  if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ user });
+  return json<LoaderData>({ details, isYou: userId === params.userId });
 };
 
-export default function UserDetailsPage() {
+export default function Index() {
+  const user = useOptionalUser();
   const data = useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
 
+  if (!user) return null;
+
+  const numberOfLunches = data.details.scores.length;
+  const averageScore =
+    data.details.scores.reduce((acc, cur) => acc + cur.score, 0) /
+    data.details.scores.length;
+  const sortedScores = data.details.scores
+    .slice()
+    .sort((a, b) => a.score - b.score);
+  const lowestScore = sortedScores[0].lunch.groupLocation.location.name;
+  const highestScore = sortedScores[1].lunch.groupLocation.location.name;
+
   return (
-    <div>
-      <Title>{data.user.name}</Title>
-      <hr />
-      <table>
-        <thead>
+    <Wrapper>
+      <Title>{data.isYou ? "You" : data.details.name}</Title>
+      <Spacer size={24} />
+      <Stats>
+        <Stat>
+          <h3>Number of lunches</h3>
+          <span>{numberOfLunches}</span>
+        </Stat>
+        <Stat>
+          <h3>Average score</h3>
+          <span>{averageScore}</span>
+        </Stat>
+        <Stat>
+          <h3>Lowest score</h3>
+          <span>{lowestScore}</span>
+        </Stat>
+        <Stat>
+          <h3>Highest score</h3>
+          <span>{highestScore}</span>
+        </Stat>
+      </Stats>
+      <Spacer size={64} />
+      <Subtitle>Lunches</Subtitle>
+      <Table>
+        <Table.Head>
           <tr>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Your score</th>
+            <Table.Heading>Date</Table.Heading>
+            <Table.Heading>Location</Table.Heading>
+            <Table.Heading numeric>Score</Table.Heading>
+            <Table.Heading>Comment</Table.Heading>
           </tr>
-        </thead>
+        </Table.Head>
         <tbody>
-          {data.user.scores.map((score) => (
+          {data.details.scores.map((score) => (
             <tr key={score.id}>
-              <td>{new Date(score.lunch.date).toLocaleDateString()}</td>
-              <td>
-                <Link
+              <Table.Cell>{score.lunch.date}</Table.Cell>
+              <Table.Cell>
+                <RemixLink
                   to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
                 >
                   {score.lunch.groupLocation.location.name}
-                </Link>
-              </td>
-              <td>{score.score}</td>
+                </RemixLink>
+              </Table.Cell>
+              <Table.Cell numeric>{score.score}</Table.Cell>
+              <Table.Cell>{score.comment}</Table.Cell>
             </tr>
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </Wrapper>
   );
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
-
-  return <div>An unexpected error occurred: {error.message}</div>;
-}
-
-export function CatchBoundary() {
-  const caught = useCatch();
-
-  if (caught.status === 404) {
-    return <div>Group not found</div>;
-  }
-
-  throw new Error(`Unexpected caught response with status: ${caught.status}`);
-}
+const Wrapper = styled.div``;
 
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
+`;
+
+const Subtitle = styled.h3`
+  margin: 0;
+  font-size: 36px;
+  margin-bottom: 16px;
+`;
+
+const Stat = styled.div`
+  display: flex;
+  flex-direction: column;
+
+  h3 {
+    font-weight: normal;
+    font-size: 14px;
+    margin: 0;
+  }
+
+  span {
+    font-weight: bold;
+    font-size: 24px;
+  }
+`;
+
+const Stats = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  max-width: 400px;
 `;
