@@ -10,6 +10,7 @@ import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 import { useOptionalUser } from "~/utils";
 import invariant from "tiny-invariant";
+import { RandomAvatar, SeedAvatar } from "~/components/Avatar";
 
 type LoaderData = {
   details: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
@@ -45,7 +46,10 @@ export default function Index() {
 
   return (
     <Wrapper>
-      <Title>{data.isYou ? "You" : data.details.name}</Title>
+      <TitleRow>
+        <SeedAvatar seed={data.details.id} />
+        <Title>{data.isYou ? "You" : data.details.name}</Title>
+      </TitleRow>
       <Spacer size={24} />
       <Stats>
         <Stat>
@@ -98,6 +102,12 @@ export default function Index() {
 }
 
 const Wrapper = styled.div``;
+
+const TitleRow = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
 
 const Title = styled.h2`
   font-size: 48px;

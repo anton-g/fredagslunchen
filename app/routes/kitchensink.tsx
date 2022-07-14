@@ -9,6 +9,7 @@ import { Input } from "~/components/Input";
 import { Spacer } from "~/components/Spacer";
 import { Stack } from "~/components/Stack";
 import { Table } from "~/components/Table";
+import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
 
 export const meta: MetaFunction = () => {
   return {
@@ -20,6 +21,16 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Avatar">
+          <Stack gap={24} axis={"horizontal"}>
+            <Avatar variant={5} />
+            <Avatar variant={5} size="medium" />
+            <Avatar variant={5} size="small" />
+            <RandomAvatar />
+            <SeedAvatar seed={"BassLabb"} />
+            <SeedAvatar seed={"Tessan"} />
+          </Stack>
+        </Component>
         <Component title="Table">
           <Table>
             <Table.Head>

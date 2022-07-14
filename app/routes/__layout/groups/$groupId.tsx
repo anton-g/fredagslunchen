@@ -10,6 +10,8 @@ import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Table } from "~/components/Table";
+import { SeedAvatar } from "~/components/Avatar";
+import { Spacer } from "~/components/Spacer";
 
 type LoaderData = {
   group: NonNullable<Prisma.PromiseReturnType<typeof getGroup>>;
@@ -32,15 +34,17 @@ export default function GroupDetailsPage() {
   return (
     <div>
       <Title>{data.group.name}</Title>
-      <hr />
-      <ul>
+      <Spacer size={8} />
+      <UsersList>
         {data.group.users.map((user) => (
           <li key={user.userId}>
-            <Link to={`/users/${user.userId}`}>{user.user.name}</Link>
+            <Link to={`/users/${user.userId}`}>
+              <SeedAvatar seed={user.userId} />
+            </Link>
           </li>
         ))}
-      </ul>
-      <hr />
+      </UsersList>
+      <Spacer size={36} />
       <Table>
         <Table.Head>
           <tr>
@@ -101,4 +105,12 @@ export function CatchBoundary() {
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
+`;
+
+const UsersList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  gap: 16px;
 `;
