@@ -8,6 +8,8 @@ import invariant from "tiny-invariant";
 import { getGroup } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
+import styled from "styled-components";
+import { Table } from "~/components/Table";
 
 type LoaderData = {
   group: NonNullable<Prisma.PromiseReturnType<typeof getGroup>>;
@@ -29,7 +31,7 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <h3>{data.group.name}</h3>
+      <Title>{data.group.name}</Title>
       <hr />
       <ul>
         {data.group.users.map((user) => (
@@ -39,37 +41,43 @@ export default function GroupDetailsPage() {
         ))}
       </ul>
       <hr />
-      <table>
-        <thead>
+      <Table>
+        <Table.Head>
           <tr>
-            <th>Date</th>
-            <th>Location</th>
-            <th>Choosen by</th>
-            <th>Average score</th>
+            <Table.Heading>Date</Table.Heading>
+            <Table.Heading>Location</Table.Heading>
+            <Table.Heading>Choosen by</Table.Heading>
+            <Table.Heading numeric>Average score</Table.Heading>
           </tr>
-        </thead>
+        </Table.Head>
         <tbody>
           {data.group.groupLocations.flatMap((loc) =>
             loc.lunches.map((lunch) => (
               <tr key={lunch.id}>
-                <td>{new Date(lunch.date).toLocaleDateString()}</td>
-                <td>
+                <Table.Cell>
+                  {new Date(lunch.date).toLocaleDateString()}
+                </Table.Cell>
+                <Table.Cell>
                   <Link
                     to={`/groups/${data.group.id}/locations/${loc.locationId}`}
                   >
                     {loc.location.name}
                   </Link>
-                </td>
-                <td>{lunch.choosenBy.name}</td>
-                <td>
+                </Table.Cell>
+                <Table.Cell>
+                  <Link to={`/users/${lunch.choosenBy.id}`}>
+                    {lunch.choosenBy.name}
+                  </Link>
+                </Table.Cell>
+                <Table.Cell numeric>
                   {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
                     lunch.scores.length}
-                </td>
+                </Table.Cell>
               </tr>
             ))
           )}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 }
@@ -89,3 +97,8 @@ export function CatchBoundary() {
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
+
+const Title = styled.h2`
+  font-size: 48px;
+  margin: 0;
+`;

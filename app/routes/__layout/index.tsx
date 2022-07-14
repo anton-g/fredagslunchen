@@ -63,7 +63,7 @@ export default function Index() {
         </Stat>
       </Stats>
       <Spacer size={64} />
-      <Subtitle>Recent lunches</Subtitle>
+      <Subtitle>Lunches</Subtitle>
       <Table>
         <Table.Head>
           <tr>

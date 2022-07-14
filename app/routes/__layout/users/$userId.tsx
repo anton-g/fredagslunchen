@@ -7,6 +7,7 @@ import invariant from "tiny-invariant";
 
 import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
+import styled from "styled-components";
 
 type LoaderData = {
   user: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
@@ -23,12 +24,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json<LoaderData>({ user });
 };
 
-export default function GroupDetailsPage() {
+export default function UserDetailsPage() {
   const data = useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
 
   return (
     <div>
-      <h3>{data.user.name}</h3>
+      <Title>{data.user.name}</Title>
       <hr />
       <table>
         <thead>
@@ -73,3 +74,8 @@ export function CatchBoundary() {
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
+
+const Title = styled.h2`
+  font-size: 48px;
+  margin: 0;
+`;

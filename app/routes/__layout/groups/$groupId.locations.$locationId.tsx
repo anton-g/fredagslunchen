@@ -8,6 +8,8 @@ import invariant from "tiny-invariant";
 import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
 import { getGroupLocation } from "~/models/location.server";
+import { Table } from "~/components/Table";
+import styled from "styled-components";
 
 type LoaderData = {
   groupLocation: NonNullable<Prisma.PromiseReturnType<typeof getGroupLocation>>;
@@ -35,33 +37,34 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <h3>{groupLocation.location.name}</h3>
-      <hr />
-      <table>
-        <thead>
+      <Title>{groupLocation.location.name}</Title>
+      <Table>
+        <Table.Head>
           <tr>
-            <th>Date</th>
-            <th>Choosen by</th>
-            <th>Average score</th>
+            <Table.Heading>Date</Table.Heading>
+            <Table.Heading>Choosen by</Table.Heading>
+            <Table.Heading>Average score</Table.Heading>
           </tr>
-        </thead>
+        </Table.Head>
         <tbody>
           {groupLocation.lunches.map((lunch) => (
             <tr key={lunch.id}>
-              <td>{new Date(lunch.date).toLocaleDateString()}</td>
-              <td>
+              <Table.Cell>
+                {new Date(lunch.date).toLocaleDateString()}
+              </Table.Cell>
+              <Table.Cell>
                 <Link to={`/users/${lunch.choosenBy.id}`}>
                   {lunch.choosenBy.name}
                 </Link>
-              </td>
-              <td>
+              </Table.Cell>
+              <Table.Cell numeric>
                 {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
                   lunch.scores.length}
-              </td>
+              </Table.Cell>
             </tr>
           ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   );
 }
@@ -81,3 +84,9 @@ export function CatchBoundary() {
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
+
+const Title = styled.h2`
+  font-size: 48px;
+  margin: 0;
+  margin-bottom: 24px;
+`;
