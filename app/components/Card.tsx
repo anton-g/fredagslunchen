@@ -4,7 +4,7 @@ import styled, { css } from "styled-components";
 type CardProps = {
   variant?: "normal" | "inverted";
   children: ReactNode;
-  className: string;
+  className?: string;
 };
 
 const Card = ({ variant = "normal", children, className }: CardProps) => {
