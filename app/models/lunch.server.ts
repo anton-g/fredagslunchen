@@ -15,7 +15,19 @@ export async function getGroupLunch({
     include: {
       discoveredBy: true,
       lunches: {
-        include: { scores: true, choosenBy: true },
+        include: {
+          scores: {
+            include: {
+              user: true,
+            },
+          },
+          choosenBy: true,
+          groupLocation: {
+            include: {
+              location: true,
+            },
+          },
+        },
       },
       location: true,
     },

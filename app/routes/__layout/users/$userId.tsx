@@ -1,6 +1,6 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/server-runtime";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatTimeAgo, RecursivelyConvertDatesToStrings } from "~/utils";
 import { useLoaderData, Link as RemixLink } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import styled from "styled-components";
@@ -11,6 +11,7 @@ import { requireUserId } from "~/session.server";
 import { useOptionalUser } from "~/utils";
 import invariant from "tiny-invariant";
 import { RandomAvatar, SeedAvatar } from "~/components/Avatar";
+import { Stat } from "~/components/Stat";
 
 type LoaderData = {
   details: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
@@ -52,22 +53,10 @@ export default function Index() {
       </TitleRow>
       <Spacer size={24} />
       <Stats>
-        <Stat>
-          <h3>Number of lunches</h3>
-          <span>{numberOfLunches}</span>
-        </Stat>
-        <Stat>
-          <h3>Average score</h3>
-          <span>{averageScore}</span>
-        </Stat>
-        <Stat>
-          <h3>Lowest score</h3>
-          <span>{lowestScore}</span>
-        </Stat>
-        <Stat>
-          <h3>Highest score</h3>
-          <span>{highestScore}</span>
-        </Stat>
+        <Stat label="Number of lunches" value={numberOfLunches} />
+        <Stat label="Average score" value={averageScore} />
+        <Stat label="Lowest score" value={lowestScore} />
+        <Stat label="Highest score" value={highestScore} />
       </Stats>
       <Spacer size={64} />
       <Subtitle>Lunches</Subtitle>
@@ -83,7 +72,9 @@ export default function Index() {
         <tbody>
           {data.details.scores.map((score) => (
             <tr key={score.id}>
-              <Table.Cell>{score.lunch.date}</Table.Cell>
+              <Table.Cell>
+                {formatTimeAgo(new Date(score.lunch.date))}
+              </Table.Cell>
               <Table.Cell>
                 <RemixLink
                   to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
@@ -118,22 +109,6 @@ const Subtitle = styled.h3`
   margin: 0;
   font-size: 36px;
   margin-bottom: 16px;
-`;
-
-const Stat = styled.div`
-  display: flex;
-  flex-direction: column;
-
-  h3 {
-    font-weight: normal;
-    font-size: 14px;
-    margin: 0;
-  }
-
-  span {
-    font-weight: bold;
-    font-size: 24px;
-  }
 `;
 
 const Stats = styled.div`

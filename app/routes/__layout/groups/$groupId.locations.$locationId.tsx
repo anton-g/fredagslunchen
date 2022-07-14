@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { json } from "@remix-run/node";
-import { Links, useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
@@ -16,7 +16,7 @@ type LoaderData = {
 };
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request);
+  await requireUserId(request);
   invariant(params.groupId, "groupId not found");
   invariant(params.locationId, "locationId not found");
 

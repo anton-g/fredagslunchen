@@ -1,13 +1,16 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatTimeAgo, RecursivelyConvertDatesToStrings } from "~/utils";
 import { json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
 import styled from "styled-components";
 import { getGroupLunch } from "~/models/lunch.server";
+import { Spacer } from "~/components/Spacer";
+import { Stat } from "~/components/Stat";
+import { Table } from "~/components/Table";
 
 type LoaderData = {
   groupLunch: NonNullable<Prisma.PromiseReturnType<typeof getGroupLunch>>;
@@ -33,36 +36,51 @@ export default function LunchDetailsPage() {
   const { groupLunch } =
     useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
 
+  const sortedScores = groupLunch.scores
+    .slice()
+    .sort((a, b) => a.score - b.score);
+  const lowestScore = sortedScores[0].score;
+  const highestScore = sortedScores[1].score;
+
   return (
     <div>
-      <Title>{groupLunch.date}</Title>
-      {/* <Table>
+      <Title>
+        {formatTimeAgo(new Date(groupLunch.date))} at{" "}
+        {groupLunch.groupLocation.location.name}
+      </Title>
+      <Spacer size={24} />
+      <Stats>
+        <Stat
+          label="Average score"
+          value={
+            groupLunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
+            groupLunch.scores.length
+          }
+        />
+        <Stat label="Highest score" value={highestScore} />
+        <Stat label="Lowest score" value={lowestScore} />
+      </Stats>
+      <Spacer size={24} />
+      <Subtitle>Scores</Subtitle>
+      <Spacer size={16} />
+      <Table>
         <Table.Head>
           <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading>Average score</Table.Heading>
+            <Table.Heading>By</Table.Heading>
+            <Table.Heading>Score</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
-          {groupLocation.lunches.map((lunch) => (
-            <tr key={lunch.id}>
+          {groupLunch.scores.map((score) => (
+            <tr key={score.id}>
               <Table.Cell>
-                {new Date(lunch.date).toLocaleDateString()}
+                <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
               </Table.Cell>
-              <Table.Cell>
-                <Link to={`/users/${lunch.choosenBy.id}`}>
-                  {lunch.choosenBy.name}
-                </Link>
-              </Table.Cell>
-              <Table.Cell numeric>
-                {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                  lunch.scores.length}
-              </Table.Cell>
+              <Table.Cell numeric>{score.score}</Table.Cell>
             </tr>
           ))}
         </tbody>
-      </Table> */}
+      </Table>
     </div>
   );
 }
@@ -86,5 +104,15 @@ export function CatchBoundary() {
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
-  margin-bottom: 24px;
+`;
+
+const Stats = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 24px;
+  max-width: 600px;
+`;
+
+const Subtitle = styled.h3`
+  margin: 0;
 `;
