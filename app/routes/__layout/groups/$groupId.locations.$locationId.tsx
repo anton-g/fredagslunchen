@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const groupLocation = await getGroupLocation({
     groupId: params.groupId,
-    id: params.locationId,
+    id: parseInt(params.locationId),
   });
 
   if (!groupLocation) {

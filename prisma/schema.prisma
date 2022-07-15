@@ -59,7 +59,7 @@ model GroupLocation {
   groupId String
 
   location   Location @relation(fields: [locationId], references: [id])
-  locationId String
+  locationId Int
 
   lunches Lunch[]
 
@@ -70,7 +70,7 @@ model GroupLocation {
 }
 
 model Location {
-  id      String @id @default(cuid())
+  id      Int    @id @default(autoincrement())
   name    String
   lon     String
   lat     String
@@ -80,13 +80,13 @@ model Location {
 }
 
 model Lunch {
-  id   String   @id @default(cuid())
+  id   Int      @id @default(autoincrement())
   date DateTime
 
   scores Score[]
 
   groupLocation   GroupLocation @relation(fields: [groupLocationId, locationGroupId], references: [locationId, groupId])
-  groupLocationId String        @map("locationId")
+  groupLocationId Int           @map("locationId")
   locationGroupId String
 
   choosenBy User   @relation(fields: [userId], references: [id])
@@ -94,14 +94,14 @@ model Lunch {
 }
 
 model Score {
-  id    String @id @default(cuid())
+  id    Int @id @default(autoincrement())
   score Int
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  lunch   Lunch  @relation(fields: [lunchId], references: [id])
-  lunchId String
+  lunch   Lunch @relation(fields: [lunchId], references: [id])
+  lunchId Int
 
   comment String?
 }

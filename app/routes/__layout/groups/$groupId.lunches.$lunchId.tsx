@@ -23,7 +23,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
 
   const groupLunch = await getGroupLunch({
     groupId: params.groupId,
-    id: params.lunchId,
+    id: parseInt(params.lunchId),
   });
 
   if (!groupLunch) {
