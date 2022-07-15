@@ -31,6 +31,7 @@
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-checkbox": "^0.1.5",
     "@radix-ui/react-icons": "^1.1.1",
+    "@radix-ui/react-select": "^0.1.1",
     "@radix-ui/react-switch": "^0.1.5",
     "@remix-run/node": "^1.6.3",
     "@remix-run/react": "^1.6.3",

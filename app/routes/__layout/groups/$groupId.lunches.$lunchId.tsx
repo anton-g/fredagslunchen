@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
-import { formatTimeAgo, RecursivelyConvertDatesToStrings } from "~/utils";
+import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
 import { Link, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";

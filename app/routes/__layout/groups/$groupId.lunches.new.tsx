@@ -7,7 +7,6 @@ import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { Stack } from "~/components/Stack";
 
-import { createGroup } from "~/models/group.server";
 import { createLunch } from "~/models/lunch.server";
 import { requireUserId } from "~/session.server";
 
@@ -20,7 +19,7 @@ type ActionData = {
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request);
+  await requireUserId(request);
 
   const formData = await request.formData();
   const date = formData.get("date");

@@ -11,6 +11,7 @@ import { Stack } from "~/components/Stack";
 import { Table } from "~/components/Table";
 import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
 import { Switch, SwitchThumb } from "~/components/Switch";
+import { Select } from "~/components/Select";
 
 export const meta: MetaFunction = () => {
   return {
@@ -22,6 +23,75 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Select">
+          <Select defaultValue="banana">
+            <Select.Group>
+              <Select.Label>Fruits</Select.Label>
+              <Select.Item value="apple">
+                <Select.ItemText>Apple</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="banana">
+                <Select.ItemText>Banana</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="blueberry">
+                <Select.ItemText>Blueberry</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="grapes">
+                <Select.ItemText>Grapes</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="pineapple">
+                <Select.ItemText>Pineapple</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+            </Select.Group>
+
+            <Select.Separator />
+
+            <Select.Group>
+              <Select.Label>Vegetables</Select.Label>
+              <Select.Item value="aubergine">
+                <Select.ItemText>Aubergine</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="broccoli">
+                <Select.ItemText>Broccoli</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="carrot" disabled>
+                <Select.ItemText>Carrot</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="courgette">
+                <Select.ItemText>Courgette</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+              <Select.Item value="leek">
+                <Select.ItemText>leek</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+            </Select.Group>
+
+            <Select.Separator />
+
+            <Select.Group>
+              <Select.Label>Meat</Select.Label>
+              <Select.Item value="beef">
+                <Select.ItemText>Beef</Select.ItemText>
+                <Select.ItemIndicator />
+                <Select.ItemText>Chicken</Select.ItemText>
+                <Select.ItemIndicator />
+                <Select.ItemText>Lamb</Select.ItemText>
+                <Select.ItemIndicator />
+                <Select.ItemText>Pork</Select.ItemText>
+                <Select.ItemIndicator />
+              </Select.Item>
+            </Select.Group>
+          </Select>
+        </Component>
         <Component title="Switch">
           <Stack gap={24} axis={"horizontal"}>
             <Switch>
