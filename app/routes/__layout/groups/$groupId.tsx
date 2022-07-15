@@ -48,7 +48,9 @@ export default function GroupDetailsPage() {
       <Spacer size={8} />
       <ActionBar>
         <LinkButton to="/">Add user</LinkButton>
-        <LinkButton to="/">New lunch</LinkButton>
+        <LinkButton to={`/groups/${data.group.id}/lunches/new`}>
+          New lunch
+        </LinkButton>
       </ActionBar>
       <Spacer size={8} />
       <Table>

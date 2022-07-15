@@ -26,6 +26,8 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     id: parseInt(params.lunchId),
   });
 
+  console.log("hm", groupLunch);
+
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -36,11 +38,18 @@ export default function LunchDetailsPage() {
   const { groupLunch } =
     useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
 
+  const scores = groupLunch.scores;
+
   const sortedScores = groupLunch.scores
     .slice()
     .sort((a, b) => a.score - b.score);
-  const lowestScore = sortedScores[0].score;
-  const highestScore = sortedScores[1].score;
+  const lowestScore = sortedScores[0]?.score;
+  const highestScore = sortedScores[1]?.score;
+
+  const averageScore =
+    scores.length > 0
+      ? scores.reduce((acc, cur) => acc + cur.score, 0) / scores.length
+      : "N/A";
 
   return (
     <div>
@@ -50,15 +59,9 @@ export default function LunchDetailsPage() {
       </Title>
       <Spacer size={24} />
       <Stats>
-        <Stat
-          label="Average score"
-          value={
-            groupLunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-            groupLunch.scores.length
-          }
-        />
-        <Stat label="Highest score" value={highestScore} />
-        <Stat label="Lowest score" value={lowestScore} />
+        <Stat label="Average score" value={averageScore} />
+        <Stat label="Highest score" value={highestScore || "N/A"} />
+        <Stat label="Lowest score" value={lowestScore || "N/A"} />
       </Stats>
       <Spacer size={24} />
       <Subtitle>Scores</Subtitle>
@@ -71,7 +74,7 @@ export default function LunchDetailsPage() {
           </tr>
         </Table.Head>
         <tbody>
-          {groupLunch.scores.map((score) => (
+          {scores.map((score) => (
             <tr key={score.id}>
               <Table.Cell>
                 <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
@@ -104,6 +107,10 @@ export function CatchBoundary() {
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
+
+  ::first-letter {
+    text-transform: uppercase;
+  }
 `;
 
 const Stats = styled.div`

@@ -85,12 +85,13 @@ model Lunch {
 
   scores Score[]
 
-  groupLocation   GroupLocation @relation(fields: [groupLocationId, locationGroupId], references: [locationId, groupId])
-  groupLocationId Int           @map("locationId")
-  locationGroupId String
+  groupLocation           GroupLocation @relation(fields: [groupLocationLocationId, groupLocationGroupId], references: [locationId, groupId])
+  groupLocationLocationId Int
+  groupLocationGroupId    String
 
-  choosenBy User   @relation(fields: [userId], references: [id])
-  userId    String
+  choosenBy       User   @relation(fields: [choosenByUserId], references: [id])
+  choosenByUserId String @map("userId")
+
 }
 
 model Score {
