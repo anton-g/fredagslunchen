@@ -43,7 +43,7 @@ export const RandomAvatar = ({
   return <Avatar size={size} variant={variant}></Avatar>;
 };
 
-const availableFaces = 12;
+const availableFaces = 30;
 export const SeedAvatar = ({
   size = "medium",
   seed,
