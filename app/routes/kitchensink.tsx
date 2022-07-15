@@ -10,6 +10,7 @@ import { Spacer } from "~/components/Spacer";
 import { Stack } from "~/components/Stack";
 import { Table } from "~/components/Table";
 import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
+import { Switch, SwitchThumb } from "~/components/Switch";
 
 export const meta: MetaFunction = () => {
   return {
@@ -21,6 +22,16 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Switch">
+          <Stack gap={24} axis={"horizontal"}>
+            <Switch>
+              <SwitchThumb />
+            </Switch>
+            <Switch defaultChecked>
+              <SwitchThumb />
+            </Switch>
+          </Stack>
+        </Component>
         <Component title="Avatar">
           <Stack gap={24} axis={"horizontal"}>
             <Avatar variant={5} />
