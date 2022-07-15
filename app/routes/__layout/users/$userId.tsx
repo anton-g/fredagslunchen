@@ -1,7 +1,8 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/server-runtime";
-import { formatTimeAgo, RecursivelyConvertDatesToStrings } from "~/utils";
-import { useLoaderData, Link as RemixLink } from "@remix-run/react";
+import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatTimeAgo } from "~/utils";
+import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import styled from "styled-components";
 import { Spacer } from "~/components/Spacer";
@@ -10,7 +11,7 @@ import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
 import { useOptionalUser } from "~/utils";
 import invariant from "tiny-invariant";
-import { RandomAvatar, SeedAvatar } from "~/components/Avatar";
+import { SeedAvatar } from "~/components/Avatar";
 import { Stat } from "~/components/Stat";
 
 type LoaderData = {
@@ -47,52 +48,70 @@ export default function Index() {
 
   return (
     <Wrapper>
-      <TitleRow>
-        <SeedAvatar seed={data.details.id} />
-        <Title>{data.isYou ? "You" : data.details.name}</Title>
-      </TitleRow>
-      <Spacer size={24} />
-      <Stats>
-        <Stat label="Number of lunches" value={numberOfLunches} />
-        <Stat label="Average score" value={averageScore} />
-        <Stat label="Lowest score" value={lowestScore} />
-        <Stat label="Highest score" value={highestScore} />
-      </Stats>
+      <Section>
+        <TitleRow>
+          <SeedAvatar seed={data.details.id} />
+          <Title>{data.isYou ? "You" : data.details.name}</Title>
+        </TitleRow>
+        <Spacer size={24} />
+        <Stats>
+          <Stat label="Number of lunches" value={numberOfLunches} />
+          <Stat label="Average score" value={averageScore} />
+          <Stat label="Lowest score" value={lowestScore} />
+          <Stat label="Highest score" value={highestScore} />
+        </Stats>
+      </Section>
       <Spacer size={64} />
-      <Subtitle>Lunches</Subtitle>
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Location</Table.Heading>
-            <Table.Heading numeric>Score</Table.Heading>
-            <Table.Heading>Comment</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {data.details.scores.map((score) => (
-            <tr key={score.id}>
-              <Table.Cell>
-                {formatTimeAgo(new Date(score.lunch.date))}
-              </Table.Cell>
-              <Table.Cell>
-                <RemixLink
-                  to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
-                >
-                  {score.lunch.groupLocation.location.name}
-                </RemixLink>
-              </Table.Cell>
-              <Table.Cell numeric>{score.score}</Table.Cell>
-              <Table.Cell>{score.comment}</Table.Cell>
+      <Section>
+        <Subtitle>Lunches</Subtitle>
+        <Table>
+          <Table.Head>
+            <tr>
+              <Table.Heading>Date</Table.Heading>
+              <Table.Heading>Location</Table.Heading>
+              <Table.Heading numeric>Score</Table.Heading>
+              <Table.Heading>Choosen by</Table.Heading>
+              <Table.Heading>Comment</Table.Heading>
             </tr>
-          ))}
-        </tbody>
-      </Table>
+          </Table.Head>
+          <tbody>
+            {data.details.scores.map((score) => (
+              <tr key={score.id}>
+                <Table.Cell>
+                  <Link
+                    to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
+                  >
+                    {formatTimeAgo(new Date(score.lunch.date))}
+                  </Link>
+                </Table.Cell>
+                <Table.Cell>
+                  <Link
+                    to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
+                  >
+                    {score.lunch.groupLocation.location.name}
+                  </Link>
+                </Table.Cell>
+                <Table.Cell numeric>{score.score}</Table.Cell>
+                <Table.Cell>
+                  <Link to={`/users/${score.lunch.choosenBy.id}`}>
+                    {score.lunch.choosenBy.name}
+                  </Link>
+                </Table.Cell>
+                <Table.Cell>{score.comment}</Table.Cell>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+      </Section>
     </Wrapper>
   );
 }
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
 
 const TitleRow = styled.div`
   display: flex;
@@ -114,6 +133,9 @@ const Subtitle = styled.h3`
 const Stats = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 24px;
+  gap: 24px 48px;
   max-width: 400px;
+  width: 100%;
 `;
+
+const Section = styled.div``;

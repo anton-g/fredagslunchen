@@ -28,6 +28,7 @@ export async function getFullUserById(id: User["id"]) {
                   location: true,
                 },
               },
+              choosenBy: true,
             },
           },
         },
