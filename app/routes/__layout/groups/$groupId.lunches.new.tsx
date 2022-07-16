@@ -55,16 +55,16 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  if (typeof locationId !== "string" || locationId.length === 0) {
+  if (typeof choosenById !== "string" || choosenById.length === 0) {
     return json<ActionData>(
-      { errors: { locationId: "Location is required" } },
+      { errors: { choosenById: "Choosen by is required" } },
       { status: 400 }
     );
   }
 
-  if (typeof choosenById !== "string" || choosenById.length === 0) {
+  if (typeof locationId !== "string" || locationId.length === 0) {
     return json<ActionData>(
-      { errors: { choosenById: "Choosen by is required" } },
+      { errors: { locationId: "Location is required" } },
       { status: 400 }
     );
   }
@@ -84,17 +84,17 @@ export default function NewLunchPage() {
   const actionData = useActionData() as ActionData;
   const loaderData =
     useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
-  const choosenByRef = useRef<HTMLInputElement>(null);
-  const locationRef = useRef<HTMLInputElement>(null);
+  const choosenByRef = useRef<HTMLInputElement>(null!);
+  const locationRef = useRef<HTMLInputElement>(null!);
   const dateRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (actionData?.errors?.date) {
       dateRef.current?.focus();
-    } else if (actionData?.errors?.locationId) {
-      locationRef.current?.focus();
     } else if (actionData?.errors?.choosenById) {
       choosenByRef.current?.focus();
+    } else if (actionData?.errors?.locationId) {
+      locationRef.current?.focus();
     }
   }, [actionData]);
 
@@ -145,6 +145,7 @@ export default function NewLunchPage() {
             name="choosenBy"
             defaultItems={users}
             defaultSelectedKey={user.id}
+            inputRef={choosenByRef}
           >
             {(item) => (
               <Item textValue={item.name}>
@@ -160,7 +161,12 @@ export default function NewLunchPage() {
         </div>
 
         <div>
-          <ComboBox label="Location" defaultItems={locations} name="location">
+          <ComboBox
+            label="Location"
+            name="location"
+            defaultItems={locations}
+            inputRef={locationRef}
+          >
             {(item) => (
               <Item textValue={item.name}>
                 <div>

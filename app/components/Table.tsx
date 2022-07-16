@@ -11,10 +11,12 @@ const Table = ({ children }: { children: ReactNode }) => {
 };
 
 const Wrapper = styled(Card)`
-  width: fit-content;
+  width: 100%;
 `;
 
-const Root = styled.table``;
+const Root = styled.table`
+  width: 100%;
+`;
 
 const Head = styled.thead``;
 

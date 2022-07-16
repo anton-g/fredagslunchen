@@ -17,6 +17,11 @@ export default createGlobalStyle`
 
   * {
     box-sizing: border-box;
+    
+    ::selection {
+      color: ${({ theme }) => theme.colors.secondary};
+      background: ${({ theme }) => theme.colors.primary};
+    }
   }
 
   svg {

@@ -56,11 +56,11 @@ export default function App() {
       <body>
         <ThemeProvider theme={theme}>
           <Outlet />
+          <GlobalStyle />
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
-        <GlobalStyle />
       </body>
     </html>
   );
