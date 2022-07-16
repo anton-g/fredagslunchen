@@ -12,6 +12,8 @@ const Input = styled.input`
   padding: 6px 8px;
   min-width: 175px;
   width: 100%;
+  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
+    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 `;
 
 export { Input };
