@@ -5,9 +5,9 @@ const StyledSwitch = styled(SwitchPrimitive.Root)`
   all: unset;
   width: 42px;
   height: 25px;
-  background-color: white;
+  background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: 9999px;
-  border: 2px solid black;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   position: relative;
 
   &:focus {
@@ -19,7 +19,7 @@ const StyledThumb = styled(SwitchPrimitive.Thumb)`
   display: block;
   width: 21px;
   height: 21px;
-  background-color: black;
+  background-color: ${({ theme }) => theme.colors.primary};
   border-radius: 9999px;
   transition: transform 100ms;
   transform: translateX(2px);

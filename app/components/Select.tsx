@@ -38,19 +38,19 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger)`
   align-items: center;
   justify-content: center;
   border-radius: 4px;
-  border: 2px solid black;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   padding: 0 15px;
   font-size: 16px;
   line-height: 1px;
   height: 35px;
   gap: 5px;
-  background-color: white;
-  color: black;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const StyledContent = styled(SelectPrimitive.Content)`
   overflow: hidden;
-  background-color: white;
+  background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: 6px;
   box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
@@ -64,7 +64,7 @@ const StyledItem = styled(SelectPrimitive.Item)`
   all: unset;
   font-size: 16px;
   line-height: 1px;
-  color: black;
+  color: ${({ theme }) => theme.colors.primary};
   border-radius: 3px;
   display: flex;
   align-items: center;
@@ -77,8 +77,8 @@ const StyledItem = styled(SelectPrimitive.Item)`
     pointer-events: none;
   }
   &:focus {
-    background-color: black;
-    color: white;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.secondary};
   }
 `;
 
@@ -87,12 +87,12 @@ const StyledLabel = styled(SelectPrimitive.Label)`
   font-size: 14px;
   line-height: 25px;
   text-decoration: underline;
-  color: black;
+  color: ${({ theme }) => theme.colors.primary};
 `;
 
 const StyledSeparator = styled(SelectPrimitive.Separator)`
   height: 1px;
-  background-color: black;
+  background-color: ${({ theme }) => theme.colors.primary};
   margin: 5px;
 `;
 
@@ -110,8 +110,8 @@ const scrollButtonStyles = css`
   align-items: center;
   justify-content: center;
   height: 25px;
-  background-color: white;
-  color: black;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  color: ${({ theme }) => theme.colors.primary};
   cursor: default;
 `;
 

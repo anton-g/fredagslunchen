@@ -10,23 +10,10 @@ interface PopoverProps {
   onClose?: () => void;
 }
 
-const Wrapper = styled.div`
-  position: absolute;
-  top: 100%;
-  z-index: 1;
-  width: 100%;
-  border: 2px solid black;
-  border-radius: 4px;
-  margin-top: 6px;
-  background: white;
-`;
-
 export function Popover(props: PopoverProps) {
   let ref = React.useRef<HTMLDivElement>(null);
   let { popoverRef = ref, isOpen, onClose, children } = props;
 
-  // Handle events that should cause the popup to close,
-  // e.g. blur, clicking outside, or pressing the escape key.
   let { overlayProps } = useOverlay(
     {
       isOpen,
@@ -37,8 +24,6 @@ export function Popover(props: PopoverProps) {
     popoverRef
   );
 
-  // Add a hidden <DismissButton> component at the end of the popover
-  // to allow screen reader users to dismiss the popup easily.
   return (
     <FocusScope restoreFocus>
       <Wrapper {...overlayProps} ref={popoverRef}>
@@ -48,3 +33,14 @@ export function Popover(props: PopoverProps) {
     </FocusScope>
   );
 }
+
+const Wrapper = styled.div`
+  position: absolute;
+  top: 100%;
+  z-index: 1;
+  width: 100%;
+  border: 2px solid ${({ theme }) => theme.colors.primary};
+  border-radius: 4px;
+  margin-top: 6px;
+  background: ${({ theme }) => theme.colors.secondary};
+`;

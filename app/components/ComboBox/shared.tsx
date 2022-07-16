@@ -4,7 +4,6 @@ export const Wrapper = styled.div`
   display: inline-flex;
   flex-direction: column;
   position: relative;
-  margin-top: 20px;
 `;
 
 export const Label = styled.label`

@@ -16,28 +16,19 @@ interface OptionProps {
   state: ListState<unknown>;
 }
 
-const List = styled.ul`
-  max-height: 300px;
-  overflow: auto;
-  list-style: none;
-  padding: 0;
-  margin: 4px 0;
-  outline: none;
-`;
-
 interface ListItemProps {
   isFocused?: boolean;
   isSelected?: boolean;
 }
 
 const ListItem = styled.li<ListItemProps>`
-  background: ${(props) => (props.isFocused ? "black" : "")};
+  background: ${(props) => (props.isFocused ? props.theme.colors.primary : "")};
   color: ${(props) =>
-    props.isFocused ? "white" : props.isSelected ? "black" : "#333"};
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
-  font-size: 14px;
-  font-weight: ${(props) => (props.isSelected ? "600" : "normal")};
+    props.isFocused
+      ? props.theme.colors.secondary
+      : props.theme.colors.primary};
+  font-size: 16px;
+  font-weight: ${(props) => (props.isSelected ? "bold" : "normal")};
   padding: 8px;
   display: flex;
   align-items: center;
@@ -64,6 +55,15 @@ export function ListBox(props: ListBoxProps) {
     </List>
   );
 }
+
+const List = styled.ul`
+  max-height: 300px;
+  overflow: auto;
+  list-style: none;
+  padding: 0;
+  margin: 4px 0;
+  outline: none;
+`;
 
 interface OptionContextValue {
   labelProps: React.HTMLAttributes<HTMLElement>;
@@ -105,21 +105,10 @@ function Option({ item, state }: OptionProps) {
   );
 }
 
-// The Label and Description components will be used within an <Item>.
-// They receive props from the OptionContext defined above.
-// This ensures that the option is ARIA labelled by the label, and
-// described by the description, which makes for better announcements
-// for screen reader users.
-
 export function Label({ children }: { children: React.ReactNode }) {
   let { labelProps } = React.useContext(OptionContext);
   return <div {...labelProps}>{children}</div>;
 }
-
-const StyledDescription = styled.div`
-  font-weight: normal;
-  font-size: 12px;
-`;
 
 export function Description({ children }: { children: React.ReactNode }) {
   let { descriptionProps } = React.useContext(OptionContext);
@@ -127,3 +116,8 @@ export function Description({ children }: { children: React.ReactNode }) {
     <StyledDescription {...descriptionProps}>{children}</StyledDescription>
   );
 }
+
+const StyledDescription = styled.div`
+  font-weight: normal;
+  font-size: 12px;
+`;

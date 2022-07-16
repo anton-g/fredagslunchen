@@ -9,7 +9,7 @@ const Input = styled.input`
   display: flex;
   align-items: center;
   font-size: 16px;
-  padding: 2px;
+  padding: 6px 8px;
   min-width: 175px;
   width: fit-content;
 `;
