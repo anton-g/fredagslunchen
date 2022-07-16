@@ -11,7 +11,7 @@ const Input = styled.input`
   font-size: 16px;
   padding: 6px 8px;
   min-width: 175px;
-  width: fit-content;
+  width: 100%;
 `;
 
 export { Input };

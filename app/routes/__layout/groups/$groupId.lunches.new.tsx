@@ -2,7 +2,7 @@ import type { Prisma } from "@prisma/client";
 import type { ActionFunction, LoaderFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import * as React from "react";
+import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
 import { ComboBox, Description, Item, Label } from "~/components/ComboBox";
@@ -48,7 +48,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   const groupId = params.groupId;
   invariant(groupId, "groupId not found");
 
-  // TODO handle all errors
   if (typeof date !== "string" || date.length === 0) {
     return json<ActionData>(
       { errors: { date: "Date is required" } },
@@ -85,11 +84,11 @@ export default function NewLunchPage() {
   const actionData = useActionData() as ActionData;
   const loaderData =
     useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
-  const choosenByRef = React.useRef<HTMLInputElement>(null);
-  const locationRef = React.useRef<HTMLInputElement>(null);
-  const dateRef = React.useRef<HTMLInputElement>(null);
+  const choosenByRef = useRef<HTMLInputElement>(null);
+  const locationRef = useRef<HTMLInputElement>(null);
+  const dateRef = useRef<HTMLInputElement>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (actionData?.errors?.date) {
       dateRef.current?.focus();
     } else if (actionData?.errors?.locationId) {
@@ -102,6 +101,7 @@ export default function NewLunchPage() {
   const locations = loaderData.group.groupLocations.map((x) => ({
     id: x.locationId,
     name: x.location.name,
+    description: x.location.address,
   }));
 
   const users = loaderData.group.users.map((x) => ({
@@ -125,6 +125,7 @@ export default function NewLunchPage() {
             <span>Date</span>
             <Input
               ref={dateRef}
+              defaultValue={new Date().toISOString().split("T")[0]}
               name="date"
               type="date"
               aria-invalid={actionData?.errors?.date ? true : undefined}
@@ -139,22 +140,6 @@ export default function NewLunchPage() {
         </div>
 
         <div>
-          <ComboBox label="Location" defaultItems={locations} name="location">
-            {(item) => (
-              <Item textValue={item.name}>
-                <div>
-                  <Label>{item.name}</Label>
-                  <Description>foo</Description>
-                </div>
-              </Item>
-            )}
-          </ComboBox>
-          {actionData?.errors?.locationId && (
-            <div id="location-error">{actionData.errors.locationId}</div>
-          )}
-        </div>
-
-        <div>
           <ComboBox
             label="Choosen by"
             name="choosenBy"
@@ -165,13 +150,28 @@ export default function NewLunchPage() {
               <Item textValue={item.name}>
                 <div>
                   <Label>{item.name}</Label>
-                  <Description>foo</Description>
                 </div>
               </Item>
             )}
           </ComboBox>
           {actionData?.errors?.choosenById && (
             <div id="choosenBy-error">{actionData.errors.choosenById}</div>
+          )}
+        </div>
+
+        <div>
+          <ComboBox label="Location" defaultItems={locations} name="location">
+            {(item) => (
+              <Item textValue={item.name}>
+                <div>
+                  <Label>{item.name}</Label>
+                  <Description>{item.description}</Description>
+                </div>
+              </Item>
+            )}
+          </ComboBox>
+          {actionData?.errors?.locationId && (
+            <div id="location-error">{actionData.errors.locationId}</div>
           )}
         </div>
 

@@ -72,7 +72,8 @@ export default function LunchDetailsPage() {
         <Table.Head>
           <tr>
             <Table.Heading>By</Table.Heading>
-            <Table.Heading>Score</Table.Heading>
+            <Table.Heading numeric>Score</Table.Heading>
+            <Table.Heading>Comment</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -82,6 +83,7 @@ export default function LunchDetailsPage() {
                 <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
               </Table.Cell>
               <Table.Cell numeric>{score.score}</Table.Cell>
+              <Table.Cell>{score.comment}</Table.Cell>
             </tr>
           ))}
         </tbody>
