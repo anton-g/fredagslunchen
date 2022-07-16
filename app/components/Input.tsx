@@ -10,7 +10,8 @@ const Input = styled.input`
   align-items: center;
   font-size: 16px;
   padding: 2px;
-  width: 100%;
+  min-width: 175px;
+  width: fit-content;
 `;
 
 export { Input };
