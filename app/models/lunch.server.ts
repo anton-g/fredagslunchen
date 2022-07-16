@@ -22,6 +22,15 @@ export async function getGroupLunch({
       groupLocation: {
         include: {
           location: true,
+          group: {
+            include: {
+              users: {
+                include: {
+                  user: true,
+                },
+              },
+            },
+          },
         },
       },
     },

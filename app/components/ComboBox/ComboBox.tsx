@@ -11,17 +11,22 @@ import { useButton } from "@react-aria/button";
 import { ChevronDownIcon } from "@radix-ui/react-icons";
 import { Wrapper, Label } from "./shared";
 import { Input } from "../Input";
+import { useRef } from "react";
 
 export { Item, Section } from "@react-stately/collections";
 
-export function ComboBox<T extends object>(props: ComboBoxProps<T>) {
+export const ComboBox = <T extends object>(
+  props: ComboBoxProps<T> & {
+    inputRef?: React.MutableRefObject<HTMLInputElement>;
+  }
+) => {
   let { contains } = useFilter({ sensitivity: "base" });
   let state = useComboBoxState({ ...props, defaultFilter: contains });
 
-  let buttonRef = React.useRef(null);
-  let inputRef = React.useRef(null);
-  let listBoxRef = React.useRef(null);
-  let popoverRef = React.useRef(null);
+  let buttonRef = useRef(null);
+  let inputRef = useRef<HTMLInputElement>(null!);
+  let listBoxRef = useRef(null);
+  let popoverRef = useRef(null);
 
   let {
     buttonProps: triggerProps,
@@ -47,7 +52,14 @@ export function ComboBox<T extends object>(props: ComboBoxProps<T>) {
       <InputGroup isFocused={state.isFocused}>
         <ComboBoxInput
           {...inputProps}
-          ref={inputRef}
+          ref={(node) => {
+            if (!node) return;
+
+            inputRef.current = node;
+            if (props.inputRef) {
+              props.inputRef.current = node;
+            }
+          }}
           isFocused={state.isFocused}
         />
         <input
@@ -73,7 +85,7 @@ export function ComboBox<T extends object>(props: ComboBoxProps<T>) {
       )}
     </Wrapper>
   );
-}
+};
 
 interface StyleProps {
   isFocused?: boolean;

@@ -66,7 +66,7 @@ const NavBar = styled.nav`
 
 const StyledForm = styled(Form)`
   position: absolute;
-  right: 16px;
+  right: 24px;
   top: 16px;
 `;
 
@@ -74,7 +74,6 @@ const LinkButton = styled.button`
   background: none;
   border: 0;
   padding: 0;
-  font-family: times, sans-serif;
   text-decoration: underline;
   cursor: pointer;
   font-size: 16px;

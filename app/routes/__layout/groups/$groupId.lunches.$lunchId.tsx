@@ -1,17 +1,29 @@
-import type { Prisma } from "@prisma/client";
+import type { Lunch, Prisma, User } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
-import { Link, useCatch, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { getGroupLunch } from "~/models/lunch.server";
 import { Spacer } from "~/components/Spacer";
 import { Stat } from "~/components/Stat";
 import { Table } from "~/components/Table";
+import { Input } from "~/components/Input";
+import { ComboBox, Item, Label } from "~/components/ComboBox";
+import { TextArea } from "~/components/TextArea";
+import { Stack } from "~/components/Stack";
+import { Button } from "~/components/Button";
+import { useEffect, useRef } from "react";
 
 type LoaderData = {
   groupLunch: NonNullable<Prisma.PromiseReturnType<typeof getGroupLunch>>;
@@ -50,6 +62,10 @@ export default function LunchDetailsPage() {
       ? scores.reduce((acc, cur) => acc + cur.score, 0) / scores.length
       : "N/A";
 
+  const usersWithoutScores = groupLunch.groupLocation.group.users
+    .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
+    .map((x) => x.user);
+
   return (
     <div>
       <Title>
@@ -63,31 +79,48 @@ export default function LunchDetailsPage() {
         <Stat label="Average score" value={averageScore} />
         <Stat label="Highest score" value={highestScore || "N/A"} />
         <Stat label="Lowest score" value={lowestScore || "N/A"} />
-        <Stat label="Choosen by" value={groupLunch.choosenBy.name} />
+        <Stat
+          label="Choosen by"
+          value={groupLunch.choosenBy.name}
+          to={`/users/${groupLunch.choosenByUserId}`}
+        />
       </Stats>
       <Spacer size={24} />
-      <Subtitle>Scores</Subtitle>
-      <Spacer size={16} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>By</Table.Heading>
-            <Table.Heading numeric>Score</Table.Heading>
-            <Table.Heading>Comment</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {scores.map((score) => (
-            <tr key={score.id}>
-              <Table.Cell>
-                <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
-              </Table.Cell>
-              <Table.Cell numeric>{score.score}</Table.Cell>
-              <Table.Cell>{score.comment}</Table.Cell>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+      {scores.length > 0 && (
+        <>
+          <Subtitle>Scores</Subtitle>
+          <Spacer size={16} />
+          <Table>
+            <Table.Head>
+              <tr>
+                <Table.Heading>By</Table.Heading>
+                <Table.Heading numeric>Score</Table.Heading>
+                <Table.Heading>Comment</Table.Heading>
+              </tr>
+            </Table.Head>
+            <tbody>
+              {scores.map((score) => (
+                <tr key={score.id}>
+                  <Table.Cell>
+                    <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
+                  </Table.Cell>
+                  <Table.Cell numeric>{score.score}</Table.Cell>
+                  <Table.Cell>{score.comment}</Table.Cell>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </>
+      )}
+      <Spacer size={24} />
+      {usersWithoutScores.length > 0 && (
+        <>
+          <Subtitle>New score</Subtitle>
+          <Spacer size={8} />
+          <NewScoreForm users={usersWithoutScores} lunchId={groupLunch.id} />
+        </>
+      )}
+      <Spacer size={128} />
     </div>
   );
 }
@@ -126,4 +159,108 @@ const Stats = styled.div`
 
 const Subtitle = styled.h3`
   margin: 0;
+`;
+
+type NewScoreFormProps = {
+  users: RecursivelyConvertDatesToStrings<User>[];
+  lunchId: Lunch["id"];
+};
+
+const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
+  const fetcher = useFetcher();
+  const formRef = useRef<HTMLFormElement>(null);
+  const userRef = useRef<HTMLInputElement>(null!);
+  const scoreRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (fetcher.type === "done" && fetcher.data.ok) {
+      formRef.current?.reset();
+    }
+
+    const errors = fetcher.data?.errors;
+    if (errors?.user) {
+      userRef.current?.focus();
+    } else if (errors?.score) {
+      scoreRef.current?.focus();
+    }
+  }, [fetcher]);
+
+  return (
+    <fetcher.Form
+      method="post"
+      action="/scores/new"
+      ref={formRef}
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        alignItems: "flex-end",
+      }}
+    >
+      <input type="hidden" name="lunchId" value={lunchId} />
+      <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
+        <Stack gap={16} style={{ width: "100%" }}>
+          <ComboBox
+            label="From"
+            name="user"
+            defaultItems={users}
+            inputRef={userRef}
+          >
+            {(item) => (
+              <Item textValue={item.name}>
+                <div>
+                  <Label>{item.name}</Label>
+                </div>
+              </Item>
+            )}
+          </ComboBox>
+          {fetcher.data?.errors?.user && (
+            <div id="user-error">{fetcher.data.errors.user}</div>
+          )}
+          <label>
+            <span>Score</span>
+            <Input
+              defaultValue={0}
+              name="score"
+              type="number"
+              ref={scoreRef}
+              aria-invalid={fetcher.data?.errors?.score ? true : undefined}
+              aria-errormessage={
+                fetcher.data?.errors?.score ? "score-error" : undefined
+              }
+            />
+          </label>
+          {fetcher.data?.errors?.score && (
+            <div id="score-error">{fetcher.data.errors.score}</div>
+          )}
+        </Stack>
+        <div style={{ width: "100%" }}>
+          <CommentLabel>
+            <span>Comment</span>
+            <TextArea name="comment" />
+          </CommentLabel>
+        </div>
+      </Stack>
+      <Button>Save score</Button>
+    </fetcher.Form>
+  );
+};
+
+const StyledForm = styled(Form)`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  align-items: flex-end;
+`;
+
+const CommentLabel = styled.label`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+
+  textarea {
+    flex-grow: 1;
+  }
 `;
