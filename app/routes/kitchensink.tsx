@@ -12,8 +12,7 @@ import { Table } from "~/components/Table";
 import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
 import { Switch, SwitchThumb } from "~/components/Switch";
 import { Select } from "~/components/Select";
-import { ComboBox, Item } from "~/components/ComboBox/ComboBox";
-import { Description, Label } from "~/components/ComboBox/ListBox";
+import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
 
 export const meta: MetaFunction = () => {
   return {

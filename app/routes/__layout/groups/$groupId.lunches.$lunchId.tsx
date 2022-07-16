@@ -27,8 +27,6 @@ export const loader: LoaderFunction = async ({ request, params }) => {
     id: parseInt(params.lunchId),
   });
 
-  console.log("hm", groupLunch);
-
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 });
   }
@@ -55,14 +53,17 @@ export default function LunchDetailsPage() {
   return (
     <div>
       <Title>
-        {formatTimeAgo(new Date(groupLunch.date))} at{" "}
-        {groupLunch.groupLocation.location.name}
+        <span title={groupLunch.date.split("T")[0]}>
+          {formatTimeAgo(new Date(groupLunch.date))}
+        </span>{" "}
+        at {groupLunch.groupLocation.location.name}
       </Title>
       <Spacer size={24} />
       <Stats>
         <Stat label="Average score" value={averageScore} />
         <Stat label="Highest score" value={highestScore || "N/A"} />
         <Stat label="Lowest score" value={lowestScore || "N/A"} />
+        <Stat label="Choosen by" value={groupLunch.choosenBy.name} />
       </Stats>
       <Spacer size={24} />
       <Subtitle>Scores</Subtitle>

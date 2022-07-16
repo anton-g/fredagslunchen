@@ -50,6 +50,11 @@ export function ComboBox<T extends object>(props: ComboBoxProps<T>) {
           ref={inputRef}
           isFocused={state.isFocused}
         />
+        <input
+          type="hidden"
+          name={props.name + "-key"}
+          value={state.selectedItem?.key}
+        />
         <Button {...buttonProps} ref={buttonRef}>
           <ChevronDownIcon
             style={{ width: 18, height: 18 }}
