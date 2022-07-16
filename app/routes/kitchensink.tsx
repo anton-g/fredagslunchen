@@ -13,6 +13,7 @@ import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
 import { Switch, SwitchThumb } from "~/components/Switch";
 import { Select } from "~/components/Select";
 import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
+import { TextArea } from "~/components/TextArea";
 
 export const meta: MetaFunction = () => {
   return {
@@ -86,6 +87,11 @@ export default function Join() {
           <Stack gap={24} axis="horizontal">
             <Checkbox />
             <Checkbox defaultChecked />
+          </Stack>
+        </Component>
+        <Component title="TextArea">
+          <Stack gap={24} axis="horizontal">
+            <TextArea />
           </Stack>
         </Component>
         <Component title="Input">
