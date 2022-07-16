@@ -41,6 +41,18 @@ async function seed() {
     },
   });
 
+  const user3 = await prisma.user.create({
+    data: {
+      email: "martin@cool.se",
+      name: "Marre",
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  });
+
   const location = await prisma.location.create({
     data: {
       lat: "59.331582",
@@ -66,6 +78,7 @@ async function seed() {
         create: [
           { user: { connect: { id: user.id } }, role: "ADMIN" },
           { user: { connect: { id: user2.id } } },
+          { user: { connect: { id: user3.id } } },
         ],
       },
       groupLocations: {

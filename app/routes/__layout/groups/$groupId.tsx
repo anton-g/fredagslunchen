@@ -5,7 +5,7 @@ import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
-import { getGroup, getGroupDetails } from "~/models/group.server";
+import { getGroupDetails } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
@@ -50,11 +50,11 @@ export default function GroupDetailsPage() {
       <Spacer size={24} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
-        <Stat label="Best score" value={"WokHouse"} />
-        <Stat label="Worst score" value={"Franzén"} />
-        <Stat label="Most positive" value={"N/A"} />
-        <Stat label="Most negative" value={"N/A"} />
-        <Stat label="Most average" value={"N/A"} />
+        <Stat label="Best score" value={details.stats.bestScore} />
+        <Stat label="Worst score" value={details.stats.worstScore} />
+        <Stat label="Most positive" value={details.stats.mostPositive} />
+        <Stat label="Most negative" value={details.stats.mostNegative} />
+        <Stat label="Most average" value={details.stats.mostAvarage} />
       </Stats>
       <Spacer size={24} />
       <ActionBar>

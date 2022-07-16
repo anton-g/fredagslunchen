@@ -223,6 +223,8 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
             <Input
               defaultValue={0}
               name="score"
+              min={0}
+              max={10}
               type="number"
               ref={scoreRef}
               aria-invalid={fetcher.data?.errors?.score ? true : undefined}
