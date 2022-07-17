@@ -192,6 +192,11 @@ const generateGroupStats = (
   const averageScore = getAverageNumber(allScores, "score");
 
   const userStats = group.users
+    .filter(
+      (x) =>
+        x.user.scores.filter((s) => s.lunch.groupLocationGroupId === group.id)
+          .length > 0
+    )
     .map((groupUser) => {
       const groupScores = groupUser.user.scores.filter(
         (x) => x.lunch.groupLocationGroupId === group.id

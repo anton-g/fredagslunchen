@@ -38,6 +38,16 @@ export async function getFullUserById(id: User["id"]) {
           },
         },
       },
+      choosenLunches: {
+        include: {
+          groupLocation: {
+            include: {
+              location: true,
+            },
+          },
+          scores: true,
+        },
+      },
     },
   });
 }

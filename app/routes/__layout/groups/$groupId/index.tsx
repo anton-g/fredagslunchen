@@ -12,6 +12,7 @@ import { Table } from "~/components/Table";
 import { Spacer } from "~/components/Spacer";
 import { LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
+import { SeedAvatar } from "~/components/Avatar";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -29,6 +30,16 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
+      <UsersList>
+        {details.group.users.map((user) => (
+          <li key={user.userId}>
+            <Link to={`/users/${user.userId}`}>
+              <SeedAvatar seed={user.userId} />
+            </Link>
+          </li>
+        ))}
+      </UsersList>
+      <Spacer size={36} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat

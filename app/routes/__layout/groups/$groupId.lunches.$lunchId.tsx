@@ -150,6 +150,10 @@ const Title = styled.h2`
   ::first-letter {
     text-transform: uppercase;
   }
+
+  a:hover {
+    text-decoration: underline;
+  }
 `;
 
 const Stats = styled.div`

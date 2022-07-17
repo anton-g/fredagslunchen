@@ -34,16 +34,6 @@ export default function GroupDetailsPage() {
         <Link to={`/groups/${details.group.id}`}>{details.group.name}</Link>
       </Title>
       <Spacer size={8} />
-      <UsersList>
-        {details.group.users.map((user) => (
-          <li key={user.userId}>
-            <Link to={`/users/${user.userId}`}>
-              <SeedAvatar seed={user.userId} />
-            </Link>
-          </li>
-        ))}
-      </UsersList>
-      <Spacer size={36} />
       <Outlet />
     </div>
   );
@@ -68,25 +58,4 @@ export function CatchBoundary() {
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
-`;
-
-const UsersList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 16px;
-`;
-
-const ActionBar = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: 16px;
-`;
-
-const Stats = styled.div`
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 24px;
-  max-width: 600px;
 `;

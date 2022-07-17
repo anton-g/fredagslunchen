@@ -29,6 +29,7 @@ export default function Index() {
 
   if (!user) return null;
 
+  // TODO move stats calc to server?
   const numberOfLunches = data.details.scores.length;
   const averageScore = formatNumber(
     getAverageNumber(data.details.scores, "score")
@@ -41,6 +42,21 @@ export default function Index() {
   const highestScore =
     sortedScores[1]?.lunch.groupLocation.location.name || "N/A";
 
+  const bestChoosenLunch = data.details.choosenLunches.reduce<
+    typeof data.details.choosenLunches[0] | null
+  >((acc, cur) => {
+    if (!acc) return cur;
+
+    if (
+      getAverageNumber(cur.scores, "score") >
+      getAverageNumber(acc.scores, "score")
+    ) {
+      return cur;
+    }
+
+    return acc;
+  }, null);
+
   return (
     <Wrapper>
       <Section>
@@ -52,7 +68,10 @@ export default function Index() {
         <Stats>
           <Stat label="Number of lunches" value={numberOfLunches} />
           <Stat label="Average score" value={averageScore} />
-          <Stat label="Most popular choice" value={"N/A"} />
+          <Stat
+            label="Most popular choice"
+            value={bestChoosenLunch?.groupLocation.location.name || "N/A"}
+          />
           <Stat label="Lowest score" value={lowestScore} />
           <Stat label="Highest score" value={highestScore} />
         </Stats>
