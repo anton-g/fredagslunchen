@@ -48,41 +48,36 @@ export default function GroupDetailsPage() {
           </li>
         ))}
       </UsersList>
-      <Spacer size={24} />
+      <Spacer size={36} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
           label="Best score"
-          value={`${details.stats.bestLocation.name} (${formatNumber(
-            details.stats.bestLocation.score
-          )})`}
+          value={`${details.stats.bestLocation.name}`}
+          detail={formatNumber(details.stats.bestLocation.score)}
         />
         <Stat
           label="Worst score"
-          value={`${details.stats.worstLocation.name} (${formatNumber(
-            details.stats.worstLocation.score
-          )})`}
+          value={`${details.stats.worstLocation.name}`}
+          detail={formatNumber(details.stats.worstLocation.score)}
         />
         <Stat
           label="Most positive"
-          value={`${details.stats.mostPositive.name} (${formatNumber(
-            details.stats.mostPositive.score
-          )})`}
+          value={`${details.stats.mostPositive.name}`}
+          detail={formatNumber(details.stats.mostPositive.score)}
         />
         <Stat
           label="Most negative"
-          value={`${details.stats.mostNegative.name} (${formatNumber(
-            details.stats.mostNegative.score
-          )})`}
+          value={`${details.stats.mostNegative.name}`}
+          detail={formatNumber(details.stats.mostNegative.score)}
         />
         <Stat
           label="Most average"
-          value={`${details.stats.mostAvarage.name} (${formatNumber(
-            details.stats.mostAvarage.score
-          )})`}
+          value={`${details.stats.mostAvarage.name}`}
+          detail={formatNumber(details.stats.mostAvarage.score)}
         />
       </Stats>
-      <Spacer size={24} />
+      <Spacer size={48} />
       <ActionBar>
         <LinkButton to="/">Add user</LinkButton>
         <LinkButton to={`/groups/${details.group.id}/lunches/new`}>

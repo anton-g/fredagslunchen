@@ -1,17 +1,27 @@
 import { Link } from "@remix-run/react";
 import styled from "styled-components";
+import { Spacer } from "./Spacer";
 
 type StatProps = {
   label: string;
   value: number | string;
   to?: string;
+  detail?: string;
 };
 
-export const Stat = ({ label, value, to }: StatProps) => {
+export const Stat = ({ label, value, to, detail }: StatProps) => {
   return (
     <StatWrapper>
       <h3>{label}</h3>
-      {to ? <StatLink to={to}>{value}</StatLink> : <span>{value}</span>}
+      <div style={{ display: "flex", alignItems: "baseline" }}>
+        {to ? <StatLink to={to}>{value}</StatLink> : <Value>{value}</Value>}
+        {detail && (
+          <>
+            <Spacer size={8} />
+            <Detail>{detail}</Detail>
+          </>
+        )}
+      </div>
     </StatWrapper>
   );
 };
@@ -25,11 +35,6 @@ const StatWrapper = styled.div`
     font-size: 14px;
     margin: 0;
   }
-
-  span {
-    font-weight: bold;
-    font-size: 24px;
-  }
 `;
 
 const StatLink = styled(Link)`
@@ -40,4 +45,14 @@ const StatLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
+`;
+
+const Value = styled.span`
+  font-weight: bold;
+  font-size: 24px;
+`;
+
+const Detail = styled.span`
+  font-size: 12px;
+  font-weight: normal;
 `;
