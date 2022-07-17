@@ -66,6 +66,7 @@ export default function Index() {
               <Table.Heading>Date</Table.Heading>
               <Table.Heading>Location</Table.Heading>
               <Table.Heading numeric>Score</Table.Heading>
+              <Table.Heading>Group</Table.Heading>
               <Table.Heading>Choosen by</Table.Heading>
               <Table.Heading>Comment</Table.Heading>
             </tr>
@@ -88,6 +89,11 @@ export default function Index() {
                   </Link>
                 </Table.Cell>
                 <Table.Cell numeric>{score.score}</Table.Cell>
+                <Table.Cell>
+                  <Link to={`/groups/${score.lunch.groupLocationGroupId}`}>
+                    {score.lunch.groupLocation.group.name}
+                  </Link>
+                </Table.Cell>
                 <Table.Cell>
                   <Link to={`/users/${score.lunch.choosenBy.id}`}>
                     {score.lunch.choosenBy.name}

@@ -17,7 +17,7 @@ async function seed() {
 
   const hashedPassword = await bcrypt.hash("woopwoop", 10);
 
-  const user = await prisma.user.create({
+  const userBasse = await prisma.user.create({
     data: {
       email,
       name,
@@ -29,7 +29,7 @@ async function seed() {
     },
   });
 
-  const user2 = await prisma.user.create({
+  const userTessan = await prisma.user.create({
     data: {
       email: "teko@cool.se",
       name: "Tessan",
@@ -41,7 +41,7 @@ async function seed() {
     },
   });
 
-  const user3 = await prisma.user.create({
+  const userMartin = await prisma.user.create({
     data: {
       email: "martin@cool.se",
       name: "Marre",
@@ -53,7 +53,7 @@ async function seed() {
     },
   });
 
-  await prisma.user.create({
+  const userKatten = await prisma.user.create({
     data: {
       email: "katten@cool.se",
       name: "Katten",
@@ -65,7 +65,7 @@ async function seed() {
     },
   });
 
-  const location = await prisma.location.create({
+  const locationWoken = await prisma.location.create({
     data: {
       lat: "59.331582",
       lon: "18.0664337",
@@ -74,7 +74,7 @@ async function seed() {
     },
   });
 
-  const location2 = await prisma.location.create({
+  const locationFranzen = await prisma.location.create({
     data: {
       lat: "59.3339128",
       lon: "18.0564237",
@@ -83,34 +83,43 @@ async function seed() {
     },
   });
 
+  const locationSandwich = await prisma.location.create({
+    data: {
+      lat: "59.3414987",
+      lon: "18.0371404",
+      name: "Sandhäxan",
+      address: "Gästrikegatan 13",
+    },
+  });
+
   await prisma.group.create({
     data: {
       name: "OGs",
       users: {
         create: [
-          { user: { connect: { id: user.id } }, role: "ADMIN" },
-          { user: { connect: { id: user2.id } } },
-          { user: { connect: { id: user3.id } } },
+          { user: { connect: { id: userBasse.id } }, role: "ADMIN" },
+          { user: { connect: { id: userTessan.id } } },
+          { user: { connect: { id: userMartin.id } } },
         ],
       },
       groupLocations: {
         create: [
           {
-            location: { connect: { id: location.id } },
-            discoveredBy: { connect: { id: user.id } },
+            location: { connect: { id: locationWoken.id } },
+            discoveredBy: { connect: { id: userBasse.id } },
             lunches: {
               create: [
                 {
                   date: new Date(),
-                  choosenBy: { connect: { id: user.id } },
+                  choosenBy: { connect: { id: userBasse.id } },
                   scores: {
                     create: [
                       {
-                        user: { connect: { id: user2.id } },
+                        user: { connect: { id: userTessan.id } },
                         score: 4,
                       },
                       {
-                        user: { connect: { id: user.id } },
+                        user: { connect: { id: userBasse.id } },
                         score: 7,
                         comment: "Seed comment",
                       },
@@ -121,23 +130,87 @@ async function seed() {
             },
           },
           {
-            location: { connect: { id: location2.id } },
-            discoveredBy: { connect: { id: user.id } },
+            location: { connect: { id: locationFranzen.id } },
+            discoveredBy: { connect: { id: userBasse.id } },
             lunches: {
               create: [
                 {
                   date: new Date(),
-                  choosenBy: { connect: { id: user2.id } },
+                  choosenBy: { connect: { id: userTessan.id } },
                   scores: {
                     create: [
                       {
-                        user: { connect: { id: user2.id } },
+                        user: { connect: { id: userTessan.id } },
                         score: 10,
                       },
                       {
-                        user: { connect: { id: user.id } },
+                        user: { connect: { id: userBasse.id } },
                         score: 2,
                         comment: "sämst",
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  });
+
+  await prisma.group.create({
+    data: {
+      name: "Lunches @ AW",
+      users: {
+        create: [
+          { user: { connect: { id: userKatten.id } }, role: "ADMIN" },
+          { user: { connect: { id: userMartin.id } } },
+        ],
+      },
+      groupLocations: {
+        create: [
+          {
+            location: { connect: { id: locationWoken.id } },
+            discoveredBy: { connect: { id: userKatten.id } },
+            lunches: {
+              create: [
+                {
+                  date: new Date(),
+                  choosenBy: { connect: { id: userKatten.id } },
+                  scores: {
+                    create: [
+                      {
+                        user: { connect: { id: userMartin.id } },
+                        score: 4.5,
+                      },
+                      {
+                        user: { connect: { id: userKatten.id } },
+                        score: 7.25,
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            location: { connect: { id: locationSandwich.id } },
+            discoveredBy: { connect: { id: userMartin.id } },
+            lunches: {
+              create: [
+                {
+                  date: new Date(),
+                  choosenBy: { connect: { id: userMartin.id } },
+                  scores: {
+                    create: [
+                      {
+                        user: { connect: { id: userMartin.id } },
+                        score: 10,
+                      },
+                      {
+                        user: { connect: { id: userKatten.id } },
+                        score: 2,
                       },
                     ],
                   },

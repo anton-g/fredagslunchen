@@ -26,6 +26,11 @@ export async function getFullUserById(id: User["id"]) {
               groupLocation: {
                 include: {
                   location: true,
+                  group: {
+                    select: {
+                      name: true,
+                    },
+                  },
                 },
               },
               choosenBy: true,

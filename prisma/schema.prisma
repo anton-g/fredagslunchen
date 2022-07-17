@@ -95,8 +95,8 @@ model Lunch {
 }
 
 model Score {
-  id    Int @id @default(autoincrement())
-  score Int
+  id    Int   @id @default(autoincrement())
+  score Float
 
   user   User   @relation(fields: [userId], references: [id])
   userId String
