@@ -1,6 +1,4 @@
-import type { Prisma } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/node";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -11,11 +9,7 @@ import { getGroupLocation } from "~/models/location.server";
 import { Table } from "~/components/Table";
 import styled from "styled-components";
 
-type LoaderData = {
-  groupLocation: NonNullable<Prisma.PromiseReturnType<typeof getGroupLocation>>;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request);
   invariant(params.groupId, "groupId not found");
   invariant(params.locationId, "locationId not found");
@@ -28,12 +22,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!groupLocation) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ groupLocation });
+  return json({ groupLocation });
 };
 
 export default function LocationDetailsPage() {
-  const { groupLocation } =
-    useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
+  const { groupLocation } = useLoaderData<typeof loader>();
 
   return (
     <div>

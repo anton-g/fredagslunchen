@@ -1,5 +1,9 @@
 import type { Prisma } from "@prisma/client";
-import type { ActionFunction, LoaderFunction } from "@remix-run/node";
+import type {
+  ActionFunction,
+  LoaderArgs,
+  LoaderFunction,
+} from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
@@ -12,14 +16,9 @@ import { getGroup } from "~/models/group.server";
 
 import { createLunch } from "~/models/lunch.server";
 import { requireUserId } from "~/session.server";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { useUser } from "~/utils";
 
-type LoaderData = {
-  group: NonNullable<Prisma.PromiseReturnType<typeof getGroup>>;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
   invariant(params.groupId, "groupId not found");
 
@@ -27,7 +26,7 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!group) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ group });
+  return json({ group });
 };
 
 type ActionData = {
@@ -82,8 +81,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function NewLunchPage() {
   const user = useUser();
   const actionData = useActionData() as ActionData;
-  const loaderData =
-    useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
+  const loaderData = useLoaderData<typeof loader>();
   const choosenByRef = useRef<HTMLInputElement>(null!);
   const locationRef = useRef<HTMLInputElement>(null!);
   const dateRef = useRef<HTMLInputElement>(null);

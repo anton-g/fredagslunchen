@@ -1,6 +1,4 @@
-import type { Prisma } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/server-runtime";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import type { LoaderArgs } from "@remix-run/server-runtime";
 import { formatTimeAgo } from "~/utils";
 import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
@@ -14,12 +12,7 @@ import invariant from "tiny-invariant";
 import { SeedAvatar } from "~/components/Avatar";
 import { Stat } from "~/components/Stat";
 
-type LoaderData = {
-  details: NonNullable<Prisma.PromiseReturnType<typeof getFullUserById>>;
-  isYou: boolean;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
   invariant(params.userId, "userId not found");
 
@@ -27,12 +20,12 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ details, isYou: userId === params.userId });
+  return json({ details, isYou: userId === params.userId });
 };
 
 export default function Index() {
   const user = useOptionalUser();
-  const data = useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
+  const data = useLoaderData<typeof loader>();
 
   if (!user) return null;
 

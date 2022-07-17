@@ -1,5 +1,5 @@
 import type { Lunch, Prisma, User } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
@@ -13,7 +13,7 @@ import {
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { getGroupLunch } from "~/models/lunch.server";
 import { Spacer } from "~/components/Spacer";
 import { Stat } from "~/components/Stat";
@@ -25,11 +25,7 @@ import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
 import { useEffect, useRef } from "react";
 
-type LoaderData = {
-  groupLunch: NonNullable<Prisma.PromiseReturnType<typeof getGroupLunch>>;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request);
   invariant(params.groupId, "groupId not found");
   invariant(params.lunchId, "lunchId not found");
@@ -42,12 +38,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ groupLunch });
+  return json({ groupLunch });
 };
 
 export default function LunchDetailsPage() {
-  const { groupLunch } =
-    useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
+  const { groupLunch } = useLoaderData<typeof loader>();
 
   const scores = groupLunch.scores;
 

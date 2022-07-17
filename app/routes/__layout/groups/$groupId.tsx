@@ -1,6 +1,4 @@
-import type { Prisma } from "@prisma/client";
-import type { LoaderFunction } from "@remix-run/node";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import type { LoaderArgs } from "@remix-run/node";
 import { formatNumber } from "~/utils";
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
@@ -16,11 +14,7 @@ import { Spacer } from "~/components/Spacer";
 import { LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
 
-type LoaderData = {
-  details: NonNullable<Prisma.PromiseReturnType<typeof getGroupDetails>>;
-};
-
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
   invariant(params.groupId, "groupId not found");
 
@@ -28,12 +22,11 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json<LoaderData>({ details });
+  return json({ details });
 };
 
 export default function GroupDetailsPage() {
-  const { details } =
-    useLoaderData() as RecursivelyConvertDatesToStrings<LoaderData>;
+  const { details } = useLoaderData<typeof loader>();
 
   return (
     <div>

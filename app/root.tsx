@@ -1,5 +1,6 @@
 import type {
   LinksFunction,
+  LoaderArgs,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node";
@@ -35,12 +36,8 @@ export const meta: MetaFunction = () => ({
   viewport: "width=device-width,initial-scale=1",
 });
 
-type LoaderData = {
-  user: Awaited<ReturnType<typeof getUser>>;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
-  return json<LoaderData>({
+export const loader = async ({ request }: LoaderArgs) => {
+  return json({
     user: await getUser(request),
   });
 };

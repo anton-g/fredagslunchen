@@ -1,4 +1,4 @@
-import type { LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs, LoaderFunction } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
@@ -9,18 +9,14 @@ import { Spacer } from "~/components/Spacer";
 import { getUserGroups } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 
-type LoaderData = {
-  groups: Awaited<ReturnType<typeof getUserGroups>>;
-};
-
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderArgs) => {
   const userId = await requireUserId(request);
   const groups = await getUserGroups({ userId });
-  return json<LoaderData>({ groups });
+  return json({ groups });
 };
 
 export default function GroupsPage() {
-  const data = useLoaderData() as LoaderData;
+  const data = useLoaderData<typeof loader>();
 
   return (
     <main>
