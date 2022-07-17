@@ -1,6 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { LoaderFunction } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatNumber } from "~/utils";
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -50,11 +51,36 @@ export default function GroupDetailsPage() {
       <Spacer size={24} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
-        <Stat label="Best score" value={details.stats.bestScore} />
-        <Stat label="Worst score" value={details.stats.worstScore} />
-        <Stat label="Most positive" value={details.stats.mostPositive} />
-        <Stat label="Most negative" value={details.stats.mostNegative} />
-        <Stat label="Most average" value={details.stats.mostAvarage} />
+        <Stat
+          label="Best score"
+          value={`${details.stats.bestLocation.name} (${formatNumber(
+            details.stats.bestLocation.score
+          )})`}
+        />
+        <Stat
+          label="Worst score"
+          value={`${details.stats.worstLocation.name} (${formatNumber(
+            details.stats.worstLocation.score
+          )})`}
+        />
+        <Stat
+          label="Most positive"
+          value={`${details.stats.mostPositive.name} (${formatNumber(
+            details.stats.mostPositive.score
+          )})`}
+        />
+        <Stat
+          label="Most negative"
+          value={`${details.stats.mostNegative.name} (${formatNumber(
+            details.stats.mostNegative.score
+          )})`}
+        />
+        <Stat
+          label="Most average"
+          value={`${details.stats.mostAvarage.name} (${formatNumber(
+            details.stats.mostAvarage.score
+          )})`}
+        />
       </Stats>
       <Spacer size={24} />
       <ActionBar>

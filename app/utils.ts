@@ -103,3 +103,10 @@ export function formatTimeAgo(date: Date) {
     duration /= division.amount;
   }
 }
+
+export const formatNumber = (num: number) => {
+  return num.toLocaleString("en-US", {
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+  });
+};

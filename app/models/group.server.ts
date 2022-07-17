@@ -1,6 +1,7 @@
 import type { User, Group, Prisma, Location } from "@prisma/client";
 
 import { prisma } from "~/db.server";
+import { formatNumber } from "~/utils";
 
 export type { Group } from "@prisma/client";
 
@@ -55,7 +56,15 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
       },
       users: {
         include: {
-          user: true,
+          user: {
+            include: {
+              scores: {
+                include: {
+                  lunch: true,
+                },
+              },
+            },
+          },
         },
       },
     },
@@ -67,27 +76,19 @@ export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
 
   if (!group) return null;
 
-  const allLunches = group.groupLocations.flatMap((l) => l.lunches);
-  const allScores = allLunches.flatMap((l) => l.scores);
+  const stats = generateGroupStats(group);
 
-  const stats2 = compileStats(group);
-
-  const bestScore = stats2.bestLocation.name;
-  const worstScore = stats2.worstLocation.name;
-  const mostPositive = "N/A";
-  const mostNegative = "N/A";
-  const mostAvarage = "N/A";
-
-  const stats = {
-    averageScore: formatNumber(getAverageNumber(allScores, "score")),
-    bestScore,
-    worstScore,
-    mostPositive,
-    mostNegative,
-    mostAvarage,
+  return {
+    group,
+    stats: {
+      averageScore: formatNumber(stats.averageScore),
+      bestLocation: stats.bestLocation,
+      worstLocation: stats.worstLocation,
+      mostPositive: stats.mostPositive,
+      mostNegative: stats.mostNegative,
+      mostAvarage: stats.mostAverage,
+    },
   };
-
-  return { group, stats };
 }
 
 export function getUserGroups({ userId }: { userId: User["id"] }) {
@@ -155,31 +156,58 @@ const getAverageNumber = <T, K extends keyof T>(array: T[], key: K) => {
     : 0;
 };
 
-const formatNumber = (num: number) => {
-  return num.toLocaleString("en-US", {
-    maximumFractionDigits: 2,
-    minimumFractionDigits: 0,
-  });
-};
-
 type StatsType = {
+  averageScore: number;
   bestLocation: {
     score: number;
-    name: string;
+    name: Location["name"];
     id: Location["id"];
   };
   worstLocation: {
     score: number;
-    name: string;
+    name: Location["name"];
     id: Location["id"];
+  };
+  mostPositive: {
+    score: number;
+    name: User["name"];
+    id: User["id"];
+  };
+  mostNegative: {
+    score: number;
+    name: User["name"];
+    id: User["id"];
+  };
+  mostAverage: {
+    score: number;
+    name: User["name"];
+    id: User["id"];
   };
 };
 
 // holy reduce
-const compileStats = (
+const generateGroupStats = (
   group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>
 ): StatsType => {
-  return group.groupLocations.reduce<StatsType>(
+  const allLunches = group.groupLocations.flatMap((l) => l.lunches);
+  const allScores = allLunches.flatMap((l) => l.scores);
+
+  const averageScore = getAverageNumber(allScores, "score");
+
+  const userStats = group.users
+    .map((groupUser) => {
+      const groupScores = groupUser.user.scores.filter(
+        (x) => x.lunch.groupLocationGroupId === group.id
+      );
+      return {
+        avg: getAverageNumber(groupScores, "score"),
+        id: groupUser.userId,
+        name: groupUser.user.name,
+      };
+    }, {})
+    .sort((a, b) => b.avg - a.avg);
+
+  const groupStats = group.groupLocations.reduce(
     (acc, cur) => {
       const averageLocationScores = cur.lunches.map((lunch) => ({
         avg: getAverageNumber(lunch.scores, "score"),
@@ -206,4 +234,36 @@ const compileStats = (
       worstLocation: { score: 11, name: "", id: 0 },
     }
   );
+
+  const mostPositive = {
+    score: userStats[0].avg,
+    name: userStats[0].name,
+    id: userStats[0].id,
+  };
+
+  const mostNegative = {
+    score: userStats[userStats.length - 1]?.avg || 0,
+    name: userStats[userStats.length - 1]?.name || "",
+    id: userStats[userStats.length - 1]?.id || "",
+  };
+
+  const averages = userStats
+    .slice()
+    .sort(
+      (a, b) => Math.abs(b.avg - averageScore) - Math.abs(a.avg - averageScore)
+    );
+
+  const mostAverage = {
+    score: averages[0].avg,
+    name: averages[0].name,
+    id: averages[0].id,
+  };
+
+  return {
+    ...groupStats,
+    averageScore,
+    mostNegative,
+    mostPositive,
+    mostAverage,
+  };
 };
