@@ -45,7 +45,7 @@ export default function NewGroupPage() {
 
   return (
     <>
-      <h2>New group</h2>
+      <h3>Invite user to group</h3>
       <Form
         method="post"
         style={{

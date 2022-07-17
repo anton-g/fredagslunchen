@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/server-runtime";
-import { formatTimeAgo } from "~/utils";
+import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils";
 import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import styled from "styled-components";
@@ -30,9 +30,9 @@ export default function Index() {
   if (!user) return null;
 
   const numberOfLunches = data.details.scores.length;
-  const averageScore =
-    data.details.scores.reduce((acc, cur) => acc + cur.score, 0) /
-    data.details.scores.length;
+  const averageScore = formatNumber(
+    getAverageNumber(data.details.scores, "score")
+  );
   const sortedScores = data.details.scores
     .slice()
     .sort((a, b) => a.score - b.score);
@@ -50,6 +50,7 @@ export default function Index() {
         <Stats>
           <Stat label="Number of lunches" value={numberOfLunches} />
           <Stat label="Average score" value={averageScore} />
+          <Stat label="Most popular choice" value={"N/A"} />
           <Stat label="Lowest score" value={lowestScore} />
           <Stat label="Highest score" value={highestScore} />
         </Stats>
@@ -103,7 +104,6 @@ export default function Index() {
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
 `;
 
 const TitleRow = styled.div`
@@ -125,9 +125,9 @@ const Subtitle = styled.h3`
 
 const Stats = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 24px 48px;
-  max-width: 400px;
+  width: 100%;
   width: 100%;
 `;
 

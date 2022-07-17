@@ -67,7 +67,12 @@ export default function LunchDetailsPage() {
         <span title={groupLunch.date.split("T")[0]}>
           {formatTimeAgo(new Date(groupLunch.date))}
         </span>{" "}
-        at {groupLunch.groupLocation.location.name}
+        at{" "}
+        <Link
+          to={`/groups/${groupLunch.groupLocationGroupId}/locations/${groupLunch.groupLocationLocationId}`}
+        >
+          {groupLunch.groupLocation.location.name}
+        </Link>
       </Title>
       <Spacer size={24} />
       <Stats>
@@ -200,6 +205,7 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
             label="From"
             name="user"
             defaultItems={users}
+            // defaultSelectedKey={users[0].id}
             inputRef={userRef}
           >
             {(item) => (

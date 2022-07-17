@@ -36,14 +36,18 @@ export default function LocationDetailsPage() {
           <tr>
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading>Average score</Table.Heading>
+            <Table.Heading numeric>Average score</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
           {groupLocation.lunches.map((lunch) => (
             <tr key={lunch.id}>
               <Table.Cell>
-                {new Date(lunch.date).toLocaleDateString()}
+                <Link
+                  to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
+                >
+                  {new Date(lunch.date).toLocaleDateString()}
+                </Link>
               </Table.Cell>
               <Table.Cell>
                 <Link to={`/users/${lunch.choosenBy.id}`}>

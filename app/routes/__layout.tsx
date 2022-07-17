@@ -81,6 +81,8 @@ const LinkButton = styled.button`
 
 const Content = styled.main`
   margin-top: 48px;
+  min-width: 550px;
+  margin-bottom: 124px;
 `;
 
 const StyledLink = styled(Link)`

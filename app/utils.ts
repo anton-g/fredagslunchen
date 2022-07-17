@@ -83,9 +83,6 @@ const formatter = new Intl.RelativeTimeFormat("en-us", {
 });
 
 const DIVISIONS: { amount: number; name: Intl.RelativeTimeFormatUnit }[] = [
-  { amount: 60, name: "seconds" },
-  { amount: 60, name: "minutes" },
-  { amount: 24, name: "hours" },
   { amount: 7, name: "days" },
   { amount: 4.34524, name: "weeks" },
   { amount: 12, name: "months" },
@@ -93,7 +90,7 @@ const DIVISIONS: { amount: number; name: Intl.RelativeTimeFormatUnit }[] = [
 ];
 
 export function formatTimeAgo(date: Date) {
-  let duration = (date.valueOf() - new Date().valueOf()) / 1000;
+  let duration = (date.valueOf() - new Date().valueOf()) / 1000 / 60 / 60 / 24;
 
   for (let i = 0; i <= DIVISIONS.length; i++) {
     const division = DIVISIONS[i];
@@ -105,8 +102,18 @@ export function formatTimeAgo(date: Date) {
 }
 
 export const formatNumber = (num: number) => {
+  if (num < 0) return "N/A";
+
   return num.toLocaleString("en-US", {
     maximumFractionDigits: 1,
     minimumFractionDigits: 0,
   });
+};
+
+// TODO improve type
+export const getAverageNumber = <T, K extends keyof T>(array: T[], key: K) => {
+  return array.length > 0
+    ? array.reduce((acc, cur) => acc + (cur[key] as unknown as number), 0) /
+        array.length
+    : -1;
 };

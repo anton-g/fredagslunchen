@@ -1,7 +1,7 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { formatNumber } from "~/utils";
 import { json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { useCatch, useLoaderData, Outlet } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { getGroupDetails } from "~/models/group.server";
@@ -30,7 +30,9 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <Title>{details.group.name}</Title>
+      <Title>
+        <Link to={`/groups/${details.group.id}`}>{details.group.name}</Link>
+      </Title>
       <Spacer size={8} />
       <UsersList>
         {details.group.users.map((user) => (
@@ -42,82 +44,7 @@ export default function GroupDetailsPage() {
         ))}
       </UsersList>
       <Spacer size={36} />
-      <Stats>
-        <Stat label="Average score" value={details.stats.averageScore} />
-        <Stat
-          label="Best score"
-          value={`${details.stats.bestLocation.name}`}
-          detail={formatNumber(details.stats.bestLocation.score)}
-        />
-        <Stat
-          label="Worst score"
-          value={`${details.stats.worstLocation.name}`}
-          detail={formatNumber(details.stats.worstLocation.score)}
-        />
-        <Stat
-          label="Most positive"
-          value={`${details.stats.mostPositive.name}`}
-          detail={formatNumber(details.stats.mostPositive.score)}
-        />
-        <Stat
-          label="Most negative"
-          value={`${details.stats.mostNegative.name}`}
-          detail={formatNumber(details.stats.mostNegative.score)}
-        />
-        <Stat
-          label="Most average"
-          value={`${details.stats.mostAvarage.name}`}
-          detail={formatNumber(details.stats.mostAvarage.score)}
-        />
-      </Stats>
-      <Spacer size={48} />
-      <ActionBar>
-        <LinkButton to="/">Add user</LinkButton>
-        <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-          New lunch
-        </LinkButton>
-      </ActionBar>
-      <Spacer size={8} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Location</Table.Heading>
-            <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Average score</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {details.group.groupLocations.flatMap((loc) =>
-            loc.lunches.map((lunch) => (
-              <tr key={lunch.id}>
-                <Table.Cell>
-                  <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
-                    {new Date(lunch.date).toLocaleDateString()}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link
-                    to={`/groups/${details.group.id}/locations/${loc.locationId}`}
-                  >
-                    {loc.location.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link to={`/users/${lunch.choosenBy.id}`}>
-                    {lunch.choosenBy.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell numeric>
-                  {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                    lunch.scores.length}
-                </Table.Cell>
-              </tr>
-            ))
-          )}
-        </tbody>
-      </Table>
-      <Spacer size={124} />
+      <Outlet />
     </div>
   );
 }

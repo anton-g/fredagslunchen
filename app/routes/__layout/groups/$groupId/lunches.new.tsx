@@ -108,83 +108,86 @@ export default function NewLunchPage() {
   }));
 
   return (
-    <Form
-      method="post"
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        gap: 8,
-        width: "100%",
-      }}
-    >
-      <Stack gap={16}>
-        <div>
-          <label>
-            <span>Date</span>
-            <Input
-              ref={dateRef}
-              defaultValue={new Date().toISOString().split("T")[0]}
-              name="date"
-              type="date"
-              aria-invalid={actionData?.errors?.date ? true : undefined}
-              aria-errormessage={
-                actionData?.errors?.date ? "date-error" : undefined
-              }
-            />
-          </label>
-          {actionData?.errors?.date && (
-            <div id="date-error">{actionData.errors.date}</div>
-          )}
-        </div>
-
-        <div>
-          <ComboBox
-            label="Choosen by"
-            name="choosenBy"
-            defaultItems={users}
-            defaultSelectedKey={user.id}
-            inputRef={choosenByRef}
-          >
-            {(item) => (
-              <Item textValue={item.name}>
-                <div>
-                  <Label>{item.name}</Label>
-                </div>
-              </Item>
+    <>
+      <h3>New lunch</h3>
+      <Form
+        method="post"
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
+          width: "100%",
+        }}
+      >
+        <Stack gap={16}>
+          <div>
+            <label>
+              <span>Date</span>
+              <Input
+                ref={dateRef}
+                defaultValue={new Date().toISOString().split("T")[0]}
+                name="date"
+                type="date"
+                aria-invalid={actionData?.errors?.date ? true : undefined}
+                aria-errormessage={
+                  actionData?.errors?.date ? "date-error" : undefined
+                }
+              />
+            </label>
+            {actionData?.errors?.date && (
+              <div id="date-error">{actionData.errors.date}</div>
             )}
-          </ComboBox>
-          {actionData?.errors?.choosenById && (
-            <div id="choosenBy-error">{actionData.errors.choosenById}</div>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <ComboBox
-            label="Location"
-            name="location"
-            defaultItems={locations}
-            inputRef={locationRef}
-          >
-            {(item) => (
-              <Item textValue={item.name}>
-                <div>
-                  <Label>{item.name}</Label>
-                  <Description>{item.description}</Description>
-                </div>
-              </Item>
+          <div>
+            <ComboBox
+              label="Choosen by"
+              name="choosenBy"
+              defaultItems={users}
+              defaultSelectedKey={user.id}
+              inputRef={choosenByRef}
+            >
+              {(item) => (
+                <Item textValue={item.name}>
+                  <div>
+                    <Label>{item.name}</Label>
+                  </div>
+                </Item>
+              )}
+            </ComboBox>
+            {actionData?.errors?.choosenById && (
+              <div id="choosenBy-error">{actionData.errors.choosenById}</div>
             )}
-          </ComboBox>
-          {actionData?.errors?.locationId && (
-            <div id="location-error">{actionData.errors.locationId}</div>
-          )}
-        </div>
+          </div>
 
-        <div>
-          <Button style={{ marginLeft: "auto" }} type="submit">
-            Save
-          </Button>
-        </div>
-      </Stack>
-    </Form>
+          <div>
+            <ComboBox
+              label="Location"
+              name="location"
+              defaultItems={locations}
+              inputRef={locationRef}
+            >
+              {(item) => (
+                <Item textValue={item.name}>
+                  <div>
+                    <Label>{item.name}</Label>
+                    <Description>{item.description}</Description>
+                  </div>
+                </Item>
+              )}
+            </ComboBox>
+            {actionData?.errors?.locationId && (
+              <div id="location-error">{actionData.errors.locationId}</div>
+            )}
+          </div>
+
+          <div>
+            <Button style={{ marginLeft: "auto" }} type="submit">
+              Save
+            </Button>
+          </div>
+        </Stack>
+      </Form>
+    </>
   );
 }

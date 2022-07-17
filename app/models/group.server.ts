@@ -1,7 +1,7 @@
 import type { User, Group, Prisma, Location } from "@prisma/client";
 
 import { prisma } from "~/db.server";
-import { formatNumber } from "~/utils";
+import { formatNumber, getAverageNumber } from "~/utils";
 
 export type { Group } from "@prisma/client";
 
@@ -147,14 +147,6 @@ export function joinGroup({
     },
   });
 }
-
-// TODO improve type
-const getAverageNumber = <T, K extends keyof T>(array: T[], key: K) => {
-  return array.length > 0
-    ? array.reduce((acc, cur) => acc + (cur[key] as unknown as number), 0) /
-        array.length
-    : 0;
-};
 
 type StatsType = {
   averageScore: number;

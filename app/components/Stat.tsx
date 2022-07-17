@@ -15,12 +15,7 @@ export const Stat = ({ label, value, to, detail }: StatProps) => {
       <h3>{label}</h3>
       <div style={{ display: "flex", alignItems: "baseline" }}>
         {to ? <StatLink to={to}>{value}</StatLink> : <Value>{value}</Value>}
-        {detail && (
-          <>
-            <Spacer size={8} />
-            <Detail>{detail}</Detail>
-          </>
-        )}
+        {detail && <Detail>{detail}</Detail>}
       </div>
     </StatWrapper>
   );
@@ -55,4 +50,5 @@ const Value = styled.span`
 const Detail = styled.span`
   font-size: 12px;
   font-weight: normal;
+  margin-left: 4px;
 `;
