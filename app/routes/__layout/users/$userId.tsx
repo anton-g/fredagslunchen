@@ -36,8 +36,10 @@ export default function Index() {
   const sortedScores = data.details.scores
     .slice()
     .sort((a, b) => a.score - b.score);
-  const lowestScore = sortedScores[0].lunch.groupLocation.location.name;
-  const highestScore = sortedScores[1].lunch.groupLocation.location.name;
+  const lowestScore =
+    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const highestScore =
+    sortedScores[1]?.lunch.groupLocation.location.name || "N/A";
 
   return (
     <Wrapper>

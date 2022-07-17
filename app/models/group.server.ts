@@ -123,29 +123,34 @@ export function createGroup({
   });
 }
 
-export function joinGroup({
+export async function addUserToGroup({
   groupId,
-  userId,
+  email,
 }: {
   groupId: Group["id"];
-  userId: User["id"];
+  email: User["email"];
 }) {
-  return prisma.group.update({
-    where: {
-      id: groupId,
-    },
-    data: {
-      users: {
-        create: {
-          user: {
-            connect: {
-              id: userId,
+  try {
+    const group = await prisma.group.update({
+      where: {
+        id: groupId,
+      },
+      data: {
+        users: {
+          create: {
+            user: {
+              connect: {
+                email: email,
+              },
             },
           },
         },
       },
-    },
-  });
+    });
+    return group;
+  } catch (err) {
+    return { error: "User does not exist" };
+  }
 }
 
 type StatsType = {

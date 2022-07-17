@@ -53,6 +53,18 @@ async function seed() {
     },
   });
 
+  await prisma.user.create({
+    data: {
+      email: "katten@cool.se",
+      name: "Katten",
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  });
+
   const location = await prisma.location.create({
     data: {
       lat: "59.331582",

@@ -2,44 +2,54 @@ import type { ActionFunction } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData } from "@remix-run/react";
 import * as React from "react";
+import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { Stack } from "~/components/Stack";
+import { addUserToGroup } from "~/models/group.server";
 
-import { createGroup } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 
 type ActionData = {
   errors?: {
-    name?: string;
+    email?: string;
   };
 };
 
-export const action: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
+export const action: ActionFunction = async ({ request, params }) => {
+  await requireUserId(request);
+  const groupId = params.groupId;
+  invariant(groupId, "groupId not found");
 
   const formData = await request.formData();
-  const name = formData.get("name");
+  const email = formData.get("email");
 
-  if (typeof name !== "string" || name.length === 0) {
+  if (typeof email !== "string" || email.length === 0) {
     return json<ActionData>(
-      { errors: { name: "Name is required" } },
+      { errors: { email: "Email is required" } },
       { status: 400 }
     );
   }
 
-  const group = await createGroup({ name, userId });
+  const group = await addUserToGroup({ groupId, email });
+
+  if ("error" in group) {
+    return json<ActionData>(
+      { errors: { email: group.error } },
+      { status: 400 }
+    );
+  }
 
   return redirect(`/groups/${group.id}`);
 };
 
 export default function NewGroupPage() {
   const actionData = useActionData() as ActionData;
-  const nameRef = React.useRef<HTMLInputElement>(null);
+  const emailRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus();
+    if (actionData?.errors?.email) {
+      emailRef.current?.focus();
     }
   }, [actionData]);
 
@@ -58,18 +68,19 @@ export default function NewGroupPage() {
         <Stack gap={16}>
           <div>
             <label>
-              <span>Name</span>
+              <span>Email</span>
               <Input
-                ref={nameRef}
-                name="name"
-                aria-invalid={actionData?.errors?.name ? true : undefined}
+                ref={emailRef}
+                name="email"
+                type="email"
+                aria-invalid={actionData?.errors?.email ? true : undefined}
                 aria-errormessage={
-                  actionData?.errors?.name ? "name-error" : undefined
+                  actionData?.errors?.email ? "email-error" : undefined
                 }
               />
             </label>
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
+            {actionData?.errors?.email && (
+              <div id="email-error">{actionData.errors.email}</div>
             )}
           </div>
 

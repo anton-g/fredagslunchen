@@ -1,6 +1,10 @@
 import type { Lunch, Prisma, User } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import {
+  formatNumber,
+  getAverageNumber,
+  RecursivelyConvertDatesToStrings,
+} from "~/utils";
 import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
 import {
@@ -53,9 +57,7 @@ export default function LunchDetailsPage() {
   const highestScore = sortedScores[1]?.score;
 
   const averageScore =
-    scores.length > 0
-      ? scores.reduce((acc, cur) => acc + cur.score, 0) / scores.length
-      : "N/A";
+    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "N/A";
 
   const usersWithoutScores = groupLunch.groupLocation.group.users
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
