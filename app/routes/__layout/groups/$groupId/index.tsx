@@ -172,9 +172,9 @@ const ActionBar = styled.div`
 
 const Stats = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px;
-  max-width: 600px;
+  width: 100%;
 `;
 
 const Subtitle = styled.h3`

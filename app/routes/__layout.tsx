@@ -82,8 +82,10 @@ const LinkButton = styled.button`
 
 const Content = styled.main`
   margin-top: 48px;
-  min-width: 550px;
+  max-width: 670px;
+  width: 100%;
   margin-bottom: 124px;
+  padding: 0 16px;
 `;
 
 const StyledLink = styled(Link)`

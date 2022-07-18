@@ -128,9 +128,8 @@ const Subtitle = styled.h3`
 
 const Stats = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px 48px;
-  width: 100%;
   width: 100%;
 `;
 

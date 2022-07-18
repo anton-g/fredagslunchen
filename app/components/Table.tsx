@@ -12,6 +12,7 @@ const Table = ({ children }: { children: ReactNode }) => {
 
 const Wrapper = styled(Card)`
   width: 100%;
+  overflow-x: scroll;
 `;
 
 const Root = styled.table`

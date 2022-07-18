@@ -51,7 +51,6 @@ const GroupList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  min-width: 450px;
 `;
 
 const GroupTitle = styled.h2`

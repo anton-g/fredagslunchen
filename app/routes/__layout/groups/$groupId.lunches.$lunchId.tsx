@@ -1,19 +1,10 @@
-import type { Lunch, Prisma, User } from "@prisma/client";
+import type { Lunch, User } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
-import {
-  formatNumber,
-  getAverageNumber,
-  RecursivelyConvertDatesToStrings,
-} from "~/utils";
+import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import { formatNumber, getAverageNumber } from "~/utils";
 import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
-import {
-  Form,
-  Link,
-  useCatch,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react";
+import { Link, useCatch, useFetcher, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
@@ -158,9 +149,9 @@ const Title = styled.h2`
 
 const Stats = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px;
-  max-width: 600px;
+  width: 100%;
 `;
 
 const Subtitle = styled.h3`
@@ -255,14 +246,6 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
     </fetcher.Form>
   );
 };
-
-const StyledForm = styled(Form)`
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  align-items: flex-end;
-`;
 
 const CommentLabel = styled.label`
   display: flex;
