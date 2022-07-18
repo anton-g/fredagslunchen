@@ -8,6 +8,8 @@ import { Link } from "react-router-dom";
 import { getGroupLocation } from "~/models/location.server";
 import { Table } from "~/components/Table";
 import styled from "styled-components";
+import { LinkButton } from "~/components/Button";
+import { Spacer } from "~/components/Spacer";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request);
@@ -62,6 +64,13 @@ export default function LocationDetailsPage() {
           ))}
         </tbody>
       </Table>
+      <Spacer size={16} />
+      <LinkButton
+        to={`/groups/${groupLocation.groupId}/lunches/new?loc=${groupLocation.locationId}`}
+        style={{ marginLeft: "auto" }}
+      >
+        New lunch
+      </LinkButton>
     </div>
   );
 }

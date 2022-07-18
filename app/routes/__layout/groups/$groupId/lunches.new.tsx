@@ -21,7 +21,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!group) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ group });
+
+  const url = new URL(request.url);
+  const preSelectedLocationId = url.searchParams.get("loc");
+
+  return json({
+    group,
+    preSelectedLocationId: preSelectedLocationId ?? undefined,
+  });
 };
 
 type ActionData = {
@@ -76,7 +83,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function NewLunchPage() {
   const user = useUser();
   const actionData = useActionData() as ActionData;
-  const loaderData = useLoaderData<typeof loader>();
+  const { group, preSelectedLocationId } = useLoaderData<typeof loader>();
   const choosenByRef = useRef<HTMLInputElement>(null!);
   const locationRef = useRef<HTMLInputElement>(null!);
   const dateRef = useRef<HTMLInputElement>(null);
@@ -91,13 +98,13 @@ export default function NewLunchPage() {
     }
   }, [actionData]);
 
-  const locations = loaderData.group.groupLocations.map((x) => ({
+  const locations = group.groupLocations.map((x) => ({
     id: x.locationId,
     name: x.location.name,
     description: x.location.address,
   }));
 
-  const members = loaderData.group.members.map((member) => ({
+  const members = group.members.map((member) => ({
     id: member.userId,
     name: member.user.name,
   }));
@@ -161,6 +168,11 @@ export default function NewLunchPage() {
               name="location"
               defaultItems={locations}
               inputRef={locationRef}
+              defaultSelectedKey={
+                preSelectedLocationId
+                  ? parseInt(preSelectedLocationId)
+                  : undefined
+              }
             >
               {(item) => (
                 <Item textValue={item.name}>
