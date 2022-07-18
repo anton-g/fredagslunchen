@@ -1,4 +1,4 @@
-import type { Password, User } from "@prisma/client";
+import type { Password, Prisma, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
@@ -6,8 +6,8 @@ import { getAverageNumber } from "~/utils";
 
 export type { User } from "@prisma/client";
 
-export async function getFullUserById(id: User["id"]) {
-  const user = await prisma.user.findUnique({
+const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
+  return await prisma.user.findUnique({
     where: { id },
     include: {
       groups: {
@@ -28,8 +28,12 @@ export async function getFullUserById(id: User["id"]) {
                 include: {
                   location: true,
                   group: {
-                    select: {
-                      name: true,
+                    include: {
+                      members: {
+                        select: {
+                          userId: true,
+                        },
+                      },
                     },
                   },
                 },
@@ -51,43 +55,33 @@ export async function getFullUserById(id: User["id"]) {
       },
     },
   });
+};
+
+export async function getFullUserById({
+  id,
+  requestUserId,
+}: {
+  id: User["id"];
+  requestUserId: User["id"];
+}) {
+  const user = await fetchUserDetails({ id });
 
   if (!user) return null;
 
-  // TODO stats generation duplicated in group.server.ts
-  const lunchCount = user.scores.length;
-  const averageScore = getAverageNumber(user.scores, "score");
-  const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score);
-  const lowestScore =
-    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
-  const highestScore =
-    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "N/A";
+  const stats = generateUserStats(user);
 
-  const bestChoosenLunch = user.choosenLunches.reduce<
-    typeof user.choosenLunches[0] | null
-  >((acc, cur) => {
-    if (!acc) return cur;
-
-    if (
-      getAverageNumber(cur.scores, "score") >
-      getAverageNumber(acc.scores, "score")
-    ) {
-      return cur;
-    }
-
-    return acc;
-  }, null);
+  const filteredUser: typeof user = {
+    ...user,
+    scores: user.scores.filter((score) =>
+      score.lunch.groupLocation.group.members.some(
+        (x) => x.userId === requestUserId
+      )
+    ),
+  };
 
   return {
-    ...user,
-    stats: {
-      lunchCount,
-      averageScore,
-      lowestScore,
-      highestScore,
-      bestChoosenLunch,
-    },
+    ...filteredUser,
+    stats,
   };
 }
 
@@ -150,4 +144,40 @@ export async function verifyLogin(
   const { password: _password, ...userWithoutPassword } = userWithPassword;
 
   return userWithoutPassword;
+}
+
+// TODO stats generation duplicated in group.server.ts
+function generateUserStats(
+  user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>
+) {
+  const lunchCount = user.scores.length;
+  const averageScore = getAverageNumber(user.scores, "score");
+  const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score);
+  const lowestScore =
+    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const highestScore =
+    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
+    "N/A";
+
+  const bestChoosenLunch = user.choosenLunches.reduce<
+    typeof user.choosenLunches[0] | null
+  >((acc, cur) => {
+    if (!acc) return cur;
+
+    if (
+      getAverageNumber(cur.scores, "score") >
+      getAverageNumber(acc.scores, "score")
+    ) {
+      return cur;
+    }
+
+    return acc;
+  }, null);
+  return {
+    lunchCount,
+    averageScore,
+    lowestScore,
+    highestScore,
+    bestChoosenLunch,
+  };
 }

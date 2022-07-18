@@ -15,7 +15,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
   invariant(params.userId, "userId not found");
 
-  const user = await getFullUserById(params.userId);
+  const user = await getFullUserById({
+    id: params.userId,
+    requestUserId: userId,
+  });
   if (!user) {
     throw new Response("Not Found", { status: 404 });
   }
