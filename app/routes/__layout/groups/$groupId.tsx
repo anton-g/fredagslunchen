@@ -17,6 +17,11 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
+
+  if (!details.group.members.some((x) => x.userId === userId)) {
+    throw new Response("Unauthorized", { status: 401 });
+  }
+
   return json({ details });
 };
 
@@ -44,7 +49,21 @@ export function CatchBoundary() {
   const caught = useCatch();
 
   if (caught.status === 404) {
-    return <div>Group not found</div>;
+    return (
+      <div>
+        <h2>Group not found</h2>
+      </div>
+    );
+  }
+
+  if (caught.status === 401) {
+    return (
+      <div>
+        <h2>Access denied</h2>
+        If someone sent you this link, create an account and ask them to add you
+        to their group.
+      </div>
+    );
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
