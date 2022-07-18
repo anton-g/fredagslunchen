@@ -25,7 +25,7 @@ export function getGroup({
           },
         },
       },
-      users: {
+      members: {
         include: {
           user: true,
         },
@@ -54,7 +54,7 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           },
         },
       },
-      users: {
+      members: {
         include: {
           user: {
             include: {
@@ -93,8 +93,8 @@ export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
 
 export function getUserGroups({ userId }: { userId: User["id"] }) {
   return prisma.group.findMany({
-    where: { users: { some: { userId } } },
-    include: { users: { include: { user: { select: { name: true } } } } },
+    where: { members: { some: { userId } } },
+    include: { members: { include: { user: { select: { name: true } } } } },
   });
 }
 
@@ -107,7 +107,7 @@ export function createGroup({
   return prisma.group.create({
     data: {
       name,
-      users: {
+      members: {
         create: [
           {
             role: "ADMIN",
@@ -136,7 +136,7 @@ export async function addUserToGroup({
         id: groupId,
       },
       data: {
-        users: {
+        members: {
           create: {
             user: {
               connect: {
@@ -191,20 +191,20 @@ const generateGroupStats = (
 
   const averageScore = getAverageNumber(allScores, "score");
 
-  const userStats = group.users
+  const memberStats = group.members
     .filter(
       (x) =>
         x.user.scores.filter((s) => s.lunch.groupLocationGroupId === group.id)
           .length > 0
     )
-    .map((groupUser) => {
-      const groupScores = groupUser.user.scores.filter(
+    .map((member) => {
+      const groupScores = member.user.scores.filter(
         (x) => x.lunch.groupLocationGroupId === group.id
       );
       return {
         avg: getAverageNumber(groupScores, "score"),
-        id: groupUser.userId,
-        name: groupUser.user.name,
+        id: member.userId,
+        name: member.user.name,
       };
     }, {})
     .sort((a, b) => b.avg - a.avg);
@@ -238,18 +238,18 @@ const generateGroupStats = (
   );
 
   const mostPositive = {
-    score: userStats[0].avg,
-    name: userStats[0].name,
-    id: userStats[0].id,
+    score: memberStats[0].avg,
+    name: memberStats[0].name,
+    id: memberStats[0].id,
   };
 
   const mostNegative = {
-    score: userStats[userStats.length - 1]?.avg || 0,
-    name: userStats[userStats.length - 1]?.name || "",
-    id: userStats[userStats.length - 1]?.id || "",
+    score: memberStats[memberStats.length - 1]?.avg || 0,
+    name: memberStats[memberStats.length - 1]?.name || "",
+    id: memberStats[memberStats.length - 1]?.id || "",
   };
 
-  const averages = userStats
+  const averages = memberStats
     .slice()
     .sort(
       (a, b) => Math.abs(b.avg - averageScore) - Math.abs(a.avg - averageScore)

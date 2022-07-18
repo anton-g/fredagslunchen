@@ -17,7 +17,7 @@ model User {
 
   password Password?
 
-  groups              UsersInGroups[]
+  groups              GroupMember[]
   scores              Score[]
   choosenLunches      Lunch[]
   discoveredLocations GroupLocation[]
@@ -36,11 +36,11 @@ model Group {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  users          UsersInGroups[]
+  members        GroupMember[]
   groupLocations GroupLocation[]
 }
 
-model UsersInGroups {
+model GroupMember {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 

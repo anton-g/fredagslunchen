@@ -95,7 +95,7 @@ async function seed() {
   await prisma.group.create({
     data: {
       name: "OGs",
-      users: {
+      members: {
         create: [
           { user: { connect: { id: userBasse.id } }, role: "ADMIN" },
           { user: { connect: { id: userTessan.id } } },
@@ -162,7 +162,7 @@ async function seed() {
   await prisma.group.create({
     data: {
       name: "Lunches @ AW",
-      users: {
+      members: {
         create: [
           { user: { connect: { id: userKatten.id } }, role: "ADMIN" },
           { user: { connect: { id: userMartin.id } } },

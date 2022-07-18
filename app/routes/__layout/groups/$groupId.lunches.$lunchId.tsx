@@ -59,7 +59,7 @@ export default function LunchDetailsPage() {
   const averageScore =
     scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "N/A";
 
-  const usersWithoutScores = groupLunch.groupLocation.group.users
+  const usersWithoutScores = groupLunch.groupLocation.group.members
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
     .map((x) => x.user);
 

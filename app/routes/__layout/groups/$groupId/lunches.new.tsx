@@ -1,9 +1,4 @@
-import type { Prisma } from "@prisma/client";
-import type {
-  ActionFunction,
-  LoaderArgs,
-  LoaderFunction,
-} from "@remix-run/node";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
@@ -102,9 +97,9 @@ export default function NewLunchPage() {
     description: x.location.address,
   }));
 
-  const users = loaderData.group.users.map((x) => ({
-    id: x.userId,
-    name: x.user.name,
+  const members = loaderData.group.members.map((member) => ({
+    id: member.userId,
+    name: member.user.name,
   }));
 
   return (
@@ -143,7 +138,7 @@ export default function NewLunchPage() {
             <ComboBox
               label="Choosen by"
               name="choosenBy"
-              defaultItems={users}
+              defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={choosenByRef}
             >

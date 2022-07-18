@@ -30,15 +30,15 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <UsersList>
-        {details.group.users.map((user) => (
-          <li key={user.userId}>
-            <Link to={`/users/${user.userId}`}>
-              <SeedAvatar seed={user.userId} />
+      <MembersList>
+        {details.group.members.map((member) => (
+          <li key={member.userId}>
+            <Link to={`/users/${member.userId}`}>
+              <SeedAvatar seed={member.userId} />
             </Link>
           </li>
         ))}
-      </UsersList>
+      </MembersList>
       <Spacer size={36} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
@@ -144,7 +144,7 @@ const Title = styled.h2`
   margin: 0;
 `;
 
-const UsersList = styled.ul`
+const MembersList = styled.ul`
   list-style: none;
   margin: 0;
   padding: 0;

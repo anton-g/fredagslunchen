@@ -132,7 +132,7 @@ export default function NewLunchPage() {
     (l) => !loaderData.group.groupLocations.find((gl) => gl.locationId === l.id)
   );
 
-  const users = loaderData.group.users.map((x) => ({
+  const members = loaderData.group.members.map((x) => ({
     id: x.userId,
     name: x.user.name,
   }));
@@ -229,7 +229,7 @@ export default function NewLunchPage() {
             <ComboBox
               label="Discovered by"
               name="discoveredBy"
-              defaultItems={users}
+              defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={discoveredByRef}
             >

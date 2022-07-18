@@ -1,6 +1,5 @@
 import { Link } from "@remix-run/react";
 import styled from "styled-components";
-import { Spacer } from "./Spacer";
 
 type StatProps = {
   label: string;

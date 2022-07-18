@@ -1,4 +1,4 @@
-import type { LoaderArgs, LoaderFunction } from "@remix-run/node";
+import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
@@ -30,7 +30,7 @@ export default function GroupsPage() {
                 <NavLink to={`/groups/${group.id}`}>
                   <Card>
                     <GroupTitle>{group.name}</GroupTitle>
-                    {group.users.map((u) => u.user.name).join(", ")}
+                    {group.members.map((m) => m.user.name).join(", ")}
                   </Card>
                 </NavLink>
               </li>
