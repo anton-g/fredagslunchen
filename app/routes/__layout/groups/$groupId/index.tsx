@@ -12,7 +12,6 @@ import { Table } from "~/components/Table";
 import { Spacer } from "~/components/Spacer";
 import { LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
-import { SeedAvatar } from "~/components/Avatar";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -30,16 +29,6 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <MembersList>
-        {details.group.members.map((member) => (
-          <li key={member.userId}>
-            <Link to={`/users/${member.userId}`}>
-              <SeedAvatar seed={member.userId} />
-            </Link>
-          </li>
-        ))}
-      </MembersList>
-      <Spacer size={36} />
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
@@ -69,17 +58,51 @@ export default function GroupDetailsPage() {
         />
       </Stats>
       <Spacer size={48} />
-      <ActionBar>
-        <LinkButton to={`/groups/${details.group.id}/invite`}>
-          Invite user
-        </LinkButton>
-        <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-          New lunch
-        </LinkButton>
-        <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-          New location
-        </LinkButton>
-      </ActionBar>
+      <SectionHeader>
+        <Subtitle>Members</Subtitle>
+        <ActionBar>
+          <LinkButton to={`/groups/${details.group.id}/invite`}>
+            Invite user
+          </LinkButton>
+        </ActionBar>
+      </SectionHeader>
+      <Spacer size={8} />
+      <Table>
+        <Table.Head>
+          <tr>
+            <Table.Heading>Name</Table.Heading>
+            <Table.Heading numeric>Lunches</Table.Heading>
+            <Table.Heading numeric>Average score</Table.Heading>
+            <Table.Heading>Favorite lunch</Table.Heading>
+            <Table.Heading>Worst lunch</Table.Heading>
+          </tr>
+        </Table.Head>
+        <tbody>
+          {details.group.members.map((member) => (
+            <tr key={member.userId}>
+              <Table.Cell>
+                <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
+              </Table.Cell>
+              <Table.Cell numeric>{member.user.scores.length}</Table.Cell>
+              <Table.Cell numeric>N/A</Table.Cell>
+              <Table.Cell>N/A</Table.Cell>
+              <Table.Cell>N/A</Table.Cell>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Spacer size={48} />
+      <SectionHeader>
+        <Subtitle>Lunches</Subtitle>
+        <ActionBar>
+          <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
+            New lunch
+          </LinkButton>
+          <LinkButton to={`/groups/${details.group.id}/locations/new`}>
+            New location
+          </LinkButton>
+        </ActionBar>
+      </SectionHeader>
       <Spacer size={8} />
       <Table>
         <Table.Head>
@@ -139,19 +162,6 @@ export function CatchBoundary() {
   throw new Error(`Unexpected caught response with status: ${caught.status}`);
 }
 
-const Title = styled.h2`
-  font-size: 48px;
-  margin: 0;
-`;
-
-const MembersList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  gap: 16px;
-`;
-
 const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -163,4 +173,14 @@ const Stats = styled.div`
   grid-template-columns: 1fr 1fr 1fr;
   gap: 24px;
   max-width: 600px;
+`;
+
+const Subtitle = styled.h3`
+  margin: 0;
+`;
+
+const SectionHeader = styled.div`
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
 `;

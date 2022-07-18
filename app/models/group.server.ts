@@ -59,6 +59,11 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           user: {
             include: {
               scores: {
+                where: {
+                  lunch: {
+                    groupLocationGroupId: id,
+                  },
+                },
                 include: {
                   lunch: true,
                 },
@@ -192,17 +197,9 @@ const generateGroupStats = (
   const averageScore = getAverageNumber(allScores, "score");
 
   const memberStats = group.members
-    .filter(
-      (x) =>
-        x.user.scores.filter((s) => s.lunch.groupLocationGroupId === group.id)
-          .length > 0
-    )
     .map((member) => {
-      const groupScores = member.user.scores.filter(
-        (x) => x.lunch.groupLocationGroupId === group.id
-      );
       return {
-        avg: getAverageNumber(groupScores, "score"),
+        avg: getAverageNumber(member.user.scores, "score"),
         id: member.userId,
         name: member.user.name,
       };

@@ -1,5 +1,4 @@
 import type { LoaderArgs } from "@remix-run/node";
-import { formatNumber } from "~/utils";
 import { json } from "@remix-run/node";
 import { useCatch, useLoaderData, Outlet } from "@remix-run/react";
 import invariant from "tiny-invariant";
@@ -8,11 +7,7 @@ import { getGroupDetails } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
-import { Table } from "~/components/Table";
-import { SeedAvatar } from "~/components/Avatar";
 import { Spacer } from "~/components/Spacer";
-import { LinkButton } from "~/components/Button";
-import { Stat } from "~/components/Stat";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
