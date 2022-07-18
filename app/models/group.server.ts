@@ -209,33 +209,35 @@ const generateGroupStats = (
     }, {})
     .sort((a, b) => b.avg - a.avg);
 
-  const groupStats = group.groupLocations.reduce(
-    (acc, cur) => {
-      const averageLocationScores = cur.lunches.map((lunch) => ({
-        avg: getAverageNumber(lunch.scores, "score"),
-      }));
+  const groupStats = group.groupLocations
+    .filter((gl) => gl.lunches.length > 0)
+    .reduce(
+      (acc, cur) => {
+        const averageLocationScores = cur.lunches.map((lunch) => ({
+          avg: getAverageNumber(lunch.scores, "score"),
+        }));
 
-      const avg = getAverageNumber(averageLocationScores, "avg");
+        const avg = getAverageNumber(averageLocationScores, "avg");
 
-      if (acc.bestLocation.score < avg) {
-        acc.bestLocation.score = avg;
-        acc.bestLocation.name = cur.location.name;
-        acc.bestLocation.id = cur.locationId;
+        if (acc.bestLocation.score < avg) {
+          acc.bestLocation.score = avg;
+          acc.bestLocation.name = cur.location.name;
+          acc.bestLocation.id = cur.locationId;
+        }
+
+        if (acc.worstLocation.score > avg) {
+          acc.worstLocation.score = avg;
+          acc.worstLocation.name = cur.location.name;
+          acc.worstLocation.id = cur.locationId;
+        }
+
+        return acc;
+      },
+      {
+        bestLocation: { score: -1, name: "", id: 0 },
+        worstLocation: { score: 11, name: "", id: 0 },
       }
-
-      if (acc.worstLocation.score > avg) {
-        acc.worstLocation.score = avg;
-        acc.worstLocation.name = cur.location.name;
-        acc.worstLocation.id = cur.locationId;
-      }
-
-      return acc;
-    },
-    {
-      bestLocation: { score: -1, name: "", id: 0 },
-      worstLocation: { score: 11, name: "", id: 0 },
-    }
-  );
+    );
 
   const mostPositive = {
     score: memberStats[0].avg,
