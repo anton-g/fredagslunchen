@@ -1,4 +1,4 @@
-import type { Group, Location } from "@prisma/client";
+import type { Group, GroupLocation, Location } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -20,4 +20,36 @@ export function getGroupLocation({
       location: true,
     },
   });
+}
+
+type CreateLocationInput = Omit<Location, "id"> & {
+  groupId: Group["id"];
+  discoveredById: GroupLocation["discoveredById"];
+};
+
+export async function createLocation({
+  address,
+  lat,
+  lon,
+  name,
+  groupId,
+  discoveredById,
+}: CreateLocationInput) {
+  // const groupLocation = await prisma.groupLocation.findFirst({
+  //   where: {
+  //     groupId,
+  //     locationId,
+  //   },
+  // });
+  // if (!groupLocation) throw "handle this";
+  // return await prisma.lunch.create({
+  //   data: {
+  //     date: new Date(date),
+  //     choosenByUserId,
+  //     groupLocationGroupId: groupId,
+  //     groupLocationLocationId: locationId,
+  //   },
+  // });
+
+  return { id: "" };
 }

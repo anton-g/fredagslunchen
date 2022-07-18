@@ -76,6 +76,9 @@ export default function GroupDetailsPage() {
         <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
           New lunch
         </LinkButton>
+        <LinkButton to={`/groups/${details.group.id}/locations/new`}>
+          New location
+        </LinkButton>
       </ActionBar>
       <Spacer size={8} />
       <Table>

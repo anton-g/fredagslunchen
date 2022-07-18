@@ -35,29 +35,6 @@ export async function getGroupLunch({
       },
     },
   });
-
-  // const groupLocation = await prisma.groupLocation.findFirst({
-  //   where: { groupId: groupId, lunches: { some: { id } } },
-  //   include: {
-  //     discoveredBy: true,
-  //     lunches: {
-  //       include: {
-  //         scores: {
-  //           include: {
-  //             user: true,
-  //           },
-  //         },
-  //         choosenBy: true,
-  //         groupLocation: {
-  //           include: {
-  //             location: true,
-  //           },
-  //         },
-  //       },
-  //     },
-  //     location: true,
-  //   },
-  // });
 }
 
 type CreateLunchInput = {
