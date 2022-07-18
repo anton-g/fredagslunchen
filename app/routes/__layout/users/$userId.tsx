@@ -40,7 +40,8 @@ export default function Index() {
   const lowestScore =
     sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
   const highestScore =
-    sortedScores[1]?.lunch.groupLocation.location.name || "N/A";
+    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
+    "N/A";
 
   const bestChoosenLunch = data.details.choosenLunches.reduce<
     typeof data.details.choosenLunches[0] | null

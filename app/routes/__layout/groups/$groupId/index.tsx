@@ -83,10 +83,12 @@ export default function GroupDetailsPage() {
               <Table.Cell>
                 <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
               </Table.Cell>
-              <Table.Cell numeric>{member.user.scores.length}</Table.Cell>
-              <Table.Cell numeric>N/A</Table.Cell>
-              <Table.Cell>N/A</Table.Cell>
-              <Table.Cell>N/A</Table.Cell>
+              <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
+              <Table.Cell numeric>
+                {formatNumber(member.stats.averageScore)}
+              </Table.Cell>
+              <Table.Cell>{member.stats.highestScore}</Table.Cell>
+              <Table.Cell>{member.stats.lowestScore}</Table.Cell>
             </tr>
           ))}
         </tbody>

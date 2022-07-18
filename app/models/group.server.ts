@@ -47,7 +47,6 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           location: true,
           lunches: {
             include: {
-              groupLocation: true,
               choosenBy: true,
               scores: true,
             },
@@ -58,6 +57,11 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
         include: {
           user: {
             include: {
+              choosenLunches: {
+                include: {
+                  scores: true,
+                },
+              },
               scores: {
                 where: {
                   lunch: {
@@ -65,7 +69,15 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
                   },
                 },
                 include: {
-                  lunch: true,
+                  lunch: {
+                    include: {
+                      groupLocation: {
+                        include: {
+                          location: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -83,8 +95,16 @@ export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
 
   const stats = generateGroupStats(group);
 
+  const membersWithStats = group.members.map((member) => {
+    const stats = generateUserStats(member);
+    return { ...member, stats };
+  });
+
   return {
-    group,
+    group: {
+      ...group,
+      members: membersWithStats,
+    },
     stats: {
       averageScore: formatNumber(stats.averageScore),
       bestLocation: stats.bestLocation,
@@ -266,5 +286,45 @@ const generateGroupStats = (
     mostNegative,
     mostPositive,
     mostAverage,
+  };
+};
+
+const generateUserStats = (
+  member: NonNullable<
+    Prisma.PromiseReturnType<typeof fetchGroupDetails>
+  >["members"][0]
+) => {
+  const lunchCount = member.user.scores.length;
+  const averageScore = getAverageNumber(member.user.scores, "score");
+  const sortedScores = member.user.scores
+    .slice()
+    .sort((a, b) => a.score - b.score);
+  const lowestScore =
+    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const highestScore =
+    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
+    "N/A";
+
+  const bestChoosenLunch = member.user.choosenLunches.reduce<
+    typeof member.user.choosenLunches[0] | null
+  >((acc, cur) => {
+    if (!acc) return cur;
+
+    if (
+      getAverageNumber(cur.scores, "score") >
+      getAverageNumber(acc.scores, "score")
+    ) {
+      return cur;
+    }
+
+    return acc;
+  }, null);
+
+  return {
+    lunchCount,
+    averageScore,
+    lowestScore,
+    highestScore,
+    bestChoosenLunch,
   };
 };
