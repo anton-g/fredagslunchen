@@ -10,16 +10,6 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
     where: { id },
     include: {
-      groups: {
-        include: {
-          group: {
-            select: {
-              id: true,
-              name: true,
-            },
-          },
-        },
-      },
       scores: {
         include: {
           lunch: {
