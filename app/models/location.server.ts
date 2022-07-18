@@ -22,34 +22,50 @@ export function getGroupLocation({
   });
 }
 
-type CreateLocationInput = Omit<Location, "id"> & {
+type CreateGroupLocationInput = Omit<Location, "id"> & {
   groupId: Group["id"];
   discoveredById: GroupLocation["discoveredById"];
+  locationId?: Location["id"];
 };
 
-export async function createLocation({
+export async function createGroupLocation({
   address,
   lat,
   lon,
   name,
   groupId,
   discoveredById,
-}: CreateLocationInput) {
-  // const groupLocation = await prisma.groupLocation.findFirst({
-  //   where: {
-  //     groupId,
-  //     locationId,
-  //   },
-  // });
-  // if (!groupLocation) throw "handle this";
-  // return await prisma.lunch.create({
-  //   data: {
-  //     date: new Date(date),
-  //     choosenByUserId,
-  //     groupLocationGroupId: groupId,
-  //     groupLocationLocationId: locationId,
-  //   },
-  // });
+  locationId,
+}: CreateGroupLocationInput) {
+  return await prisma.groupLocation.create({
+    data: {
+      group: {
+        connect: {
+          id: groupId,
+        },
+      },
+      discoveredBy: {
+        connect: {
+          id: discoveredById,
+        },
+      },
+      location: {
+        connectOrCreate: {
+          where: {
+            id: locationId || -1,
+          },
+          create: {
+            address,
+            lat,
+            lon,
+            name,
+          },
+        },
+      },
+    },
+  });
+}
 
-  return { id: "" };
+export function getAllLocations() {
+  return prisma.location.findMany({});
 }

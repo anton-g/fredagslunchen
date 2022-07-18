@@ -1,20 +1,16 @@
 import type { Prisma } from "@prisma/client";
-import type {
-  ActionFunction,
-  LoaderArgs,
-  LoaderFunction,
-} from "@remix-run/node";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import { Form, useActionData, useLoaderData } from "@remix-run/react";
 import { useEffect, useRef } from "react";
 import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
-import { ComboBox, Description, Item, Label } from "~/components/ComboBox";
+import { ComboBox, Item, Label } from "~/components/ComboBox";
 import { Input } from "~/components/Input";
 import { Stack } from "~/components/Stack";
 import { getGroup } from "~/models/group.server";
 
-import { createLocation } from "~/models/location.server";
+import { createGroupLocation, getAllLocations } from "~/models/location.server";
 import { requireUserId } from "~/session.server";
 import { useUser } from "~/utils";
 
@@ -26,7 +22,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!group) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ group });
+
+  const locations = await getAllLocations();
+
+  return json({ group, locations });
 };
 
 type ActionData = {
@@ -43,7 +42,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   await requireUserId(request);
 
   const formData = await request.formData();
-  const name = formData.get("name");
+  const locationId = formData.get("location-key");
+  const name = formData.get("location");
   const address = formData.get("address");
   const lat = formData.get("lat");
   const lon = formData.get("lon");
@@ -86,23 +86,29 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  const location = await createLocation({
+  const parsedId =
+    locationId && typeof locationId === "string"
+      ? parseInt(locationId)
+      : undefined;
+
+  const location = await createGroupLocation({
     groupId,
     name,
     address,
     lat,
     lon,
     discoveredById,
+    locationId: parsedId,
   });
 
-  return redirect(`/groups/${groupId}/locations/${location.id}`);
+  return redirect(`/groups/${groupId}/locations/${location.locationId}`);
 };
 
 export default function NewLunchPage() {
   const user = useUser();
   const actionData = useActionData() as ActionData;
   const loaderData = useLoaderData<typeof loader>();
-  const nameRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null!);
   const addressRef = useRef<HTMLInputElement>(null);
   const latRef = useRef<HTMLInputElement>(null);
   const lonRef = useRef<HTMLInputElement>(null);
@@ -122,11 +128,9 @@ export default function NewLunchPage() {
     }
   }, [actionData]);
 
-  // const locations = loaderData.group.groupLocations.map((x) => ({
-  //   id: x.locationId,
-  //   name: x.location.name,
-  //   description: x.location.address,
-  // }));
+  const locations = loaderData.locations.filter(
+    (l) => !loaderData.group.groupLocations.find((gl) => gl.locationId === l.id)
+  );
 
   const users = loaderData.group.users.map((x) => ({
     id: x.userId,
@@ -147,17 +151,22 @@ export default function NewLunchPage() {
       >
         <Stack gap={16}>
           <div>
-            <label>
-              <span>Name</span>
-              <Input
-                ref={nameRef}
-                name="name"
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.name ? "name-error" : undefined
-                }
-              />
-            </label>
+            <ComboBox
+              label="Name"
+              name="location"
+              defaultItems={locations}
+              defaultSelectedKey={user.id}
+              inputRef={nameRef}
+              allowsCustomValue={true}
+            >
+              {(item) => (
+                <Item textValue={item.name}>
+                  <div>
+                    <Label>{item.name}</Label>
+                  </div>
+                </Item>
+              )}
+            </ComboBox>
             {actionData?.errors?.name && (
               <div id="name-error">{actionData.errors.name}</div>
             )}

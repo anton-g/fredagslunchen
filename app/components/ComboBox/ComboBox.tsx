@@ -20,15 +20,15 @@ export const ComboBox = <T extends object>(
     inputRef?: React.MutableRefObject<HTMLInputElement>;
   }
 ) => {
-  let { contains } = useFilter({ sensitivity: "base" });
-  let state = useComboBoxState({ ...props, defaultFilter: contains });
+  const { contains } = useFilter({ sensitivity: "base" });
+  const state = useComboBoxState({ ...props, defaultFilter: contains });
 
-  let buttonRef = useRef(null);
-  let inputRef = useRef<HTMLInputElement>(null!);
-  let listBoxRef = useRef(null);
-  let popoverRef = useRef(null);
+  const buttonRef = useRef(null);
+  const inputRef = useRef<HTMLInputElement>(null!);
+  const listBoxRef = useRef(null);
+  const popoverRef = useRef(null);
 
-  let {
+  const {
     buttonProps: triggerProps,
     inputProps,
     listBoxProps,
@@ -44,7 +44,7 @@ export const ComboBox = <T extends object>(
     state
   );
 
-  let { buttonProps } = useButton(triggerProps, buttonRef);
+  const { buttonProps } = useButton(triggerProps, buttonRef);
 
   return (
     <Wrapper>
@@ -99,8 +99,6 @@ const InputGroup = styled.div<StyleProps>`
   overflow: hidden;
   margin-top: 4px;
   border-radius: 4px;
-  /* box-shadow: ${(props) =>
-    props.isFocused ? "0 0 0 3px rgba(143, 188, 143, 0.5)" : ""}; */
 `;
 
 const ComboBoxInput = styled(Input)<StyleProps>`
