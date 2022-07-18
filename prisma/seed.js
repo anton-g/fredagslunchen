@@ -21,6 +21,7 @@ async function seed() {
     data: {
       email,
       name,
+      role: "ADMIN",
       password: {
         create: {
           hash: hashedPassword,
