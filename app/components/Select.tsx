@@ -32,7 +32,7 @@ const Select = ({ defaultValue, children }: SelectProps) => (
   </SelectPrimitive.Root>
 );
 
-const StyledTrigger = styled(SelectPrimitive.SelectTrigger)`
+const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
   all: unset;
   display: inline-flex;
   align-items: center;
@@ -48,7 +48,7 @@ const StyledTrigger = styled(SelectPrimitive.SelectTrigger)`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const StyledContent = styled(SelectPrimitive.Content)`
+const SelectContent = styled(SelectPrimitive.Content)`
   overflow: hidden;
   background-color: ${({ theme }) => theme.colors.secondary};
   border-radius: 6px;
@@ -56,11 +56,11 @@ const StyledContent = styled(SelectPrimitive.Content)`
     0px 10px 20px -15px rgba(22, 23, 24, 0.2);
 `;
 
-const StyledViewport = styled(SelectPrimitive.Viewport)`
+const SelectViewport = styled(SelectPrimitive.Viewport)`
   padding: 5px;
 `;
 
-const StyledItem = styled(SelectPrimitive.Item)`
+const SelectItem = styled(SelectPrimitive.Item)`
   all: unset;
   font-size: 16px;
   line-height: 1px;
@@ -82,7 +82,7 @@ const StyledItem = styled(SelectPrimitive.Item)`
   }
 `;
 
-const StyledLabel = styled(SelectPrimitive.Label)`
+const SelectLabel = styled(SelectPrimitive.Label)`
   padding: 0 25px;
   font-size: 14px;
   line-height: 25px;
@@ -90,13 +90,13 @@ const StyledLabel = styled(SelectPrimitive.Label)`
   color: ${({ theme }) => theme.colors.primary};
 `;
 
-const StyledSeparator = styled(SelectPrimitive.Separator)`
+const SelectSeparator = styled(SelectPrimitive.Separator)`
   height: 1px;
   background-color: ${({ theme }) => theme.colors.primary};
   margin: 5px;
 `;
 
-const StyledItemIndicator = styled(SelectPrimitive.ItemIndicator)`
+const SelectItemIndicator = styled(SelectPrimitive.ItemIndicator)`
   position: absolute;
   left: 0px;
   width: 25px;
@@ -115,27 +115,18 @@ const scrollButtonStyles = css`
   cursor: default;
 `;
 
-const StyledScrollUpButton = styled(SelectPrimitive.ScrollUpButton)`
+const SelectScrollUpButton = styled(SelectPrimitive.ScrollUpButton)`
   ${scrollButtonStyles}
 `;
 
-const StyledScrollDownButton = styled(SelectPrimitive.ScrollDownButton)`
+const SelectScrollDownButton = styled(SelectPrimitive.ScrollDownButton)`
   ${scrollButtonStyles}
 `;
 
-const SelectTrigger = StyledTrigger;
 const SelectValue = SelectPrimitive.Value;
 const SelectIcon = SelectPrimitive.Icon;
-const SelectContent = StyledContent;
-const SelectViewport = StyledViewport;
 const SelectGroup = SelectPrimitive.Group;
-const SelectItem = StyledItem;
 const SelectItemText = SelectPrimitive.ItemText;
-const SelectItemIndicator = StyledItemIndicator;
-const SelectLabel = StyledLabel;
-const SelectSeparator = StyledSeparator;
-const SelectScrollUpButton = StyledScrollUpButton;
-const SelectScrollDownButton = StyledScrollDownButton;
 
 const Indicator = () => {
   return (
