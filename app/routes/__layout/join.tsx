@@ -107,6 +107,7 @@ export default function Join() {
 
   return (
     <div>
+      <h2>Sign up</h2>
       <Form method="post">
         <Stack gap={16}>
           <div>

@@ -96,54 +96,57 @@ export default function LoginPage() {
   }, [actionData]);
 
   return (
-    <Form method="post">
-      <Stack gap={16}>
-        <div>
-          <label htmlFor="email">Email address</label>
+    <>
+      <h2>Login</h2>
+      <Form method="post">
+        <Stack gap={16}>
           <div>
-            <Input
-              ref={emailRef}
-              id="email"
-              required
-              autoFocus={true}
-              name="email"
-              type="email"
-              autoComplete="email"
-              aria-invalid={actionData?.errors?.email ? true : undefined}
-              aria-describedby="email-error"
-            />
-            {actionData?.errors?.email && (
-              <div id="email-error">{actionData.errors.email}</div>
-            )}
+            <label htmlFor="email">Email address</label>
+            <div>
+              <Input
+                ref={emailRef}
+                id="email"
+                required
+                autoFocus={true}
+                name="email"
+                type="email"
+                autoComplete="email"
+                aria-invalid={actionData?.errors?.email ? true : undefined}
+                aria-describedby="email-error"
+              />
+              {actionData?.errors?.email && (
+                <div id="email-error">{actionData.errors.email}</div>
+              )}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <label htmlFor="password">Password</label>
           <div>
-            <Input
-              id="password"
-              ref={passwordRef}
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              aria-invalid={actionData?.errors?.password ? true : undefined}
-              aria-describedby="password-error"
-            />
-            {actionData?.errors?.password && (
-              <div id="password-error">{actionData.errors.password}</div>
-            )}
+            <label htmlFor="password">Password</label>
+            <div>
+              <Input
+                id="password"
+                ref={passwordRef}
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                aria-invalid={actionData?.errors?.password ? true : undefined}
+                aria-describedby="password-error"
+              />
+              {actionData?.errors?.password && (
+                <div id="password-error">{actionData.errors.password}</div>
+              )}
+            </div>
           </div>
-        </div>
 
-        <input type="hidden" name="redirectTo" value={redirectTo} />
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <Checkbox id="remember" name="remember" />
-          <label htmlFor="remember">Remember me</label>
-        </div>
-        <SubmitButton type="submit">Log in</SubmitButton>
-      </Stack>
-    </Form>
+          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <Checkbox id="remember" name="remember" />
+            <label htmlFor="remember">Remember me</label>
+          </div>
+          <SubmitButton type="submit">Log in</SubmitButton>
+        </Stack>
+      </Form>
+    </>
   );
 }
 

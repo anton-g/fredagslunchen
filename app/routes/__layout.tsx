@@ -24,7 +24,7 @@ export default function Index() {
             </>
           ) : (
             <>
-              <StyledLink to={"/join"}>register</StyledLink>
+              <StyledLink to={"/join"}>join</StyledLink>
               <StyledLink to={"/login"}>login</StyledLink>
             </>
           )}
