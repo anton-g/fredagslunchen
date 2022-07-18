@@ -19,6 +19,7 @@ export default function Index() {
               <StyledLink to={"/groups"}>groups</StyledLink>
               <StyledLink to={"/discover"}>discover</StyledLink>
               <StyledForm action="/logout" method="post">
+                {/* TODO logout on mobile*/}
                 <LinkButton type="submit">logout</LinkButton>
               </StyledForm>
             </>
@@ -41,6 +42,7 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 24px;
 `;
 
 const Header = styled.header`
