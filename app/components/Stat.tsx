@@ -44,6 +44,7 @@ const StatLink = styled(Link)`
 const Value = styled.span`
   font-weight: bold;
   font-size: 24px;
+  white-space: nowrap;
 `;
 
 const Detail = styled.span`

@@ -1,5 +1,5 @@
 import type { LoaderArgs } from "@remix-run/server-runtime";
-import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils";
+import { formatNumber, formatTimeAgo } from "~/utils";
 import { useLoaderData, Link } from "@remix-run/react";
 import { json } from "@remix-run/server-runtime";
 import styled from "styled-components";
@@ -7,7 +7,6 @@ import { Spacer } from "~/components/Spacer";
 import { Table } from "~/components/Table";
 import { getFullUserById } from "~/models/user.server";
 import { requireUserId } from "~/session.server";
-import { useOptionalUser } from "~/utils";
 import invariant from "tiny-invariant";
 import { SeedAvatar } from "~/components/Avatar";
 import { Stat } from "~/components/Stat";
@@ -16,65 +15,38 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
   invariant(params.userId, "userId not found");
 
-  const details = await getFullUserById(params.userId);
-  if (!details) {
+  const user = await getFullUserById(params.userId);
+  if (!user) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ details, isYou: userId === params.userId });
+  return json({ user, isYou: userId === params.userId });
 };
 
 export default function Index() {
-  const user = useOptionalUser();
-  const data = useLoaderData<typeof loader>();
-
-  if (!user) return null;
-
-  // TODO move stats calc to server?
-  const numberOfLunches = data.details.scores.length;
-  const averageScore = formatNumber(
-    getAverageNumber(data.details.scores, "score")
-  );
-  const sortedScores = data.details.scores
-    .slice()
-    .sort((a, b) => a.score - b.score);
-  const lowestScore =
-    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
-  const highestScore =
-    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "N/A";
-
-  const bestChoosenLunch = data.details.choosenLunches.reduce<
-    typeof data.details.choosenLunches[0] | null
-  >((acc, cur) => {
-    if (!acc) return cur;
-
-    if (
-      getAverageNumber(cur.scores, "score") >
-      getAverageNumber(acc.scores, "score")
-    ) {
-      return cur;
-    }
-
-    return acc;
-  }, null);
+  const { user, isYou } = useLoaderData<typeof loader>();
 
   return (
     <Wrapper>
       <Section>
         <TitleRow>
-          <SeedAvatar seed={data.details.id} />
-          <Title>{data.isYou ? "You" : data.details.name}</Title>
+          <SeedAvatar seed={user.id} />
+          <Title>{isYou ? "You" : user.name}</Title>
         </TitleRow>
         <Spacer size={24} />
         <Stats>
-          <Stat label="Number of lunches" value={numberOfLunches} />
-          <Stat label="Average score" value={averageScore} />
+          <Stat label="Number of lunches" value={user.stats.lunchCount} />
+          <Stat
+            label="Average score"
+            value={formatNumber(user.stats.averageScore)}
+          />
           <Stat
             label="Most popular choice"
-            value={bestChoosenLunch?.groupLocation.location.name || "N/A"}
+            value={
+              user.stats.bestChoosenLunch?.groupLocation.location.name || "N/A"
+            }
           />
-          <Stat label="Lowest score" value={lowestScore} />
-          <Stat label="Highest score" value={highestScore} />
+          <Stat label="Lowest score" value={user.stats.lowestScore} />
+          <Stat label="Highest score" value={user.stats.highestScore} />
         </Stats>
       </Section>
       <Spacer size={64} />
@@ -92,7 +64,7 @@ export default function Index() {
             </tr>
           </Table.Head>
           <tbody>
-            {data.details.scores.map((score) => (
+            {user.scores.map((score) => (
               <tr key={score.id}>
                 <Table.Cell>
                   <Link

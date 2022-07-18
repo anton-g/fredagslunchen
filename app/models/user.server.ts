@@ -2,11 +2,12 @@ import type { Password, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
+import { getAverageNumber } from "~/utils";
 
 export type { User } from "@prisma/client";
 
 export async function getFullUserById(id: User["id"]) {
-  return prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id },
     include: {
       groups: {
@@ -50,6 +51,44 @@ export async function getFullUserById(id: User["id"]) {
       },
     },
   });
+
+  if (!user) return null;
+
+  // TODO stats generation duplicated in group.server.ts
+  const lunchCount = user.scores.length;
+  const averageScore = getAverageNumber(user.scores, "score");
+  const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score);
+  const lowestScore =
+    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const highestScore =
+    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
+    "N/A";
+
+  const bestChoosenLunch = user.choosenLunches.reduce<
+    typeof user.choosenLunches[0] | null
+  >((acc, cur) => {
+    if (!acc) return cur;
+
+    if (
+      getAverageNumber(cur.scores, "score") >
+      getAverageNumber(acc.scores, "score")
+    ) {
+      return cur;
+    }
+
+    return acc;
+  }, null);
+
+  return {
+    ...user,
+    stats: {
+      lunchCount,
+      averageScore,
+      lowestScore,
+      highestScore,
+      bestChoosenLunch,
+    },
+  };
 }
 
 export async function getUserById(id: User["id"]) {
