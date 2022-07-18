@@ -17,7 +17,7 @@ export default function Index() {
             <>
               <StyledLink to={`/users/${user.id}`}>you</StyledLink>
               <StyledLink to={"/groups"}>groups</StyledLink>
-              <StyledLink to={"/"}>discover</StyledLink>
+              <StyledLink to={"/discover"}>discover</StyledLink>
               <StyledForm action="/logout" method="post">
                 <LinkButton type="submit">logout</LinkButton>
               </StyledForm>

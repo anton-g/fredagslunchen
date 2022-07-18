@@ -1,6 +1,7 @@
 import type { Group, GroupLocation, Location } from "@prisma/client";
 
 import { prisma } from "~/db.server";
+import { getAverageNumber } from "~/utils";
 
 export type { Location } from "@prisma/client";
 
@@ -68,4 +69,35 @@ export async function createGroupLocation({
 
 export function getAllLocations() {
   return prisma.location.findMany({});
+}
+
+export async function getAllLocationsStats() {
+  const locations = await prisma.location.findMany({
+    include: {
+      groupLocation: {
+        include: {
+          lunches: {
+            include: {
+              scores: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  const locationsWithStats = locations.map((loc) => {
+    const allScores = loc.groupLocation.flatMap((gl) =>
+      gl.lunches.flatMap((l) => l.scores)
+    );
+
+    const averageScore = getAverageNumber(allScores, "score");
+
+    return {
+      ...loc,
+      averageScore,
+    };
+  });
+
+  return locationsWithStats;
 }
