@@ -24,7 +24,10 @@ export default function GroupsPage() {
     <main>
       <div>
         {data.groups.length === 0 ? (
-          <p>No groups yet</p>
+          <>
+            <GroupTitle>No groups yet</GroupTitle>
+            <p>Create a new group or ask for an invite to see them here!</p>
+          </>
         ) : (
           <GroupList>
             {data.groups.map((group) => (

@@ -53,53 +53,55 @@ export default function Index() {
         </Stats>
       </Section>
       <Spacer size={64} />
-      <Section>
-        <Subtitle>Lunches</Subtitle>
-        <Table>
-          <Table.Head>
-            <tr>
-              <Table.Heading>Date</Table.Heading>
-              <Table.Heading>Location</Table.Heading>
-              <Table.Heading numeric>Score</Table.Heading>
-              <Table.Heading>Group</Table.Heading>
-              <Table.Heading>Choosen by</Table.Heading>
-              <Table.Heading>Comment</Table.Heading>
-            </tr>
-          </Table.Head>
-          <tbody>
-            {user.scores.map((score) => (
-              <tr key={score.id}>
-                <Table.Cell>
-                  <Link
-                    to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
-                  >
-                    {formatTimeAgo(new Date(score.lunch.date))}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link
-                    to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
-                  >
-                    {score.lunch.groupLocation.location.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell numeric>{score.score}</Table.Cell>
-                <Table.Cell>
-                  <Link to={`/groups/${score.lunch.groupLocationGroupId}`}>
-                    {score.lunch.groupLocation.group.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link to={`/users/${score.lunch.choosenBy.id}`}>
-                    {score.lunch.choosenBy.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>{score.comment}</Table.Cell>
+      {user.scores.length > 0 && (
+        <Section>
+          <Subtitle>Lunches</Subtitle>
+          <Table>
+            <Table.Head>
+              <tr>
+                <Table.Heading>Date</Table.Heading>
+                <Table.Heading>Location</Table.Heading>
+                <Table.Heading numeric>Score</Table.Heading>
+                <Table.Heading>Group</Table.Heading>
+                <Table.Heading>Choosen by</Table.Heading>
+                <Table.Heading>Comment</Table.Heading>
               </tr>
-            ))}
-          </tbody>
-        </Table>
-      </Section>
+            </Table.Head>
+            <tbody>
+              {user.scores.map((score) => (
+                <tr key={score.id}>
+                  <Table.Cell>
+                    <Link
+                      to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
+                    >
+                      {formatTimeAgo(new Date(score.lunch.date))}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Link
+                      to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
+                    >
+                      {score.lunch.groupLocation.location.name}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell numeric>{score.score}</Table.Cell>
+                  <Table.Cell>
+                    <Link to={`/groups/${score.lunch.groupLocationGroupId}`}>
+                      {score.lunch.groupLocation.group.name}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell>
+                    <Link to={`/users/${score.lunch.choosenBy.id}`}>
+                      {score.lunch.choosenBy.name}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell>{score.comment}</Table.Cell>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </Section>
+      )}
     </Wrapper>
   );
 }
