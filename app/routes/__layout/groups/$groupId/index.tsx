@@ -35,6 +35,8 @@ export default function GroupDetailsPage() {
         b.stats.lunchCount / b.stats.choiceCount -
         a.stats.lunchCount / a.stats.choiceCount
     );
+  const suggestedPicker = orderedPickers[0];
+  const alternativePickers = orderedPickers.slice(1);
 
   return (
     <div>
@@ -134,19 +136,20 @@ export default function GroupDetailsPage() {
       <Stats>
         <HoverCard>
           <HoverCard.Trigger>
-            <Stat label="Location picker" value={orderedPickers[0].user.name} />
+            <Stat label="Location picker" value={suggestedPicker.user.name} />
           </HoverCard.Trigger>
-          <HoverCard.Content align="start" alignOffset={16}>
-            <h4 style={{ margin: 0 }}>Alternatives</h4>
-            <Spacer size={8} />
-            <PickerAlternativesList start={2}>
-              {orderedPickers.slice(1).map((member) => (
-                <li key={member.userId}>{member.user.name}</li>
-              ))}
-            </PickerAlternativesList>
-          </HoverCard.Content>
+          {alternativePickers.length > 0 && (
+            <HoverCard.Content align="start" alignOffset={16}>
+              <h4 style={{ margin: 0 }}>Alternatives</h4>
+              <Spacer size={8} />
+              <PickerAlternativesList start={2}>
+                {alternativePickers.map((member) => (
+                  <li key={member.userId}>{member.user.name}</li>
+                ))}
+              </PickerAlternativesList>
+            </HoverCard.Content>
+          )}
         </HoverCard>
-        <Stat label="Lunch location" value={"WokHouse"} />
       </Stats>
       <Spacer size={48} />
       <SectionHeader>
