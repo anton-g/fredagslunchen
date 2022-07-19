@@ -14,6 +14,7 @@ import { Switch, SwitchThumb } from "~/components/Switch";
 import { Select } from "~/components/Select";
 import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
 import { TextArea } from "~/components/TextArea";
+import { HoverCard } from "~/components/HoverCard";
 
 export const meta: MetaFunction = () => {
   return {
@@ -25,6 +26,22 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Hover Card">
+          <HoverCard>
+            <HoverCard.Trigger asChild>
+              <div
+                style={{
+                  width: "fit-content",
+                  padding: 8,
+                  border: "2px dashed black",
+                }}
+              >
+                Hover me
+              </div>
+            </HoverCard.Trigger>
+            <HoverCard.Content>Hello</HoverCard.Content>
+          </HoverCard>
+        </Component>
         <Component title="ComboBox">
           <ComboBoxExample />
         </Component>
