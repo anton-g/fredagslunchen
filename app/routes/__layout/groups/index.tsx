@@ -2,12 +2,14 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { NavLink, useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
+import { SeedAvatar } from "~/components/Avatar";
 import { LinkButton } from "~/components/Button";
 import { Card } from "~/components/Card";
 import { Spacer } from "~/components/Spacer";
 
 import { getUserGroups } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
+import { formatTimeAgo } from "~/utils";
 
 export const loader = async ({ request }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -29,8 +31,29 @@ export default function GroupsPage() {
               <li key={group.id}>
                 <NavLink to={`/groups/${group.id}`}>
                   <Card>
-                    <GroupTitle>{group.name}</GroupTitle>
-                    {group.members.map((m) => m.user.name).join(", ")}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <GroupTitle>{group.name}</GroupTitle>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {group.members.map((m) => (
+                          <SeedAvatar
+                            key={m.userId}
+                            seed={m.user.name}
+                            size="small"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    {group.groupLocations.reduce(
+                      (total, gl) => total + gl._count.lunches,
+                      0
+                    )}{" "}
+                    lunches in {group.groupLocations.length} locations since{" "}
+                    {formatTimeAgo(new Date(group.createdAt))}
                   </Card>
                 </NavLink>
               </li>
@@ -55,6 +78,7 @@ const GroupList = styled.ul`
 
 const GroupTitle = styled.h2`
   margin: 0;
+  font-size: 36px;
 `;
 
 const NewGroupLink = styled(LinkButton)`

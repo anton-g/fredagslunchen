@@ -119,7 +119,18 @@ export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
 export function getUserGroups({ userId }: { userId: User["id"] }) {
   return prisma.group.findMany({
     where: { members: { some: { userId } } },
-    include: { members: { include: { user: { select: { name: true } } } } },
+    include: {
+      groupLocations: {
+        select: {
+          _count: {
+            select: {
+              lunches: true,
+            },
+          },
+        },
+      },
+      members: { include: { user: { select: { name: true } } } },
+    },
   });
 }
 
