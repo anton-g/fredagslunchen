@@ -101,8 +101,10 @@ export function formatTimeAgo(date: Date) {
   }
 }
 
-export const formatNumber = (num: number) => {
+export const formatNumber = (num: number, max?: number) => {
+  if (!num) return "N/A"; // TODO fix type
   if (num < 0) return "N/A";
+  if (max && num > max) return "N/A";
 
   return num.toLocaleString("en-US", {
     maximumFractionDigits: 1,

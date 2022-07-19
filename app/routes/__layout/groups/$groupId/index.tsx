@@ -33,28 +33,54 @@ export default function GroupDetailsPage() {
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
           label="Best score"
-          value={`${details.stats.bestLocation.name}`}
-          detail={formatNumber(details.stats.bestLocation.score)}
+          value={`${details.stats.bestLocation.name || "N/A"}`}
+          detail={
+            details.stats.bestLocation.name
+              ? formatNumber(details.stats.bestLocation.score, 10)
+              : undefined
+          }
         />
         <Stat
           label="Worst score"
-          value={`${details.stats.worstLocation.name}`}
-          detail={formatNumber(details.stats.worstLocation.score)}
+          value={`${details.stats.worstLocation.name || "N/A"}`}
+          detail={
+            details.stats.worstLocation.name
+              ? formatNumber(details.stats.worstLocation.score, 10)
+              : undefined
+          }
         />
         <Stat
           label="Most positive"
-          value={`${details.stats.mostPositive.name}`}
-          detail={formatNumber(details.stats.mostPositive.score)}
+          value={`${
+            details.stats.mostPositive ? details.stats.mostPositive.name : "N/A"
+          }`}
+          detail={
+            details.stats.mostPositive
+              ? formatNumber(details.stats.mostPositive.score)
+              : undefined
+          }
         />
         <Stat
           label="Most negative"
-          value={`${details.stats.mostNegative.name}`}
-          detail={formatNumber(details.stats.mostNegative.score)}
+          value={`${
+            details.stats.mostNegative ? details.stats.mostNegative.name : "N/A"
+          }`}
+          detail={
+            details.stats.mostNegative
+              ? formatNumber(details.stats.mostNegative.score)
+              : undefined
+          }
         />
         <Stat
           label="Most average"
-          value={`${details.stats.mostAvarage.name}`}
-          detail={formatNumber(details.stats.mostAvarage.score)}
+          value={`${
+            details.stats.mostAvarage ? details.stats.mostAvarage.name : "N/A"
+          }`}
+          detail={
+            details.stats.mostAvarage
+              ? formatNumber(details.stats.mostAvarage.score)
+              : undefined
+          }
         />
       </Stats>
       <Spacer size={48} />

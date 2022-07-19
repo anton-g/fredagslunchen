@@ -205,17 +205,17 @@ type StatsType = {
     score: number;
     name: User["name"];
     id: User["id"];
-  };
+  } | null;
   mostNegative: {
     score: number;
     name: User["name"];
     id: User["id"];
-  };
+  } | null;
   mostAverage: {
     score: number;
     name: User["name"];
     id: User["id"];
-  };
+  } | null;
 };
 
 // holy reduce
@@ -228,6 +228,7 @@ const generateGroupStats = (
   const averageScore = getAverageNumber(allScores, "score");
 
   const memberStats = group.members
+    .filter((member) => member.user.scores.length > 0)
     .map((member) => {
       return {
         avg: getAverageNumber(member.user.scores, "score"),
@@ -267,17 +268,21 @@ const generateGroupStats = (
       }
     );
 
-  const mostPositive = {
-    score: memberStats[0].avg,
-    name: memberStats[0].name,
-    id: memberStats[0].id,
-  };
+  const mostPositive = memberStats[0]
+    ? {
+        score: memberStats[0].avg,
+        name: memberStats[0].name,
+        id: memberStats[0].id,
+      }
+    : null;
 
-  const mostNegative = {
-    score: memberStats[memberStats.length - 1]?.avg || 0,
-    name: memberStats[memberStats.length - 1]?.name || "",
-    id: memberStats[memberStats.length - 1]?.id || "",
-  };
+  const mostNegative = memberStats[memberStats.length - 1]
+    ? {
+        score: memberStats[memberStats.length - 1].avg || 0,
+        name: memberStats[memberStats.length - 1].name || "",
+        id: memberStats[memberStats.length - 1].id || "",
+      }
+    : null;
 
   const averages = memberStats
     .slice()
@@ -285,11 +290,13 @@ const generateGroupStats = (
       (a, b) => Math.abs(b.avg - averageScore) - Math.abs(a.avg - averageScore)
     );
 
-  const mostAverage = {
-    score: averages[0].avg,
-    name: averages[0].name,
-    id: averages[0].id,
-  };
+  const mostAverage = averages[0]
+    ? {
+        score: averages[0].avg,
+        name: averages[0].name,
+        id: averages[0].id,
+      }
+    : null;
 
   return {
     ...groupStats,
