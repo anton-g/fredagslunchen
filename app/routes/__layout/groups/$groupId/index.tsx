@@ -12,6 +12,7 @@ import { Table } from "~/components/Table";
 import { Spacer } from "~/components/Spacer";
 import { LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
+import { HoverCard } from "~/components/HoverCard";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -26,6 +27,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 export default function GroupDetailsPage() {
   const { details } = useLoaderData<typeof loader>();
+
+  const orderedPickers = details.group.members
+    .slice()
+    .sort(
+      (a, b) =>
+        b.stats.lunchCount / b.stats.choiceCount -
+        a.stats.lunchCount / a.stats.choiceCount
+    );
 
   return (
     <div>
@@ -120,6 +129,26 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
+      <Subtitle>Suggestions</Subtitle>
+      <Spacer size={8} />
+      <Stats>
+        <HoverCard>
+          <HoverCard.Trigger>
+            <Stat label="Location picker" value={orderedPickers[0].user.name} />
+          </HoverCard.Trigger>
+          <HoverCard.Content align="start" alignOffset={16}>
+            <h4 style={{ margin: 0 }}>Alternatives</h4>
+            <Spacer size={8} />
+            <PickerAlternativesList start={2}>
+              {orderedPickers.slice(1).map((member) => (
+                <li key={member.userId}>{member.user.name}</li>
+              ))}
+            </PickerAlternativesList>
+          </HoverCard.Content>
+        </HoverCard>
+        <Stat label="Lunch location" value={"WokHouse"} />
+      </Stats>
+      <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
         <ActionBar>
@@ -211,4 +240,17 @@ const SectionHeader = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
+`;
+
+const PickerAlternativesList = styled.ol`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style-position: inside;
+
+  > li {
+    font-size: 16px;
+  }
 `;

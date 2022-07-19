@@ -58,6 +58,9 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           user: {
             include: {
               choosenLunches: {
+                orderBy: {
+                  date: "desc",
+                },
                 include: {
                   scores: true,
                 },
@@ -313,6 +316,7 @@ const generateUserStats = (
   >["members"][0]
 ) => {
   const lunchCount = member.user.scores.length;
+  const choiceCount = member.user.choosenLunches.length;
   const averageScore = getAverageNumber(member.user.scores, "score");
   const sortedScores = member.user.scores
     .slice()
@@ -340,6 +344,7 @@ const generateUserStats = (
 
   return {
     lunchCount,
+    choiceCount,
     averageScore,
     lowestScore,
     highestScore,

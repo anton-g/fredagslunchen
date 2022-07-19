@@ -1,4 +1,5 @@
 import { Link } from "@remix-run/react";
+import { forwardRef } from "react";
 import styled from "styled-components";
 
 type StatProps = {
@@ -8,17 +9,20 @@ type StatProps = {
   detail?: string;
 };
 
-export const Stat = ({ label, value, to, detail }: StatProps) => {
-  return (
-    <StatWrapper>
-      <h3>{label}</h3>
-      <div style={{ display: "flex", alignItems: "baseline" }}>
-        {to ? <StatLink to={to}>{value}</StatLink> : <Value>{value}</Value>}
-        {detail && <Detail>{detail}</Detail>}
-      </div>
-    </StatWrapper>
-  );
-};
+// eslint-disable-next-line react/display-name
+export const Stat = forwardRef<HTMLDivElement, StatProps>(
+  ({ label, value, to, detail }, ref) => {
+    return (
+      <StatWrapper ref={ref}>
+        <h3>{label}</h3>
+        <div style={{ display: "flex", alignItems: "baseline" }}>
+          {to ? <StatLink to={to}>{value}</StatLink> : <Value>{value}</Value>}
+          {detail && <Detail>{detail}</Detail>}
+        </div>
+      </StatWrapper>
+    );
+  }
+);
 
 const StatWrapper = styled.div`
   display: flex;
