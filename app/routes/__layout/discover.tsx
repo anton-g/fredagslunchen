@@ -23,6 +23,7 @@ export default function DiscoverPage() {
   return (
     <main>
       <Title>Discover</Title>
+      <Subtitle>Top 10</Subtitle>
       <Table>
         <Table.Head>
           <tr>
@@ -32,20 +33,23 @@ export default function DiscoverPage() {
           </tr>
         </Table.Head>
         <tbody>
-          {data.locations.map((loc) => {
-            return (
-              <tr key={loc.id}>
-                <Table.Cell>{loc.name}</Table.Cell>
-                <Table.Cell>{loc.address}</Table.Cell>
-                <Table.Cell numeric>
-                  {formatNumber(loc.averageScore)}
-                </Table.Cell>
-              </tr>
-            );
-          })}
+          {data.locations
+            .sort((a, b) => b.averageScore - a.averageScore)
+            .map((loc) => {
+              return (
+                <tr key={loc.id}>
+                  <Table.Cell>{loc.name}</Table.Cell>
+                  <Table.Cell>{loc.address}</Table.Cell>
+                  <Table.Cell numeric>
+                    {formatNumber(loc.averageScore)}
+                  </Table.Cell>
+                </tr>
+              );
+            })}
         </tbody>
       </Table>
       <Spacer size={24} />
+      <Subtitle>Map</Subtitle>
       <MapCard>
         <Map locations={data.locations} />
       </MapCard>
@@ -57,6 +61,12 @@ const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
+`;
+
+const Subtitle = styled.h2`
+  font-size: 36px;
+  margin: 0;
+  margin-bottom: 18px;
 `;
 
 const MapCard = styled(Card)`

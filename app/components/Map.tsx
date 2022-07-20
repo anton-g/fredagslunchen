@@ -11,6 +11,7 @@ type Location = {
   lon: string;
   lat: string;
   name: string;
+  address: string;
   lunchCount: number;
   averageScore: number;
   highestScore: number;
@@ -121,7 +122,8 @@ const LocationPopupContent = ({ location }: { location: Location }) => {
       <Link to={`/locations/${location.id}`}>
         <LocationTitle>{location.name}</LocationTitle>
       </Link>
-      <Spacer size={8} />
+      {location.address}
+      <Spacer size={4} />
       <Stats>
         <Stat size="small" label="Lunches" value={location.lunchCount} />
         <Stat
