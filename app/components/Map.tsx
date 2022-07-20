@@ -14,8 +14,8 @@ type Location = {
   address: string;
   lunchCount: number;
   averageScore: number;
-  highestScore: number;
-  lowestScore: number;
+  highestScore?: number;
+  lowestScore?: number;
 };
 
 type MapProps = {
@@ -40,14 +40,19 @@ export const Map = ({ locations }: MapProps) => {
       properties: {
         ...loc,
         averageScore: formatNumber(loc.averageScore),
-        highestScore: formatNumber(loc.highestScore),
-        lowestScore: formatNumber(loc.lowestScore),
+        highestScore: loc.highestScore
+          ? formatNumber(loc.highestScore)
+          : undefined,
+        lowestScore: loc.lowestScore
+          ? formatNumber(loc.lowestScore)
+          : undefined,
       },
     })),
   };
 
   return (
     <MapPrimitive
+      reuseMaps
       initialViewState={{
         longitude: 18.055201,
         latitude: 59.333761,
@@ -58,7 +63,6 @@ export const Map = ({ locations }: MapProps) => {
       interactiveLayerIds={["places"]}
       onClick={(e) => {
         if (!e.features?.length) return;
-
         setSelectedLocation(e.features[0].properties as Location);
       }}
       onMouseEnter={() => setCursor("pointer")}
@@ -144,12 +148,20 @@ const LocationPopupContent = ({ location }: { location: Location }) => {
           label="Average score"
           value={location.averageScore}
         />
-        <Stat
-          size="small"
-          label="Highest score"
-          value={location.highestScore}
-        />
-        <Stat size="small" label="Lowest score" value={location.lowestScore} />
+        {location.highestScore && (
+          <Stat
+            size="small"
+            label="Highest score"
+            value={location.highestScore}
+          />
+        )}
+        {location.lowestScore && (
+          <Stat
+            size="small"
+            label="Lowest score"
+            value={location.lowestScore}
+          />
+        )}
       </Stats>
     </div>
   );
@@ -162,7 +174,6 @@ const LocationTitle = styled.h4`
 
 const Stats = styled.div`
   display: grid;
-  /* grid-template-columns: repeat(auto-fit, minmax(auto, 150px)); */
   grid-template-columns: 1fr 1fr;
   gap: 12px 24px;
   width: 100%;

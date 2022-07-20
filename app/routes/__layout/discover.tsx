@@ -71,5 +71,4 @@ const Subtitle = styled.h2`
 
 const MapCard = styled(Card)`
   padding: 0;
-  overflow: hidden;
 `;

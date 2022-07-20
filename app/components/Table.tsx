@@ -29,6 +29,7 @@ const Heading = styled.th<{ numeric?: boolean }>`
 const Cell = styled.td<{ numeric?: boolean }>`
   text-align: ${({ numeric }) => (numeric ? "right" : "left")};
   padding: 4px 12px;
+  white-space: nowrap;
 
   a {
     text-decoration: underline;

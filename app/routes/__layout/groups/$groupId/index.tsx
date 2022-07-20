@@ -13,6 +13,8 @@ import { Spacer } from "~/components/Spacer";
 import { LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
 import { HoverCard } from "~/components/HoverCard";
+import { Map } from "~/components/Map";
+import { Card } from "~/components/Card";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -202,6 +204,27 @@ export default function GroupDetailsPage() {
           )}
         </tbody>
       </Table>
+      <Spacer size={48} />
+      <Subtitle>Map</Subtitle>
+      <Spacer size={8} />
+      <MapCard>
+        <Map
+          locations={details.group.groupLocations.map((x) => ({
+            address: x.location.address,
+            averageScore: getAverageNumber(
+              x.lunches.flatMap((y) => y.scores),
+              "score"
+            ),
+            highestScore: 0,
+            id: x.locationId,
+            lat: x.location.lat,
+            lon: x.location.lon,
+            lowestScore: 0,
+            lunchCount: x.lunches.length,
+            name: x.location.name,
+          }))}
+        />
+      </MapCard>
     </div>
   );
 }
@@ -256,4 +279,8 @@ const PickerAlternativesList = styled.ol`
   > li {
     font-size: 16px;
   }
+`;
+
+const MapCard = styled(Card)`
+  padding: 0;
 `;
