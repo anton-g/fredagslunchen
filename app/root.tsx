@@ -1,9 +1,5 @@
-import type {
-  LinksFunction,
-  LoaderArgs,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node";
+import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
+import mapboxgl from "mapbox-gl";
 import { json } from "@remix-run/node";
 import {
   Links,
@@ -27,8 +23,15 @@ export const links: LinksFunction = () => {
       rel: "stylesheet",
       href: "https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap",
     },
+    {
+      rel: "stylesheet",
+      href: "https://api.tiles.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css",
+    },
   ];
 };
+
+mapboxgl.accessToken =
+  "pk.eyJ1IjoiYW50b24tZyIsImEiOiJjbDV0aDZiOG0wZXF3M2RzZHB0MXBteGZ6In0.ARgAT6GpakcgZbRsO1dA6Q";
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",

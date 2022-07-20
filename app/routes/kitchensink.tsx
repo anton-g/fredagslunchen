@@ -15,6 +15,7 @@ import { Select } from "~/components/Select";
 import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
 import { TextArea } from "~/components/TextArea";
 import { HoverCard } from "~/components/HoverCard";
+import { Map } from "~/components/Map";
 
 export const meta: MetaFunction = () => {
   return {
@@ -26,6 +27,9 @@ export default function Join() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Map">
+          <Map />
+        </Component>
         <Component title="Hover Card">
           <HoverCard>
             <HoverCard.Trigger asChild>
