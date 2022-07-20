@@ -54,7 +54,7 @@ export const Map = ({ locations }: MapProps) => {
         zoom: 11,
       }}
       style={{ width: "100%", height: 400 }}
-      mapStyle="mapbox://styles/mapbox/streets-v11"
+      mapStyle="mapbox://styles/mapbox/light-v10"
       interactiveLayerIds={["places"]}
       onClick={(e) => {
         if (!e.features?.length) return;
@@ -106,8 +106,21 @@ export const Map = ({ locations }: MapProps) => {
 };
 
 const StyledPopup = styled(Popup)`
-  .mapboxgl-popup-tip {
-    border-top-color: black;
+  &.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
+  &.mapboxgl-popup-anchor-top-left .mapboxgl-popup-tip,
+  &.mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip {
+    border-bottom-color: ${({ theme }) => theme.colors.primary};
+  }
+  &.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip,
+  &.mapboxgl-popup-anchor-bottom-left .mapboxgl-popup-tip,
+  &.mapboxgl-popup-anchor-bottom-right .mapboxgl-popup-tip {
+    border-top-color: ${({ theme }) => theme.colors.primary};
+  }
+  &.mapboxgl-popup-anchor-left .mapboxgl-popup-tip {
+    border-right-color: ${({ theme }) => theme.colors.primary};
+  }
+  &.mapboxgl-popup-anchor-right .mapboxgl-popup-tip {
+    border-left-color: ${({ theme }) => theme.colors.primary};
   }
 
   .mapboxgl-popup-content {
