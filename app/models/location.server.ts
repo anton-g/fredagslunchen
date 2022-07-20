@@ -87,15 +87,26 @@ export async function getAllLocationsStats() {
   });
 
   const locationsWithStats = locations.map((loc) => {
-    const allScores = loc.groupLocation.flatMap((gl) =>
-      gl.lunches.flatMap((l) => l.scores)
-    );
+    const allLunches = loc.groupLocation.flatMap((gl) => gl.lunches);
+    const allScores = allLunches
+      .flatMap((l) => l.scores)
+      .sort((a, b) => b.score - a.score);
 
     const averageScore = getAverageNumber(allScores, "score");
 
+    const highestScore = allScores[0].score;
+    const lowestScore = allScores[allScores.length - 1].score;
+
     return {
-      ...loc,
+      address: loc.address,
+      id: loc.id,
+      lat: loc.lat,
+      lon: loc.lon,
+      name: loc.name,
+      lunchCount: allLunches.length,
       averageScore,
+      highestScore,
+      lowestScore,
     };
   });
 

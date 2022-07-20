@@ -2,6 +2,9 @@ import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import styled from "styled-components";
+import { Card } from "~/components/Card";
+import { Map } from "~/components/Map";
+import { Spacer } from "~/components/Spacer";
 import { Table } from "~/components/Table";
 
 import { getAllLocationsStats } from "~/models/location.server";
@@ -42,6 +45,10 @@ export default function DiscoverPage() {
           })}
         </tbody>
       </Table>
+      <Spacer size={24} />
+      <MapCard>
+        <Map locations={data.locations} />
+      </MapCard>
     </main>
   );
 }
@@ -50,4 +57,9 @@ const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
+`;
+
+const MapCard = styled(Card)`
+  padding: 0;
+  overflow: hidden;
 `;

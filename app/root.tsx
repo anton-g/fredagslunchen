@@ -30,6 +30,7 @@ export const links: LinksFunction = () => {
   ];
 };
 
+// TODO check if we can switch to maplibre to avoid access tokens from MapBox
 mapboxgl.accessToken =
   "pk.eyJ1IjoiYW50b24tZyIsImEiOiJjbDV0aDZiOG0wZXF3M2RzZHB0MXBteGZ6In0.ARgAT6GpakcgZbRsO1dA6Q";
 

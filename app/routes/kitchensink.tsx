@@ -28,7 +28,40 @@ export default function Join() {
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
         <Component title="Map">
-          <Map />
+          <Map
+            locations={[
+              {
+                id: 1,
+                lat: "59.331582",
+                lon: "18.0664337",
+                name: "WokHouse",
+                averageScore: 4.2,
+                highestScore: 8,
+                lowestScore: 2,
+                lunchCount: 4,
+              },
+              {
+                id: 2,
+                lat: "59.3339128",
+                lon: "18.0564237",
+                name: "Franzén",
+                averageScore: 7.9,
+                highestScore: 8,
+                lowestScore: 2,
+                lunchCount: 4,
+              },
+              {
+                id: 3,
+                lat: "59.3414987",
+                lon: "18.0371404",
+                name: "Zocalo",
+                averageScore: 9,
+                highestScore: 8,
+                lowestScore: 2,
+                lunchCount: 4,
+              },
+            ]}
+          />
         </Component>
         <Component title="Hover Card">
           <HoverCard>
