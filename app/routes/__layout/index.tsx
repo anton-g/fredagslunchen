@@ -12,9 +12,9 @@ export default function Index() {
       <Title>Welcome.</Title>
       <Spacer size={16} />
       <p>
-        No more discussions about where to eat. Get together with your friends
-        or colleagues. Discover new restaurants. Have a lovely time. Rate your
-        lunch. Soak in the statistics. And then do it all again.
+        No more discussions about where to eat. Just get together with your
+        friends or colleagues, discover new restaurants, have a lovely time,
+        rate your lunch, soak in the statistics. And then do it all again.
       </p>
       <Spacer size={8} />
       <p style={{ fontWeight: "bold" }}>Enjoy Fredagslunchen.</p>

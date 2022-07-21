@@ -4,7 +4,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
+import { Form, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
 import { getUserId, createUserSession } from "~/session.server";
@@ -15,10 +15,26 @@ import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import styled from "styled-components";
+import { addUserToGroupWithInviteToken } from "~/models/group.server";
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await getUserId(request);
-  if (userId) return redirect("/");
+
+  if (userId) {
+    const url = new URL(request.url);
+    const inviteToken = url.searchParams.get("token");
+
+    if (inviteToken) {
+      const group = await addUserToGroupWithInviteToken({
+        inviteToken,
+        userId,
+      });
+
+      return redirect(`/groups/${group.id}`);
+    }
+
+    return redirect("/");
+  }
   return json({});
 };
 
@@ -30,7 +46,7 @@ interface ActionData {
   };
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const name = formData.get("name");
@@ -71,6 +87,10 @@ export const action: ActionFunction = async ({ request }) => {
       { errors: { email: "A user already exists with this email" } },
       { status: 400 }
     );
+  }
+
+  if (params.token) {
+    // join group
   }
 
   const user = await createUser(email, name, password);

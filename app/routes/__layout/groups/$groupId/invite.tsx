@@ -1,14 +1,51 @@
-import type { ActionFunction } from "@remix-run/node";
+import {
+  CopyIcon,
+  Cross1Icon,
+  Cross2Icon,
+  UpdateIcon,
+} from "@radix-ui/react-icons";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react";
 import * as React from "react";
 import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
 import { Stack } from "~/components/Stack";
-import { addUserToGroup } from "~/models/group.server";
+import { Tooltip } from "~/components/Tooltip";
+import {
+  addUserEmailToGroup,
+  getGroupInviteToken,
+} from "~/models/group.server";
 
 import { requireUserId } from "~/session.server";
+
+export const loader = async ({ request, params }: LoaderArgs) => {
+  const userId = await requireUserId(request);
+  invariant(params.groupId, "groupId is required");
+  const group = await getGroupInviteToken({
+    groupId: params.groupId,
+    userId,
+  });
+
+  if (!group) return new Response("Not found", { status: 404 });
+
+  const { origin } = new URL(request.url);
+
+  return json({
+    groupInviteToken: group.inviteToken,
+    groupId: params.groupId,
+    userId,
+    baseUrl: origin,
+  });
+};
 
 type ActionData = {
   errors?: {
@@ -31,7 +68,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  const group = await addUserToGroup({ groupId, email });
+  const group = await addUserEmailToGroup({ groupId, email });
 
   if ("error" in group) {
     return json<ActionData>(
@@ -43,7 +80,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect(`/groups/${group.id}`);
 };
 
-export default function NewGroupPage() {
+export default function InvitePage() {
+  const fetcher = useFetcher();
+  const { groupInviteToken, groupId, userId, baseUrl } =
+    useLoaderData<typeof loader>();
   const actionData = useActionData() as ActionData;
   const emailRef = React.useRef<HTMLInputElement>(null);
 
@@ -55,7 +95,7 @@ export default function NewGroupPage() {
 
   return (
     <>
-      <h3>Invite user to group</h3>
+      <h3>Add existing user to group</h3>
       <Form
         method="post"
         style={{
@@ -86,11 +126,83 @@ export default function NewGroupPage() {
 
           <div>
             <Button style={{ marginLeft: "auto" }} type="submit">
-              Save
+              Add
             </Button>
           </div>
         </Stack>
       </Form>
+      <h3>Invite with link</h3>
+      {groupInviteToken ? (
+        <Stack gap={16}>
+          <Input
+            value={`${baseUrl}/join?token=${groupInviteToken}`}
+            onFocus={(e) => e.target.select()}
+          />
+          <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
+            <fetcher.Form method="delete" action="/groups/api/invite-token">
+              <input type="hidden" name="groupId" value={groupId} />
+              <input type="hidden" name="userId" value={userId} />
+              <Tooltip>
+                <Tooltip.Trigger asChild>
+                  <Button variant="round">
+                    <Cross2Icon />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Remove invite link</Tooltip.Content>
+              </Tooltip>
+            </fetcher.Form>
+            <fetcher.Form method="post" action="/groups/api/invite-token">
+              <input type="hidden" name="groupId" value={groupId} />
+              <input type="hidden" name="userId" value={userId} />
+              <Tooltip>
+                <Tooltip.Trigger asChild>
+                  <Button variant="round">
+                    <UpdateIcon />
+                  </Button>
+                </Tooltip.Trigger>
+                <Tooltip.Content>Refresh invite link</Tooltip.Content>
+              </Tooltip>
+            </fetcher.Form>
+            <Tooltip>
+              <Tooltip.Trigger asChild>
+                <Button
+                  variant="round"
+                  onClick={() => {
+                    navigator.clipboard.writeText(
+                      `${baseUrl}/join?token=${groupInviteToken}`
+                    );
+                  }}
+                >
+                  <CopyIcon />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Copy invite link</Tooltip.Content>
+            </Tooltip>
+          </Stack>
+        </Stack>
+      ) : (
+        <fetcher.Form method="post" action="/groups/api/invite-token">
+          <input type="hidden" name="groupId" value={groupId} />
+          <input type="hidden" name="userId" value={userId} />
+          <Button>Create invite link</Button>
+        </fetcher.Form>
+      )}
     </>
   );
+}
+
+export function CatchBoundary() {
+  const caught = useCatch();
+
+  if (caught.status === 404) {
+    return <div>Group not found</div>;
+  }
+
+  throw new Error(`Unexpected caught response with status: ${caught.status}`);
+}
+
+export function ErrorBoundary({ error }: { error: Error }) {
+  console.error(error);
+
+  return <div>An unexpected error occurred: {error.message}</div>;
 }

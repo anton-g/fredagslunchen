@@ -16,6 +16,7 @@ import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
 import { TextArea } from "~/components/TextArea";
 import { HoverCard } from "~/components/HoverCard";
 import { Map } from "~/components/Map";
+import { Tooltip } from "~/components/Tooltip";
 
 export const meta: MetaFunction = () => {
   return {
@@ -23,10 +24,18 @@ export const meta: MetaFunction = () => {
   };
 };
 
-export default function Join() {
+export default function Kitchensink() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Tooltip">
+          <Tooltip>
+            <Tooltip.Trigger asChild>
+              <Button>Hover me</Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>Example tooltip</Tooltip.Content>
+          </Tooltip>
+        </Component>
         <Component title="Map">
           <Map
             locations={[

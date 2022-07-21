@@ -22,6 +22,7 @@ type MapProps = {
   locations: Location[];
 };
 
+// TODO disable maps by default in dev?
 // TODO make generic with popup as render prop child?
 export const Map = ({ locations }: MapProps) => {
   const [cursor, setCursor] = useState<"auto" | "pointer">("auto");

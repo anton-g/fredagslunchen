@@ -1,4 +1,5 @@
 import type { User, Group, Prisma, Location } from "@prisma/client";
+import { nanoid } from "nanoid";
 
 import { prisma } from "~/db.server";
 import { formatNumber, getAverageNumber } from "~/utils";
@@ -162,7 +163,35 @@ export function createGroup({
   });
 }
 
-export async function addUserToGroup({
+export async function addUserToGroupWithInviteToken({
+  inviteToken,
+  userId,
+}: {
+  inviteToken: NonNullable<Group["inviteToken"]>;
+  userId: User["id"];
+}) {
+  return await prisma.group.update({
+    where: {
+      inviteToken: inviteToken,
+    },
+    data: {
+      members: {
+        create: {
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function addUserEmailToGroup({
   groupId,
   email,
 }: {
@@ -190,6 +219,64 @@ export async function addUserToGroup({
   } catch (err) {
     return { error: "User does not exist" };
   }
+}
+
+export async function getGroupInviteToken({
+  groupId,
+  userId,
+}: {
+  groupId: Group["id"];
+  userId: User["id"];
+}) {
+  return prisma.group.findFirst({
+    where: {
+      id: groupId,
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+    select: {
+      inviteToken: true,
+    },
+  });
+}
+
+export async function createGroupInviteToken({
+  groupId,
+  userId,
+}: {
+  groupId: Group["id"];
+  userId: User["id"];
+}) {
+  // TODO only allow this if user is in group?
+  return prisma.group.update({
+    where: {
+      id: groupId,
+    },
+    data: {
+      inviteToken: nanoid(),
+    },
+  });
+}
+
+export async function deleteGroupInviteToken({
+  groupId,
+  userId,
+}: {
+  groupId: Group["id"];
+  userId: User["id"];
+}) {
+  // TODO only allow this if user is in group?
+  return prisma.group.update({
+    where: {
+      id: groupId,
+    },
+    data: {
+      inviteToken: null,
+    },
+  });
 }
 
 type StatsType = {
