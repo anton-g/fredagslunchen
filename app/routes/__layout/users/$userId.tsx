@@ -45,7 +45,7 @@ export default function Index() {
           <Stat
             label="Most popular choice"
             value={
-              user.stats.bestChoosenLunch?.groupLocation.location.name || "N/A"
+              user.stats.bestChoosenLunch?.groupLocation.location.name || "-"
             }
           />
           <Stat label="Lowest score" value={user.stats.lowestScore} />

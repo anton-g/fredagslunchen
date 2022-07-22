@@ -48,7 +48,7 @@ export default function LunchDetailsPage() {
   const highestScore = sortedScores[1]?.score;
 
   const averageScore =
-    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "N/A";
+    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-";
 
   const usersWithoutScores = groupLunch.groupLocation.group.members
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
@@ -70,8 +70,8 @@ export default function LunchDetailsPage() {
       <Spacer size={24} />
       <Stats>
         <Stat label="Average score" value={averageScore} />
-        <Stat label="Highest score" value={highestScore || "N/A"} />
-        <Stat label="Lowest score" value={lowestScore || "N/A"} />
+        <Stat label="Highest score" value={highestScore || "-"} />
+        <Stat label="Lowest score" value={lowestScore || "-"} />
         <Stat
           label="Choosen by"
           value={groupLunch.choosenBy.name}

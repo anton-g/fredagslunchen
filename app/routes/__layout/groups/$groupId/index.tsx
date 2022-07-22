@@ -46,7 +46,7 @@ export default function GroupDetailsPage() {
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
           label="Best score"
-          value={`${details.stats.bestLocation.name || "N/A"}`}
+          value={`${details.stats.bestLocation.name || "-"}`}
           detail={
             details.stats.bestLocation.name
               ? formatNumber(details.stats.bestLocation.score, 10)
@@ -55,7 +55,7 @@ export default function GroupDetailsPage() {
         />
         <Stat
           label="Worst score"
-          value={`${details.stats.worstLocation.name || "N/A"}`}
+          value={`${details.stats.worstLocation.name || "-"}`}
           detail={
             details.stats.worstLocation.name
               ? formatNumber(details.stats.worstLocation.score, 10)
@@ -65,7 +65,7 @@ export default function GroupDetailsPage() {
         <Stat
           label="Most positive"
           value={`${
-            details.stats.mostPositive ? details.stats.mostPositive.name : "N/A"
+            details.stats.mostPositive ? details.stats.mostPositive.name : "-"
           }`}
           detail={
             details.stats.mostPositive
@@ -76,7 +76,7 @@ export default function GroupDetailsPage() {
         <Stat
           label="Most negative"
           value={`${
-            details.stats.mostNegative ? details.stats.mostNegative.name : "N/A"
+            details.stats.mostNegative ? details.stats.mostNegative.name : "-"
           }`}
           detail={
             details.stats.mostNegative
@@ -87,7 +87,7 @@ export default function GroupDetailsPage() {
         <Stat
           label="Most average"
           value={`${
-            details.stats.mostAvarage ? details.stats.mostAvarage.name : "N/A"
+            details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"
           }`}
           detail={
             details.stats.mostAvarage

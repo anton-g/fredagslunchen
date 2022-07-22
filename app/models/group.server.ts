@@ -408,11 +408,10 @@ const generateUserStats = (
   const sortedScores = member.user.scores
     .slice()
     .sort((a, b) => a.score - b.score);
-  const lowestScore =
-    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-";
   const highestScore =
     sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "N/A";
+    "-";
 
   const bestChoosenLunch = member.user.choosenLunches.reduce<
     typeof member.user.choosenLunches[0] | null

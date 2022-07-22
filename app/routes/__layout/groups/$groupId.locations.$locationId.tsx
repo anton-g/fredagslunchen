@@ -33,6 +33,7 @@ export default function LocationDetailsPage() {
   return (
     <div>
       <Title>{groupLocation.location.name}</Title>
+      <h3>Lunches</h3>
       <Table>
         <Table.Head>
           <tr>

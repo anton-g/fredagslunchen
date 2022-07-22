@@ -171,11 +171,10 @@ function generateUserStats(
   const lunchCount = user.scores.length;
   const averageScore = getAverageNumber(user.scores, "score");
   const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score);
-  const lowestScore =
-    sortedScores[0]?.lunch.groupLocation.location.name || "N/A";
+  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-";
   const highestScore =
     sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "N/A";
+    "-";
 
   const bestChoosenLunch = user.choosenLunches.reduce<
     typeof user.choosenLunches[0] | null
