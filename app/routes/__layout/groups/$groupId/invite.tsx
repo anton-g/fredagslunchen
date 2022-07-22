@@ -15,6 +15,7 @@ import {
   useLocation,
 } from "@remix-run/react";
 import * as React from "react";
+import styled from "styled-components";
 import invariant from "tiny-invariant";
 import { Button } from "~/components/Button";
 import { Input } from "~/components/Input";
@@ -131,57 +132,65 @@ export default function InvitePage() {
           </div>
         </Stack>
       </Form>
-      <h3>Invite with link</h3>
+      <h3 style={{ marginBottom: 0 }}>Invite with link</h3>
       {groupInviteToken ? (
-        <Stack gap={16}>
-          <Input
-            value={`${baseUrl}/join?token=${groupInviteToken}`}
-            onFocus={(e) => e.target.select()}
-          />
-          <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
-            <fetcher.Form method="delete" action="/groups/api/invite-token">
-              <input type="hidden" name="groupId" value={groupId} />
-              <input type="hidden" name="userId" value={userId} />
+        <>
+          <InviteDescription>
+            Anyone with the link can join your group.
+          </InviteDescription>
+          <Stack gap={16}>
+            <Input
+              value={`${baseUrl}/join?token=${groupInviteToken}`}
+              onFocus={(e) => e.target.select()}
+            />
+            <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
+              <fetcher.Form method="delete" action="/groups/api/invite-token">
+                <input type="hidden" name="groupId" value={groupId} />
+                <input type="hidden" name="userId" value={userId} />
+                <Tooltip>
+                  <Tooltip.Trigger asChild>
+                    <Button variant="round">
+                      <Cross2Icon />
+                    </Button>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Remove invite link</Tooltip.Content>
+                </Tooltip>
+              </fetcher.Form>
+              <fetcher.Form method="post" action="/groups/api/invite-token">
+                <input type="hidden" name="groupId" value={groupId} />
+                <input type="hidden" name="userId" value={userId} />
+                <Tooltip>
+                  <Tooltip.Trigger asChild>
+                    <Button variant="round">
+                      <UpdateIcon />
+                    </Button>
+                  </Tooltip.Trigger>
+                  <Tooltip.Content>Refresh invite link</Tooltip.Content>
+                </Tooltip>
+              </fetcher.Form>
               <Tooltip>
                 <Tooltip.Trigger asChild>
-                  <Button variant="round">
-                    <Cross2Icon />
+                  <Button
+                    variant="round"
+                    onClick={() => {
+                      navigator.clipboard.writeText(
+                        `${baseUrl}/join?token=${groupInviteToken}`
+                      );
+                    }}
+                  >
+                    <CopyIcon />
                   </Button>
                 </Tooltip.Trigger>
-                <Tooltip.Content>Remove invite link</Tooltip.Content>
+                <Tooltip.Content>Copy invite link</Tooltip.Content>
               </Tooltip>
-            </fetcher.Form>
-            <fetcher.Form method="post" action="/groups/api/invite-token">
-              <input type="hidden" name="groupId" value={groupId} />
-              <input type="hidden" name="userId" value={userId} />
-              <Tooltip>
-                <Tooltip.Trigger asChild>
-                  <Button variant="round">
-                    <UpdateIcon />
-                  </Button>
-                </Tooltip.Trigger>
-                <Tooltip.Content>Refresh invite link</Tooltip.Content>
-              </Tooltip>
-            </fetcher.Form>
-            <Tooltip>
-              <Tooltip.Trigger asChild>
-                <Button
-                  variant="round"
-                  onClick={() => {
-                    navigator.clipboard.writeText(
-                      `${baseUrl}/join?token=${groupInviteToken}`
-                    );
-                  }}
-                >
-                  <CopyIcon />
-                </Button>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Copy invite link</Tooltip.Content>
-            </Tooltip>
+            </Stack>
           </Stack>
-        </Stack>
+        </>
       ) : (
         <fetcher.Form method="post" action="/groups/api/invite-token">
+          <InviteDescription>
+            Create a link that anyone can use to join your group.
+          </InviteDescription>
           <input type="hidden" name="groupId" value={groupId} />
           <input type="hidden" name="userId" value={userId} />
           <Button>Create invite link</Button>
@@ -190,6 +199,11 @@ export default function InvitePage() {
     </>
   );
 }
+
+const InviteDescription = styled.p`
+  margin: 0;
+  margin-bottom: 16px;
+`;
 
 export function CatchBoundary() {
   const caught = useCatch();

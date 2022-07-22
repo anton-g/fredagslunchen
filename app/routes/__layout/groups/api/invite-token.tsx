@@ -4,7 +4,6 @@ import {
   createGroupInviteToken,
   deleteGroupInviteToken,
 } from "~/models/group.server";
-import { createScore } from "~/models/score.server";
 import { requireUserId } from "~/session.server";
 
 type ActionData = {

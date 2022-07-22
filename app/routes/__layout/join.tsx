@@ -4,7 +4,12 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useSearchParams } from "@remix-run/react";
+import {
+  Form,
+  useActionData,
+  useLocation,
+  useSearchParams,
+} from "@remix-run/react";
 import * as React from "react";
 
 import { getUserId, createUserSession } from "~/session.server";
@@ -46,12 +51,14 @@ interface ActionData {
   };
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData();
   const email = formData.get("email");
   const name = formData.get("name");
   const password = formData.get("password");
   const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
+  const url = new URL(request.url);
+  const inviteToken = url.searchParams.get("token");
 
   if (!validateEmail(email)) {
     return json<ActionData>(
@@ -89,17 +96,18 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  if (params.token) {
-    // join group
-  }
-
-  const user = await createUser(email, name, password);
+  const { user, groupId } = await createUser(
+    email,
+    name,
+    password,
+    inviteToken
+  );
 
   return createUserSession({
     request,
     userId: user.id,
     remember: false,
-    redirectTo,
+    redirectTo: groupId ? `/groups/${groupId}` : redirectTo,
   });
 };
 
@@ -116,6 +124,7 @@ export default function Join() {
   const emailRef = React.useRef<HTMLInputElement>(null);
   const passwordRef = React.useRef<HTMLInputElement>(null);
   const nameRef = React.useRef<HTMLInputElement>(null);
+  const location = useLocation();
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {
@@ -128,7 +137,8 @@ export default function Join() {
   return (
     <div>
       <h2>Sign up</h2>
-      <Form method="post">
+      {/* Workaround to include search to action: https://github.com/remix-run/remix/issues/3133 */}
+      <Form method="post" action={`${location.pathname}${location.search}`}>
         <Stack gap={16}>
           <div>
             <label htmlFor="name">Name</label>

@@ -86,11 +86,12 @@ export async function getUserByEmail(email: User["email"]) {
 export async function createUser(
   email: User["email"],
   name: string,
-  password: string
+  password: string,
+  inviteToken?: string | null
 ) {
   const hashedPassword = await bcrypt.hash(password, 10);
 
-  return prisma.user.create({
+  const user = await prisma.user.create({
     data: {
       email,
       name,
@@ -101,6 +102,33 @@ export async function createUser(
       },
     },
   });
+
+  console.log("CREATE", { inviteToken });
+
+  let group = undefined;
+  if (inviteToken) {
+    group = await prisma.group.update({
+      where: {
+        inviteToken: inviteToken,
+      },
+      data: {
+        members: {
+          create: {
+            user: {
+              connect: {
+                id: user.id,
+              },
+            },
+          },
+        },
+      },
+      select: {
+        id: true,
+      },
+    });
+  }
+
+  return { user, groupId: group?.id };
 }
 
 export async function deleteUserByEmail(email: User["email"]) {
