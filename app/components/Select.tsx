@@ -50,10 +50,12 @@ const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
 
 const SelectContent = styled(SelectPrimitive.Content)`
   overflow: hidden;
+  color: ${({ theme }) => theme.colors.primary};
   background-color: ${({ theme }) => theme.colors.secondary};
+  border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
-  box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
-    0px 10px 20px -15px rgba(22, 23, 24, 0.2);
+  /* box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
+    0px 10px 20px -15px rgba(22, 23, 24, 0.2); */
 `;
 
 const SelectViewport = styled(SelectPrimitive.Viewport)`

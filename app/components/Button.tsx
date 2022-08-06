@@ -4,6 +4,7 @@ import styled, { css } from "styled-components";
 type ButtonVariant = "normal" | "round";
 
 const styles = css<{ variant?: ButtonVariant }>`
+  color: ${({ theme }) => theme.colors.primary};
   background-color: ${({ theme }) => theme.colors.secondary};
   border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: ${({ variant }) => (variant === "normal" ? "4px" : "50%")};

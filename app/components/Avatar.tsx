@@ -32,6 +32,7 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   img {
     height: 100%;
     width: 100%;
+    background-color: white;
   }
 `;
 
