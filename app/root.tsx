@@ -8,12 +8,14 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
 import GlobalStyle from "./styles/global";
 
 import { getUser } from "./session.server";
 import { ThemeProvider } from "styled-components";
 import { theme } from "./styles/theme";
+import { getEnv } from "./env.server";
 
 export const links: LinksFunction = () => {
   return [
@@ -43,10 +45,13 @@ export const meta: MetaFunction = () => ({
 export const loader = async ({ request }: LoaderArgs) => {
   return json({
     user: await getUser(request),
+    ENV: getEnv(),
   });
 };
 
 export default function App() {
+  const data = useLoaderData<typeof loader>();
+
   return (
     <html lang="en">
       <head>
@@ -61,7 +66,12 @@ export default function App() {
         </ThemeProvider>
         <ScrollRestoration />
         <Scripts />
-        <LiveReload />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `window.ENV = ${JSON.stringify(data.ENV)};`,
+          }}
+        />
+        {ENV.NODE_ENV === "development" ? <LiveReload /> : null}
       </body>
     </html>
   );
