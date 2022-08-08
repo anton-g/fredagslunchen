@@ -1,0 +1,11 @@
+- Remove group member
+- Edit user
+  - Reset password
+- Delete lunch
+- Delete group location
+- Delete user
+- Move tokens to ENV
+  - Fathom
+  - Mapbox
+- About/help page
+- Anonymous users
