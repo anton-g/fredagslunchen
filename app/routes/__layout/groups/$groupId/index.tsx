@@ -15,6 +15,8 @@ import { Stat } from "~/components/Stat";
 import { HoverCard } from "~/components/HoverCard";
 import { Map } from "~/components/Map";
 import { Card } from "~/components/Card";
+import { useOnScreen } from "~/hooks/useOnScreen";
+import { useRef } from "react";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -207,7 +209,7 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <Subtitle>Map</Subtitle>
       <Spacer size={8} />
-      <MapCard>
+      <LazyCard>
         <Map
           locations={details.group.groupLocations.map((x) => ({
             address: x.location.address,
@@ -224,7 +226,7 @@ export default function GroupDetailsPage() {
             name: x.location.name,
           }))}
         />
-      </MapCard>
+      </LazyCard>
     </div>
   );
 }
@@ -281,6 +283,14 @@ const PickerAlternativesList = styled.ol`
   }
 `;
 
+const LazyCard: React.FC = ({ children }) => {
+  const ref = useRef<HTMLDivElement>(null!);
+  const isOnScreen = useOnScreen(ref);
+
+  return <MapCard ref={ref}>{isOnScreen && children}</MapCard>;
+};
+
 const MapCard = styled(Card)`
   padding: 0;
+  min-height: 400px;
 `;

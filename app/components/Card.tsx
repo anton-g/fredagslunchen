@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import React from "react";
 import styled, { css } from "styled-components";
 
 type CardProps = {
@@ -7,13 +8,21 @@ type CardProps = {
   className?: string;
 };
 
-const Card = ({ variant = "normal", children, className }: CardProps) => {
-  return (
-    <Wrapper className={className} inverted={variant === "inverted"}>
-      {children}
-    </Wrapper>
-  );
-};
+const Card = React.forwardRef<HTMLDivElement, CardProps>(
+  ({ variant = "normal", children, className }, ref) => {
+    return (
+      <Wrapper
+        className={className}
+        ref={ref}
+        inverted={variant === "inverted"}
+      >
+        {children}
+      </Wrapper>
+    );
+  }
+);
+
+Card.displayName = "Card";
 
 const Wrapper = styled.div<{ inverted: boolean }>`
   ${({ theme, inverted }) =>

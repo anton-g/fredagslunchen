@@ -24,6 +24,7 @@ const Head = styled.thead``;
 const Heading = styled.th<{ numeric?: boolean }>`
   text-align: ${({ numeric }) => (numeric ? "right" : "left")};
   padding: 4px 12px;
+  white-space: nowrap;
 `;
 
 const Cell = styled.td<{ numeric?: boolean }>`
