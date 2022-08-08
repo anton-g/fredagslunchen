@@ -6,6 +6,7 @@ import type {
 import { json, redirect } from "@remix-run/node";
 import {
   Form,
+  Link,
   useActionData,
   useLocation,
   useSearchParams,
@@ -198,7 +199,10 @@ export default function Join() {
           </div>
 
           <input type="hidden" name="redirectTo" value={redirectTo} />
-          <SubmitButton type="submit">Create Account</SubmitButton>
+          <div style={{ display: "flex" }}>
+            <PrivacyLink to={"/privacy"}>Privacy Policy</PrivacyLink>
+            <SubmitButton type="submit">Create Account</SubmitButton>
+          </div>
         </Stack>
       </Form>
     </div>
@@ -207,4 +211,10 @@ export default function Join() {
 
 const SubmitButton = styled(Button)`
   margin-left: auto;
+`;
+
+const PrivacyLink = styled(Link)`
+  &:hover {
+    text-decoration: underline;
+  }
 `;
