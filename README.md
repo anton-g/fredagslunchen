@@ -4,24 +4,47 @@ Fredagslunchen is a app where you can create groups to rate your lunches togethe
 
 ## Development
 
+### Setup
+
 - Initial setup:
 
   ```sh
   npm run setup
   ```
 
-- Start dev server:
-
-  ```sh
-  npm run dev
-  ```
-
-This starts your app in development mode, rebuilding assets on file changes.
-
 The database seed script creates a new user with some data you can use to get started:
 
 - Email: `bassman@nosegrove.com`
 - Password: `woopwoop`
+
+### Day-to-day
+
+Start dev server:
+
+```sh
+npm run dev
+```
+
+This starts your app in development mode, rebuilding assets on file changes.
+
+### Database changes
+
+We use [Prisma](https://www.prisma.io/) to manage our database migrations.
+To create a new migration:
+
+```sh
+prisma migrate dev --name migration-name
+```
+
+To make changes to the database schema without creating a migration (for prototyping etc):
+
+```sh
+prisma db push
+```
+
+Commit your changes by creating a new migration.
+
+> **Note:** This will force you to reset your local db. See [Schema prototyping with db push](https://www.prisma.io/docs/guides/database/prototyping-schema-db-push#prototyping-with-an-existing-migration-history) for more details.
 
 ## Deployment
 
