@@ -26,6 +26,16 @@ declare global {
        *    cy.cleanupUser({ email: 'whatever@example.com' })
        */
       cleanupUser: typeof cleanupUser;
+
+      /**
+       * Deletes the current group
+       *
+       * @returns {typeof cleanupGroup}
+       * @memberof Chainable
+       * @example
+       *    cy.cleanupGroup({ name: 'Group name' })
+       */
+      cleanupGroup: typeof cleanupGroup;
     }
   }
 }
@@ -68,8 +78,15 @@ function deleteUserByEmail(email: string) {
   cy.clearCookie("__session");
 }
 
+function cleanupGroup({ name }: { name: string }) {
+  cy.exec(
+    `npx ts-node --require tsconfig-paths/register ./cypress/support/delete-group.ts "${name}"`
+  );
+}
+
 Cypress.Commands.add("login", login);
 Cypress.Commands.add("cleanupUser", cleanupUser);
+Cypress.Commands.add("cleanupGroup", cleanupGroup);
 
 /*
 eslint

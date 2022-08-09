@@ -48,7 +48,7 @@ model GroupMember {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  group   Group  @relation(fields: [groupId], references: [id])
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId String
 
   role String @default("MEMBER")
@@ -59,7 +59,7 @@ model GroupMember {
 }
 
 model GroupLocation {
-  group   Group  @relation(fields: [groupId], references: [id])
+  group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId String
 
   location   Location @relation(fields: [locationId], references: [id])
@@ -89,13 +89,12 @@ model Lunch {
 
   scores Score[]
 
-  groupLocation           GroupLocation @relation(fields: [groupLocationLocationId, groupLocationGroupId], references: [locationId, groupId])
+  groupLocation           GroupLocation @relation(fields: [groupLocationLocationId, groupLocationGroupId], references: [locationId, groupId], onDelete: Cascade)
   groupLocationLocationId Int
   groupLocationGroupId    String
 
   choosenBy       User   @relation(fields: [choosenByUserId], references: [id])
   choosenByUserId String @map("userId")
-
 }
 
 model Score {
@@ -105,7 +104,7 @@ model Score {
   user   User   @relation(fields: [userId], references: [id])
   userId String
 
-  lunch   Lunch @relation(fields: [lunchId], references: [id])
+  lunch   Lunch @relation(fields: [lunchId], references: [id], onDelete: Cascade)
   lunchId Int
 
   comment String?
