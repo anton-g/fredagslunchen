@@ -23,10 +23,14 @@ describe("smoke tests", () => {
 
     cy.findByRole("link", { name: /you/i }).click();
     cy.findByRole("button", { name: /logout/i }).click();
-    cy.findByRole("link", { name: /login/i });
+    cy.findByRole("link", { name: /login/i }).click();
+
+    cy.findByLabelText(/email/i).type(loginForm.email);
+    cy.findByLabelText(/password/i).type(loginForm.password);
+    cy.findByRole("button", { name: /log in/i }).click();
   });
 
-  // it("should allow you to make a note", () => {
+  // it("should allow you to create a group", () => {
   //   const testNote = {
   //     title: faker.lorem.words(1),
   //     body: faker.lorem.sentences(1),
