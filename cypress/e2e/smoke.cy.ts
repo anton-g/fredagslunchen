@@ -50,4 +50,37 @@ describe("smoke tests", () => {
 
     cy.cleanupGroup({ name: testGroup.name });
   });
+
+  it("should allow you to create new location", () => {
+    const testGroup = {
+      name: faker.lorem.words(2),
+    };
+    const testLocation = {
+      name: faker.lorem.words(2),
+      address: faker.address.streetAddress(),
+      lng: faker.address.longitude(),
+      lat: faker.address.latitude(),
+    };
+    cy.login().then((user) => {
+      cy.createGroup({ name: testGroup.name, userId: user.userId });
+    });
+    cy.visit("/");
+
+    cy.findByRole("link", { name: /groups/i }).click();
+    cy.findByRole("link", {
+      name: new RegExp(`${testGroup.name}`, "i"),
+    }).click();
+    cy.findByRole("link", { name: /new location/i }).click();
+
+    cy.findByRole("combobox", { name: /name/i }).type(testLocation.name);
+    cy.findByRole("textbox", { name: /address/i }).type(testLocation.address);
+    cy.findByRole("textbox", { name: /lat/i }).type(testLocation.lat);
+    cy.findByRole("textbox", { name: /lon/i }).type(testLocation.lng);
+
+    cy.findByRole("button", { name: /save/i }).click();
+
+    cy.findByText(/lunches/i);
+
+    cy.cleanupGroup({ name: testGroup.name });
+  });
 });

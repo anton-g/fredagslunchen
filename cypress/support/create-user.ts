@@ -42,6 +42,13 @@ async function createAndLogin(email: string) {
 </cookie>
   `.trim()
   );
+  console.log(
+    `
+<userId>
+  ${user.id}
+</userId>
+  `.trim()
+  );
 }
 
 createAndLogin(process.argv[2]);

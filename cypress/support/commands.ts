@@ -6,7 +6,6 @@ declare global {
       /**
        * Logs in with a random user. Yields the user and adds an alias to the user
        *
-       * @returns {typeof login}
        * @memberof Chainable
        * @example
        *    cy.login()
@@ -28,6 +27,18 @@ declare global {
       cleanupUser: typeof cleanupUser;
 
       /**
+       * Create a new group. Yields the group and adds an alias to the group
+       *
+       * @returns {typeof createGroup}
+       * @memberof Chainable
+       * @example
+       *    cy.createGroup({ userId: 'userId' })
+       * @example
+       *    cy.createGroup({ name: 'Group name', userId: 'userId' })
+       */
+      createGroup: typeof createGroup;
+
+      /**
        * Deletes the current group
        *
        * @returns {typeof cleanupGroup}
@@ -45,7 +56,6 @@ function login({
 }: {
   email?: string;
 } = {}) {
-  cy.then(() => ({ email })).as("user");
   cy.exec(
     `npx ts-node --require tsconfig-paths/register ./cypress/support/create-user.ts "${email}"`
   ).then(({ stdout }) => {
@@ -53,8 +63,14 @@ function login({
       .replace(/.*<cookie>(?<cookieValue>.*)<\/cookie>.*/s, "$<cookieValue>")
       .trim();
     cy.setCookie("__session", cookieValue);
+
+    // Really should be able to get this from session cookie value instead but ¯\_(ツ)_/¯
+    const userId = stdout
+      .replace(/.*<userId>(?<userIdValue>.*)<\/userId>.*/s, "$<userIdValue>")
+      .trim();
+    cy.then(() => ({ email, userId })).as("user");
   });
-  return cy.get("@user");
+  return cy.get<{ userId: string; name: string }>("@user");
 }
 
 function cleanupUser({ email }: { email?: string } = {}) {
@@ -84,8 +100,29 @@ function cleanupGroup({ name }: { name: string }) {
   );
 }
 
+function createGroup({
+  name = faker.lorem.words(2),
+  userId,
+}: {
+  name?: string;
+  userId: string;
+}) {
+  if (!userId) throw new Error("No user found");
+
+  cy.exec(
+    `npx ts-node --require tsconfig-paths/register ./cypress/support/create-group.ts "${name}" "${userId}"`
+  ).then(({ stdout }) => {
+    const groupId = stdout
+      .replace(/.*<groupId>(?<cookieValue>.*)<\/groupId>.*/s, "$<groupId>")
+      .trim();
+    cy.then(() => ({ name, id: groupId })).as("group");
+  });
+  return cy.get("@group");
+}
+
 Cypress.Commands.add("login", login);
 Cypress.Commands.add("cleanupUser", cleanupUser);
+Cypress.Commands.add("createGroup", createGroup);
 Cypress.Commands.add("cleanupGroup", cleanupGroup);
 
 /*
