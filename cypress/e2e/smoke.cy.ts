@@ -57,7 +57,9 @@ describe("smoke tests", () => {
     };
     const testLocation = {
       name: faker.lorem.words(2),
-      address: faker.address.streetAddress(),
+      streetAddress: faker.address.streetAddress(),
+      zipCode: faker.address.zipCode(),
+      city: faker.address.city(),
       lng: faker.address.longitude(),
       lat: faker.address.latitude(),
     };
@@ -73,7 +75,11 @@ describe("smoke tests", () => {
     cy.findByRole("link", { name: /new location/i }).click();
 
     cy.findByRole("combobox", { name: /name/i }).type(testLocation.name);
-    cy.findByRole("textbox", { name: /address/i }).type(testLocation.address);
+    cy.findByRole("textbox", { name: /address/i }).type(
+      testLocation.streetAddress
+    );
+    cy.findByRole("textbox", { name: /zip code/i }).type(testLocation.zipCode);
+    cy.findByRole("textbox", { name: /city/i }).type(testLocation.city);
     cy.findByRole("textbox", { name: /lat/i }).type(testLocation.lat);
     cy.findByRole("textbox", { name: /lon/i }).type(testLocation.lng);
 
