@@ -6,6 +6,7 @@ import { Card } from "~/components/Card";
 import { Map } from "~/components/Map";
 import { Spacer } from "~/components/Spacer";
 import { Table } from "~/components/Table";
+import { getEnv } from "~/env.server";
 
 import { getAllLocationsStats } from "~/models/location.server";
 import { requireUserId } from "~/session.server";
@@ -14,11 +15,11 @@ import { formatNumber } from "~/utils";
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request);
   const locations = await getAllLocationsStats();
-  return json({ locations });
+  return json({ locations, ENV: getEnv() });
 };
 
 export default function DiscoverPage() {
-  const data = useLoaderData<typeof loader>();
+  const { locations, ENV } = useLoaderData<typeof loader>();
 
   return (
     <main>
@@ -33,7 +34,7 @@ export default function DiscoverPage() {
           </tr>
         </Table.Head>
         <tbody>
-          {data.locations
+          {locations
             .sort((a, b) => b.averageScore - a.averageScore)
             .map((loc) => {
               return (
@@ -48,11 +49,15 @@ export default function DiscoverPage() {
             })}
         </tbody>
       </Table>
-      <Spacer size={24} />
-      <Subtitle>Map</Subtitle>
-      <MapCard>
-        <Map locations={data.locations} />
-      </MapCard>
+      {ENV.ENABLE_MAPS && (
+        <>
+          <Spacer size={24} />
+          <Subtitle>Map</Subtitle>
+          <MapCard>
+            <Map locations={locations} />
+          </MapCard>
+        </>
+      )}
     </main>
   );
 }

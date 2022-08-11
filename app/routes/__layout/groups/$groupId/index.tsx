@@ -17,6 +17,7 @@ import { Map } from "~/components/Map";
 import { Card } from "~/components/Card";
 import { useOnScreen } from "~/hooks/useOnScreen";
 import { useRef } from "react";
+import { getEnv } from "~/env.server";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -26,11 +27,11 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ details });
+  return json({ details, ENV: getEnv() });
 };
 
 export default function GroupDetailsPage() {
-  const { details } = useLoaderData<typeof loader>();
+  const { details, ENV } = useLoaderData<typeof loader>();
 
   const orderedPickers = details.group.members
     .slice()
@@ -207,26 +208,30 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
-      <Subtitle>Map</Subtitle>
-      <Spacer size={8} />
-      <LazyCard>
-        <Map
-          locations={details.group.groupLocations.map((x) => ({
-            address: x.location.address,
-            averageScore: getAverageNumber(
-              x.lunches.flatMap((y) => y.scores),
-              "score"
-            ),
-            highestScore: 0,
-            id: x.locationId,
-            lat: x.location.lat,
-            lon: x.location.lon,
-            lowestScore: 0,
-            lunchCount: x.lunches.length,
-            name: x.location.name,
-          }))}
-        />
-      </LazyCard>
+      {ENV.ENABLE_MAPS && (
+        <>
+          <Subtitle>Map</Subtitle>
+          <Spacer size={8} />
+          <LazyCard>
+            <Map
+              locations={details.group.groupLocations.map((x) => ({
+                address: x.location.address,
+                averageScore: getAverageNumber(
+                  x.lunches.flatMap((y) => y.scores),
+                  "score"
+                ),
+                highestScore: 0,
+                id: x.locationId,
+                lat: x.location.lat,
+                lon: x.location.lon,
+                lowestScore: 0,
+                lunchCount: x.lunches.length,
+                name: x.location.name,
+              }))}
+            />
+          </LazyCard>
+        </>
+      )}
     </div>
   );
 }

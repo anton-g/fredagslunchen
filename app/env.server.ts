@@ -1,6 +1,7 @@
 function getEnv() {
   return {
     NODE_ENV: process.env.NODE_ENV,
+    ENABLE_MAPS: process.env.ENABLE_MAPS === "true",
   };
 }
 

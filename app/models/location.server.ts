@@ -94,8 +94,8 @@ export async function getAllLocationsStats() {
 
     const averageScore = getAverageNumber(allScores, "score");
 
-    const highestScore = allScores[0].score;
-    const lowestScore = allScores[allScores.length - 1].score;
+    const highestScore = allScores[0]?.score || 0;
+    const lowestScore = allScores[allScores.length - 1]?.score || 0;
 
     return {
       address: loc.address,
