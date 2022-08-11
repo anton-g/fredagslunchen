@@ -1,11 +1,30 @@
+- Forgot password
 - Remove group member
+  - Require group admin
 - Edit user
   - Reset password
 - Delete lunch
+  - Require group admin?
 - Delete group location
+  - Require group admin?
 - Delete user
+- Delete score
+  - As group member
+  - As group admin
 - Move tokens to ENV
   - Fathom
   - Mapbox
 - About/help page
 - Anonymous users
+  - A group should be able to contain "anonymous" users, that is users that isn't tied to a login.
+  - When creating a new score you should be able to create a new "anonymous" user and score for said user.
+  - The anonymous user should be able to be "claimed" by a real user when they join a group.
+    - Claiming a anonymous user should transfer all scores from the anonymous user to the user who claimed it.
+- Admin page
+  - See all locations
+    - Merge locations (ie Sandhäxan and Sandhaxan)
+  - See all groups
+    - Number of users, number of lunches, number of scores
+  - See all users
+- Discover page
+  - Top locations
