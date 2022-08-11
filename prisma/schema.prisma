@@ -79,6 +79,8 @@ model Location {
   lon     String
   lat     String
   address String
+  city    String
+  zipCode String
 
   groupLocation GroupLocation[]
 }

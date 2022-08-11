@@ -35,6 +35,8 @@ export async function createGroupLocation({
   lon,
   name,
   groupId,
+  city,
+  zipCode,
   discoveredById,
   locationId,
 }: CreateGroupLocationInput) {
@@ -60,6 +62,8 @@ export async function createGroupLocation({
             lat,
             lon,
             name,
+            city,
+            zipCode,
           },
         },
       },

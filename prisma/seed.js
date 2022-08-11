@@ -72,6 +72,8 @@ async function seed() {
       lon: "18.0664337",
       name: "WokHouse",
       address: "Regeringsgatan 1337",
+      city: "Stockholm",
+      zipCode: "11737",
     },
   });
 
@@ -81,6 +83,8 @@ async function seed() {
       lon: "18.0564237",
       name: "Franzén",
       address: "Klara Norra 1337",
+      city: "Stockholm",
+      zipCode: "11439",
     },
   });
 
@@ -90,6 +94,8 @@ async function seed() {
       lon: "18.0371404",
       name: "Sandhäxan",
       address: "Gästrikegatan 13",
+      city: "Stockholm",
+      zipCode: "11123",
     },
   });
 

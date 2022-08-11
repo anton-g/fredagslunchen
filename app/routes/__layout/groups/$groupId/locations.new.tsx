@@ -35,6 +35,8 @@ type ActionData = {
     lat?: string;
     lon?: string;
     discoveredBy?: string;
+    city?: string;
+    zipCode?: string;
   };
 };
 
@@ -45,6 +47,8 @@ export const action: ActionFunction = async ({ request, params }) => {
   const locationId = formData.get("location-key");
   const name = formData.get("location");
   const address = formData.get("address");
+  const zipCode = formData.get("zipCode");
+  const city = formData.get("city");
   const lat = formData.get("lat");
   const lon = formData.get("lon");
   const discoveredById = formData.get("discoveredBy-key");
@@ -60,7 +64,21 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (typeof address !== "string" || address.length === 0) {
     return json<ActionData>(
-      { errors: { address: "Address is required" } },
+      { errors: { address: "Street address is required" } },
+      { status: 400 }
+    );
+  }
+
+  if (typeof zipCode !== "string" || zipCode.length === 0) {
+    return json<ActionData>(
+      { errors: { zipCode: "Zip code is required" } },
+      { status: 400 }
+    );
+  }
+
+  if (typeof city !== "string" || city.length === 0) {
+    return json<ActionData>(
+      { errors: { city: "City is required" } },
       { status: 400 }
     );
   }
@@ -97,6 +115,8 @@ export const action: ActionFunction = async ({ request, params }) => {
     address,
     lat,
     lon,
+    city,
+    zipCode,
     discoveredById,
     locationId: parsedId,
   });
@@ -110,6 +130,8 @@ export default function NewLunchPage() {
   const loaderData = useLoaderData<typeof loader>();
   const nameRef = useRef<HTMLInputElement>(null!);
   const addressRef = useRef<HTMLInputElement>(null);
+  const zipCodeRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLInputElement>(null);
   const latRef = useRef<HTMLInputElement>(null);
   const lonRef = useRef<HTMLInputElement>(null);
   const discoveredByRef = useRef<HTMLInputElement>(null!);
@@ -119,6 +141,10 @@ export default function NewLunchPage() {
       nameRef.current?.focus();
     } else if (actionData?.errors?.address) {
       addressRef.current?.focus();
+    } else if (actionData?.errors?.zipCode) {
+      zipCodeRef.current?.focus();
+    } else if (actionData?.errors?.city) {
+      cityRef.current?.focus();
     } else if (actionData?.errors?.lat) {
       latRef.current?.focus();
     } else if (actionData?.errors?.lon) {
@@ -174,7 +200,7 @@ export default function NewLunchPage() {
 
           <div>
             <label>
-              <span>Address</span>
+              <span>Street address</span>
               <Input
                 ref={addressRef}
                 name="address"
@@ -189,7 +215,43 @@ export default function NewLunchPage() {
             )}
           </div>
 
-          <div style={{ display: "flex", width: "100%", gap: 16 }}>
+          <Stack axis="horizontal" gap={16}>
+            <div style={{ width: "100%" }}>
+              <label>
+                <span>Zip code</span>
+                <Input
+                  ref={zipCodeRef}
+                  name="zipCode"
+                  aria-invalid={actionData?.errors?.zipCode ? true : undefined}
+                  aria-errormessage={
+                    actionData?.errors?.zipCode ? "zip-code-error" : undefined
+                  }
+                />
+              </label>
+              {actionData?.errors?.zipCode && (
+                <div id="zip-code-error">{actionData.errors.zipCode}</div>
+              )}
+            </div>
+
+            <div style={{ width: "100%" }}>
+              <label>
+                <span>City</span>
+                <Input
+                  ref={cityRef}
+                  name="city"
+                  aria-invalid={actionData?.errors?.city ? true : undefined}
+                  aria-errormessage={
+                    actionData?.errors?.city ? "city-error" : undefined
+                  }
+                />
+              </label>
+              {actionData?.errors?.city && (
+                <div id="city-error">{actionData.errors.city}</div>
+              )}
+            </div>
+          </Stack>
+
+          <Stack axis="horizontal" gap={16}>
             <div style={{ width: "100%" }}>
               <label>
                 <span>Latitude</span>
@@ -223,7 +285,7 @@ export default function NewLunchPage() {
                 <div id="lon-error">{actionData.errors.lon}</div>
               )}
             </div>
-          </div>
+          </Stack>
 
           <div>
             <ComboBox
