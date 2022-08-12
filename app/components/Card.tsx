@@ -39,7 +39,7 @@ const Wrapper = styled.div<{ inverted: boolean }>`
         `}
   border-radius: 8px;
   padding: 16px 24px;
-  box-shadow: -5px 5px 0px 0px #000000;
+  box-shadow: -5px 5px 0px 0px ${({ theme }) => theme.colors.primary};
   overflow: hidden;
 `;
 

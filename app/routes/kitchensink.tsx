@@ -1,7 +1,8 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons";
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderArgs, MetaFunction } from "@remix-run/node";
+import { json } from "@remix-run/node";
 import type { FC } from "react";
-import { Link } from "@remix-run/react";
+import { Link, useLoaderData } from "@remix-run/react";
 import { Button, LinkButton } from "~/components/Button";
 import { Card } from "~/components/Card";
 import { Checkbox } from "~/components/Checkbox";
@@ -17,6 +18,9 @@ import { TextArea } from "~/components/TextArea";
 import { HoverCard } from "~/components/HoverCard";
 import { Map } from "~/components/Map";
 import { Tooltip } from "~/components/Tooltip";
+import { Dialog } from "~/components/Dialog";
+import { getEnv } from "~/env.server";
+import styled from "styled-components";
 
 export const meta: MetaFunction = () => {
   return {
@@ -24,10 +28,33 @@ export const meta: MetaFunction = () => {
   };
 };
 
+export const loader = async ({ request }: LoaderArgs) => {
+  return json({
+    ENV: getEnv(),
+  });
+};
+
 export default function Kitchensink() {
+  const { ENV } = useLoaderData<typeof loader>();
+
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Dialog">
+          <Dialog>
+            <Dialog.Trigger asChild>
+              <Button>Trigger dialog</Button>
+            </Dialog.Trigger>
+            <Dialog.Content>
+              <Dialog.Title>Title</Dialog.Title>
+              <Dialog.Description>
+                An automatically accessible description. You can write anything
+                or nothing in here :)
+              </Dialog.Description>
+              <Dialog.Close />
+            </Dialog.Content>
+          </Dialog>
+        </Component>
         <Component title="Tooltip">
           <Tooltip>
             <Tooltip.Trigger asChild>
@@ -37,43 +64,11 @@ export default function Kitchensink() {
           </Tooltip>
         </Component>
         <Component title="Map">
-          <Map
-            locations={[
-              {
-                id: 1,
-                lat: "59.331582",
-                lon: "18.0664337",
-                name: "WokHouse",
-                address: "Fake address 1",
-                averageScore: 4.2,
-                highestScore: 8,
-                lowestScore: 2,
-                lunchCount: 4,
-              },
-              {
-                id: 2,
-                lat: "59.3339128",
-                lon: "18.0564237",
-                name: "Franzén",
-                address: "Fake address 1",
-                averageScore: 7.9,
-                highestScore: 8,
-                lowestScore: 2,
-                lunchCount: 4,
-              },
-              {
-                id: 3,
-                lat: "59.3414987",
-                lon: "18.0371404",
-                name: "Zocalo",
-                address: "Fake address 1",
-                averageScore: 9,
-                highestScore: 8,
-                lowestScore: 2,
-                lunchCount: 4,
-              },
-            ]}
-          />
+          {ENV.ENABLE_MAPS ? (
+            <Map locations={locationsMock} />
+          ) : (
+            <span>Maps disabled</span>
+          )}
         </Component>
         <Component title="Hover Card">
           <HoverCard>
@@ -184,26 +179,14 @@ export default function Kitchensink() {
         <Component title="Stack">
           <Stack gap={36} axis="horizontal">
             <Stack gap={8}>
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
+              <Box></Box>
+              <Box></Box>
+              <Box></Box>
             </Stack>
             <Stack gap={8} axis="horizontal">
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
-              <div
-                style={{ width: 100, height: 50, backgroundColor: "black" }}
-              ></div>
+              <Box></Box>
+              <Box></Box>
+              <Box></Box>
             </Stack>
           </Stack>
         </Component>
@@ -220,6 +203,12 @@ const Component: FC<{ title: string }> = ({ title, children }) => {
     </div>
   );
 };
+
+const Box = styled.div`
+  width: 100px;
+  height: 50px;
+  background-color: ${({ theme }) => theme.colors.primary};
+`;
 
 const SelectExample = () => {
   return (
@@ -393,3 +382,39 @@ const ComboBoxExample = () => {
     </ComboBox>
   );
 };
+
+const locationsMock = [
+  {
+    id: 1,
+    lat: "59.331582",
+    lon: "18.0664337",
+    name: "WokHouse",
+    address: "Fake address 1",
+    averageScore: 4.2,
+    highestScore: 8,
+    lowestScore: 2,
+    lunchCount: 4,
+  },
+  {
+    id: 2,
+    lat: "59.3339128",
+    lon: "18.0564237",
+    name: "Franzén",
+    address: "Fake address 1",
+    averageScore: 7.9,
+    highestScore: 8,
+    lowestScore: 2,
+    lunchCount: 4,
+  },
+  {
+    id: 3,
+    lat: "59.3414987",
+    lon: "18.0371404",
+    name: "Zocalo",
+    address: "Fake address 1",
+    averageScore: 9,
+    highestScore: 8,
+    lowestScore: 2,
+    lunchCount: 4,
+  },
+];
