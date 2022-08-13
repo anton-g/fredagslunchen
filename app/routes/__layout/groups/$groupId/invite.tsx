@@ -142,6 +142,7 @@ export default function InvitePage() {
             <Input
               value={`${baseUrl}/join?token=${groupInviteToken}`}
               onFocus={(e) => e.target.select()}
+              aria-label="Invite link"
             />
             <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
               <fetcher.Form method="delete" action="/groups/api/invite-token">
@@ -149,7 +150,7 @@ export default function InvitePage() {
                 <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
                   <Tooltip.Trigger asChild>
-                    <Button variant="round">
+                    <Button variant="round" aria-label="Remove invite link">
                       <Cross2Icon />
                     </Button>
                   </Tooltip.Trigger>
@@ -161,7 +162,7 @@ export default function InvitePage() {
                 <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
                   <Tooltip.Trigger asChild>
-                    <Button variant="round">
+                    <Button variant="round" aria-label="Refresh invite link">
                       <UpdateIcon />
                     </Button>
                   </Tooltip.Trigger>

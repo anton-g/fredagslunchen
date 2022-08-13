@@ -89,4 +89,35 @@ describe("smoke tests", () => {
 
     cy.cleanupGroup({ name: testGroup.name });
   });
+
+  it("should allow you to configure an invite link for a group", () => {
+    const testGroup = {
+      name: faker.lorem.words(2),
+    };
+    cy.login().then((user) => {
+      cy.createGroup({ name: testGroup.name, userId: user.userId });
+    });
+    cy.visit("/");
+
+    cy.findByRole("link", { name: /groups/i }).click();
+    cy.findByRole("link", {
+      name: new RegExp(`${testGroup.name}`, "i"),
+    }).click();
+    cy.findByRole("link", { name: /invite user/i }).click();
+
+    cy.findByRole("button", { name: /create invite link/i }).click();
+    cy.findByLabelText(/^invite link$/i)
+      .invoke("val")
+      .then((val1) => {
+        cy.findByLabelText(/refresh invite link/i).click();
+
+        cy.findByLabelText(/^invite link$/i).should("not.have.value", val1);
+      });
+
+    cy.findByLabelText(/remove invite link/i).click();
+
+    cy.findByRole("button", { name: /create invite link/i });
+
+    cy.cleanupGroup({ name: testGroup.name });
+  });
 });
