@@ -120,4 +120,44 @@ describe("smoke tests", () => {
 
     cy.cleanupGroup({ name: testGroup.name });
   });
+
+  it("should allow you to create a new lunch and score for existing location", () => {
+    const testGroup = {
+      name: faker.lorem.words(2),
+    };
+    cy.login().then((user) => {
+      cy.createGroup({ name: testGroup.name, userId: user.userId });
+    });
+    cy.visit(`/`);
+    cy.findByRole("link", { name: /groups/i }).click();
+    cy.findByRole("link", {
+      name: new RegExp(`${testGroup.name}`, "i"),
+    }).click();
+
+    cy.findByRole("link", { name: /new lunch/i }).click();
+
+    cy.findByRole("button", { name: /location show suggestions/i }).click();
+    cy.findAllByRole("option").eq(0).click();
+
+    cy.findByRole("button", { name: /save/i }).click();
+
+    const testScore = {
+      score: "6",
+      comment: "test comment",
+    };
+
+    cy.findByRole("button", { name: /from show suggestions/i }).click();
+    cy.findAllByRole("option").eq(0).click();
+
+    cy.findByRole("spinbutton", { name: /score/i }).type(testScore.score);
+    cy.findByRole("textbox", { name: /comment/i }).type(testScore.comment);
+
+    cy.findByRole("button", { name: /save score/i }).click();
+
+    cy.findByRole("cell", { name: /name/i });
+    cy.findByRole("cell", { name: testScore.score });
+    cy.findByRole("cell", { name: testScore.comment });
+
+    cy.cleanupGroup({ name: testGroup.name });
+  });
 });
