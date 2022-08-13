@@ -1,6 +1,8 @@
+- Move tokens to ENV
+  - Fathom
+  - Mapbox
 - Write tests
   - New lunch from location
-  - New score
   - Invite user with email
   - Invite user with link
 - Forgot password
@@ -16,9 +18,6 @@
 - Delete score
   - As group member
   - As group admin
-- Move tokens to ENV
-  - Fathom
-  - Mapbox
 - About/help page
 - Anonymous users
   - A group should be able to contain "anonymous" users, that is users that isn't tied to a login.
