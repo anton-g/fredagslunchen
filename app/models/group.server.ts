@@ -377,7 +377,7 @@ const generateGroupStats = (
   const averages = memberStats
     .slice()
     .sort(
-      (a, b) => Math.abs(b.avg - averageScore) - Math.abs(a.avg - averageScore)
+      (a, b) => Math.abs(a.avg - averageScore) - Math.abs(b.avg - averageScore)
     );
 
   const mostAverage = averages[0]

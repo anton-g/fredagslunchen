@@ -48,7 +48,7 @@ export default function GroupDetailsPage() {
       <Stats>
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
-          label="Best score"
+          label="Best location"
           value={`${details.stats.bestLocation.name || "-"}`}
           detail={
             details.stats.bestLocation.name
@@ -57,7 +57,7 @@ export default function GroupDetailsPage() {
           }
         />
         <Stat
-          label="Worst score"
+          label="Worst location"
           value={`${details.stats.worstLocation.name || "-"}`}
           detail={
             details.stats.worstLocation.name
