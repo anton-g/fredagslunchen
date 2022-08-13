@@ -45,7 +45,7 @@ export default function LunchDetailsPage() {
     .slice()
     .sort((a, b) => a.score - b.score);
   const lowestScore = sortedScores[0]?.score;
-  const highestScore = sortedScores[1]?.score;
+  const highestScore = sortedScores[sortedScores.length - 1]?.score;
 
   const averageScore =
     scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-";

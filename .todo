@@ -5,10 +5,10 @@
   - Invite user with email
   - Invite user with link
 - Forgot password
-- Remove group member
-  - Require group admin
 - Edit user
   - Reset password
+- Remove group member
+  - Require group admin
 - Delete lunch
   - Require group admin?
 - Delete group location
