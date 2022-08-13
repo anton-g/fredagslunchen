@@ -1,4 +1,4 @@
-import type { User, Group, Prisma, Location } from "@prisma/client";
+import type { User, Group, Prisma, Location, Email } from "@prisma/client";
 import { nanoid } from "nanoid";
 
 import { prisma } from "~/db.server";
@@ -196,9 +196,17 @@ export async function addUserEmailToGroup({
   email,
 }: {
   groupId: Group["id"];
-  email: User["email"];
+  email: Email["email"];
 }) {
   try {
+    const user = await prisma.user.findFirst({
+      where: {
+        email: { email },
+      },
+    });
+
+    if (!user) return { error: "User does not exist" };
+
     const group = await prisma.group.update({
       where: {
         id: groupId,
@@ -208,7 +216,7 @@ export async function addUserEmailToGroup({
           create: {
             user: {
               connect: {
-                email: email,
+                id: user.id,
               },
             },
           },

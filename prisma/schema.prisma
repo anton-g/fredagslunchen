@@ -7,15 +7,22 @@ generator client {
   provider = "prisma-client-js"
 }
 
-model User {
-  id    String @id @default(cuid())
+model Email {
+  id    Int    @id @default(autoincrement())
   email String @unique
-  name  String
+  user  User[]
+}
+
+model User {
+  id      String @id @default(cuid())
+  email   Email? @relation(fields: [emailId], references: [id], onDelete: Cascade)
+  emailId Int?
+  name    String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  role String @default("USER")
+  role String @default("USER") // USER, ADMIN, ANONYMOUS
 
   password Password?
 

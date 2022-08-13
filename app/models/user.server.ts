@@ -1,4 +1,4 @@
-import type { Password, Prisma, User } from "@prisma/client";
+import type { Email, Group, Password, Prisma, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { prisma } from "~/db.server";
@@ -79,12 +79,12 @@ export async function getUserById(id: User["id"]) {
   return prisma.user.findUnique({ where: { id } });
 }
 
-export async function getUserByEmail(email: User["email"]) {
-  return prisma.user.findUnique({ where: { email } });
+export async function getUserByEmail(email: Email["email"]) {
+  return prisma.user.findFirst({ where: { email: { email } } });
 }
 
 export async function createUser(
-  email: User["email"],
+  email: Email["email"],
   name: string,
   password: string,
   inviteToken?: string | null
@@ -93,7 +93,11 @@ export async function createUser(
 
   const user = await prisma.user.create({
     data: {
-      email,
+      email: {
+        create: {
+          email,
+        },
+      },
       name,
       password: {
         create: {
@@ -102,8 +106,6 @@ export async function createUser(
       },
     },
   });
-
-  console.log("CREATE", { inviteToken });
 
   let group = undefined;
   if (inviteToken) {
@@ -131,16 +133,32 @@ export async function createUser(
   return { user, groupId: group?.id };
 }
 
-export async function deleteUserByEmail(email: User["email"]) {
-  return prisma.user.delete({ where: { email } });
+export async function createAnonymousUser(name: string, groupId: Group["id"]) {
+  const user = await prisma.user.create({
+    data: {
+      name,
+      role: "ANONYMOUS",
+      groups: {
+        create: {
+          groupId,
+        },
+      },
+    },
+  });
+
+  return user;
+}
+
+export async function deleteUserByEmail(email: Email["email"]) {
+  return prisma.user.delete({ where: {} });
 }
 
 export async function verifyLogin(
-  email: User["email"],
+  email: Email["email"],
   password: Password["hash"]
 ) {
-  const userWithPassword = await prisma.user.findUnique({
-    where: { email },
+  const userWithPassword = await prisma.user.findFirst({
+    where: { email: { email } },
     include: {
       password: true,
     },

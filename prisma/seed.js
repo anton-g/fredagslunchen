@@ -5,9 +5,6 @@ const bcrypt = require("bcryptjs");
 const prisma = new PrismaClient();
 
 async function seed() {
-  const email = "bassman@nosegrove.com";
-  const name = "Bass Labb";
-
   // TODO cleanup the existing database
   // await prisma.score.deleteMany().catch(() => {});
   // await prisma.lunch.deleteMany().catch(() => {});
@@ -19,8 +16,12 @@ async function seed() {
 
   const userBasse = await prisma.user.create({
     data: {
-      email,
-      name,
+      email: {
+        create: {
+          email: "bassman@nosegrove.com",
+        },
+      },
+      name: "Bass Labb",
       role: "ADMIN",
       password: {
         create: {
@@ -32,7 +33,7 @@ async function seed() {
 
   const userTessan = await prisma.user.create({
     data: {
-      email: "teko@cool.se",
+      email: { create: { email: "teko@cool.se" } },
       name: "Tessan",
       password: {
         create: {
@@ -44,7 +45,7 @@ async function seed() {
 
   const userMartin = await prisma.user.create({
     data: {
-      email: "martin@cool.se",
+      email: { create: { email: "martin@cool.se" } },
       name: "Marre",
       password: {
         create: {
@@ -56,7 +57,7 @@ async function seed() {
 
   const userKatten = await prisma.user.create({
     data: {
-      email: "katten@cool.se",
+      email: { create: { email: "katten@cool.se" } },
       name: "Katten",
       password: {
         create: {
@@ -107,6 +108,22 @@ async function seed() {
           { user: { connect: { id: userBasse.id } }, role: "ADMIN" },
           { user: { connect: { id: userTessan.id } } },
           { user: { connect: { id: userMartin.id } } },
+          {
+            user: {
+              create: {
+                name: "Anonymous user",
+                role: "ANONYMOUS",
+              },
+            },
+          },
+          {
+            user: {
+              create: {
+                name: "Anonymous user 2",
+                role: "ANONYMOUS",
+              },
+            },
+          },
         ],
       },
       groupLocations: {
