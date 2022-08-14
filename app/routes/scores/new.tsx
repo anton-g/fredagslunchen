@@ -1,6 +1,9 @@
 import type { ActionFunction } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { createScore } from "~/models/score.server";
+import {
+  createScore,
+  createScoreWithNewAnonymousUser,
+} from "~/models/score.server";
 import { requireUserId } from "~/session.server";
 
 type ActionData = {
@@ -8,6 +11,7 @@ type ActionData = {
     score?: string;
     user?: string;
     lunchId?: string;
+    groupId?: string;
   };
 };
 
@@ -18,10 +22,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const scoreString = formData.get("score");
   const score = scoreString ? parseFloat(scoreString.toString()) : null;
   const comment = formData.get("comment");
+  const user = formData.get("user");
   const userId = formData.get("user-key");
   const lunchId = formData.get("lunchId");
 
-  if (typeof userId !== "string" || userId.length === 0) {
+  if (typeof user !== "string" || user.length === 0) {
     return json<ActionData>(
       { errors: { user: "User is required" } },
       { status: 400 }
@@ -42,11 +47,33 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  await createScore({
-    userId,
-    score,
+  // Score for existing user
+  if (typeof userId === "string" && userId.length > 0) {
+    await createScore({
+      userId,
+      score,
+      comment: comment ? comment.toString() : null,
+      lunchId: parseInt(lunchId),
+    });
+
+    return json({ ok: true });
+  }
+
+  const groupId = formData.get("groupId");
+
+  if (typeof groupId !== "string" || groupId.length === 0) {
+    return json<ActionData>(
+      { errors: { groupId: "Group is required" } },
+      { status: 400 }
+    );
+  }
+
+  await createScoreWithNewAnonymousUser({
     comment: comment ? comment.toString() : null,
     lunchId: parseInt(lunchId),
+    groupId: groupId,
+    score,
+    newUserName: user,
   });
 
   return json({ ok: true });

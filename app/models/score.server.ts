@@ -1,4 +1,4 @@
-import type { Lunch, Score, User } from "@prisma/client";
+import type { Group, Lunch, Score, User } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
@@ -29,4 +29,34 @@ export function createScore({
       },
     },
   });
+}
+
+export async function createScoreWithNewAnonymousUser({
+  score,
+  comment,
+  newUserName,
+  lunchId,
+  groupId,
+}: Pick<Score, "score" | "comment"> & {
+  newUserName: User["name"];
+  lunchId: Lunch["id"];
+  groupId: Group["id"];
+}) {
+  const member = await prisma.groupMember.create({
+    data: {
+      group: {
+        connect: {
+          id: groupId,
+        },
+      },
+      user: {
+        create: {
+          name: newUserName,
+          role: "ANONYMOUS",
+        },
+      },
+    },
+  });
+
+  return createScore({ score, comment, lunchId, userId: member.userId });
 }

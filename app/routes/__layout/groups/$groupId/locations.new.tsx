@@ -184,6 +184,7 @@ export default function NewLunchPage() {
               defaultSelectedKey={user.id}
               inputRef={nameRef}
               allowsCustomValue={true}
+              menuTrigger="focus"
             >
               {(item) => (
                 <Item textValue={item.name}>
@@ -294,6 +295,7 @@ export default function NewLunchPage() {
               defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={discoveredByRef}
+              menuTrigger="focus"
             >
               {(item) => (
                 <Item textValue={item.name}>

@@ -1,4 +1,4 @@
-import type { Lunch, User } from "@prisma/client";
+import type { Group, Lunch, User } from "@prisma/client";
 import type { LoaderArgs } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { formatNumber, getAverageNumber } from "~/utils";
@@ -18,7 +18,7 @@ import { ComboBox, Item, Label } from "~/components/ComboBox";
 import { TextArea } from "~/components/TextArea";
 import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request);
@@ -110,7 +110,11 @@ export default function LunchDetailsPage() {
         <>
           <Subtitle>New score</Subtitle>
           <Spacer size={8} />
-          <NewScoreForm users={usersWithoutScores} lunchId={groupLunch.id} />
+          <NewScoreForm
+            users={usersWithoutScores}
+            lunchId={groupLunch.id}
+            groupId={groupLunch.groupLocationGroupId}
+          />
         </>
       )}
       <Spacer size={128} />
@@ -161,10 +165,13 @@ const Subtitle = styled.h3`
 type NewScoreFormProps = {
   users: RecursivelyConvertDatesToStrings<User>[];
   lunchId: Lunch["id"];
+  groupId: Group["id"];
 };
 
-const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
+const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
   const fetcher = useFetcher();
+  const [selectedFrom, setSelectedFrom] = useState<string | null>(null);
+  const [fromInputValue, setFromInputValue] = useState<string | null>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const userRef = useRef<HTMLInputElement>(null!);
   const scoreRef = useRef<HTMLInputElement>(null);
@@ -182,6 +189,11 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
     }
   }, [fetcher]);
 
+  const isFromNewAnonymousUser =
+    fromInputValue &&
+    !users.some((x) => x.name === fromInputValue) &&
+    !selectedFrom;
+
   return (
     <fetcher.Form
       method="post"
@@ -198,24 +210,29 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
-          <ComboBox
-            label="From"
-            name="user"
-            defaultItems={users}
-            // defaultSelectedKey={users[0].id}
-            inputRef={userRef}
-          >
-            {(item) => (
-              <Item textValue={item.name}>
-                <div>
-                  <Label>{item.name}</Label>
-                </div>
-              </Item>
+          <Stack gap={4}>
+            <ComboBox
+              label="From"
+              name="user"
+              defaultItems={users}
+              menuTrigger="focus"
+              inputRef={userRef}
+              onSelectionChange={(key) => setSelectedFrom(key?.toString())}
+              onBlur={(e: any) => setFromInputValue(e.target.value)}
+              allowsCustomValue
+            >
+              {(item) => (
+                <Item textValue={item.name}>
+                  <div>
+                    <Label>{item.name}</Label>
+                  </div>
+                </Item>
+              )}
+            </ComboBox>
+            {fetcher.data?.errors?.user && (
+              <div id="user-error">{fetcher.data.errors.user}</div>
             )}
-          </ComboBox>
-          {fetcher.data?.errors?.user && (
-            <div id="user-error">{fetcher.data.errors.user}</div>
-          )}
+          </Stack>
           <label>
             <span>Score</span>
             <Input
@@ -242,7 +259,13 @@ const NewScoreForm = ({ users, lunchId }: NewScoreFormProps) => {
           </CommentLabel>
         </div>
       </Stack>
-      <Button>Save score</Button>
+      <Stack axis="horizontal" gap={16}>
+        {isFromNewAnonymousUser && (
+          <div>You're creating a new anonymous user.</div>
+        )}
+        <Button>Save score</Button>
+      </Stack>
+      <input type="hidden" name="groupId" value={groupId} />
     </fetcher.Form>
   );
 };

@@ -21,7 +21,10 @@ export const ComboBox = <T extends object>(
   }
 ) => {
   const { contains } = useFilter({ sensitivity: "base" });
-  const state = useComboBoxState({ ...props, defaultFilter: contains });
+  const state = useComboBoxState({
+    ...props,
+    defaultFilter: contains,
+  });
 
   const buttonRef = useRef(null);
   const inputRef = useRef<HTMLInputElement>(null!);

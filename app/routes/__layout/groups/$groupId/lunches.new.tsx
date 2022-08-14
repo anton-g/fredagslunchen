@@ -148,6 +148,7 @@ export default function NewLunchPage() {
               defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={choosenByRef}
+              menuTrigger="focus"
             >
               {(item) => (
                 <Item textValue={item.name}>
@@ -168,6 +169,7 @@ export default function NewLunchPage() {
               name="location"
               defaultItems={locations}
               inputRef={locationRef}
+              menuTrigger="focus"
               defaultSelectedKey={
                 preSelectedLocationId
                   ? parseInt(preSelectedLocationId)
