@@ -174,6 +174,7 @@ export default function Kitchensink() {
               <CubeIcon />
             </Button>
             <LinkButton to="/kitchensink">As link</LinkButton>
+            <Button variant="large">Large</Button>
           </Stack>
         </Component>
         <Component title="Stack">

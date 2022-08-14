@@ -1,13 +1,13 @@
 import { Link as RemixLink } from "@remix-run/react";
 import styled, { css } from "styled-components";
 
-type ButtonVariant = "normal" | "round";
+type ButtonVariant = "normal" | "round" | "large";
 
 const styles = css<{ variant?: ButtonVariant }>`
   color: ${({ theme }) => theme.colors.primary};
   background-color: ${({ theme }) => theme.colors.secondary};
   border: 2px solid ${({ theme }) => theme.colors.primary};
-  border-radius: ${({ variant }) => (variant === "normal" ? "4px" : "50%")};
+  border-radius: ${({ variant }) => (variant === "round" ? "50%" : "4px")};
   position: relative;
   transform: translate(0.15rem, -0.15em);
   transform-style: preserve-3d;
@@ -15,9 +15,10 @@ const styles = css<{ variant?: ButtonVariant }>`
   display: flex;
   align-items: center;
   width: fit-content;
-  font-size: 16px;
+  font-size: ${({ variant }) => (variant === "large" ? "18px" : "16px")};
   transition: transform 75ms ease-in-out;
-  padding: 2px 6px;
+  padding: ${({ variant }) => (variant === "large" ? "4px 8px" : "2px 6px")};
+  height: fit-content;
 
   ${({ variant }) =>
     variant === "round" &&
