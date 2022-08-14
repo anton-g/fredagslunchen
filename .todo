@@ -5,6 +5,9 @@
   - New lunch from location
   - Invite user with email
   - Invite user with link
+  - Creating anonymous user
+  - Claiming anonymous user
+- Create location from New lunch page
 - Forgot password
 - Edit user
   - Reset password
@@ -19,11 +22,6 @@
   - As group member
   - As group admin
 - About/help page
-- Anonymous users
-  - A group should be able to contain "anonymous" users, that is users that isn't tied to a login.
-  - When creating a new score you should be able to create a new "anonymous" user and score for said user.
-  - The anonymous user should be able to be "claimed" by a real user when they join a group.
-  - Claiming a anonymous user should transfer all scores from the anonymous user to the user who claimed it.
 - Admin page
   - See all locations
   - Merge locations (ie Sandhäxan and Sandhaxan)

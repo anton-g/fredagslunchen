@@ -1,5 +1,6 @@
 import type { Email, Group, Password, Prisma, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
+import invariant from "tiny-invariant";
 
 import { prisma } from "~/db.server";
 import { getAverageNumber } from "~/utils";
@@ -10,6 +11,19 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
     where: { id },
     include: {
+      groups: {
+        include: {
+          group: {
+            include: {
+              members: {
+                select: {
+                  userId: true,
+                },
+              },
+            },
+          },
+        },
+      },
       scores: {
         include: {
           lunch: {
@@ -151,6 +165,105 @@ export async function createAnonymousUser(name: string, groupId: Group["id"]) {
 
 export async function deleteUserByEmail(email: Email["email"]) {
   return prisma.user.delete({ where: {} });
+}
+
+export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
+  const fromUser = await prisma.user.findUnique({
+    where: {
+      id: fromUserId,
+    },
+    include: {
+      groups: {
+        select: {
+          groupId: true,
+        },
+      },
+    },
+  });
+
+  if (!fromUser) {
+    throw Error("No fromUser found");
+  }
+
+  // Anonymous users should only ever have one group
+  if (fromUser.groups.length !== 1) {
+    throw Error(
+      "Something went wrong. Tried to merge user with more than 1 group."
+    );
+  }
+
+  const toUser = await prisma.user.findUnique({
+    where: {
+      id: toUserId,
+    },
+    include: {
+      groups: {
+        select: {
+          groupId: true,
+        },
+      },
+    },
+  });
+
+  if (!toUser) {
+    throw Error("No toUser found");
+  }
+
+  // Make sure users share group
+  const sharesGroup = fromUser.groups.some((group) =>
+    toUser.groups.find((g) => g.groupId === group.groupId)
+  );
+
+  if (!sharesGroup) {
+    throw Error("Can't merge users that don't share a group");
+  }
+
+  // TODO handle all collisions. Right now PKs might conflict.
+
+  // Update group locations
+  await prisma.groupLocation.updateMany({
+    where: {
+      discoveredById: fromUserId,
+    },
+    data: {
+      discoveredById: toUserId,
+    },
+  });
+
+  // Update scores
+  await prisma.score.updateMany({
+    where: {
+      userId: fromUserId,
+    },
+    data: {
+      userId: toUserId,
+    },
+  });
+
+  // Update choosen by
+  await prisma.lunch.updateMany({
+    where: {
+      choosenByUserId: fromUserId,
+    },
+    data: {
+      choosenByUserId: toUserId,
+    },
+  });
+
+  // Delete anonymous user
+  await prisma.groupMember.delete({
+    where: {
+      userId_groupId: {
+        userId: fromUserId,
+        groupId: fromUser.groups[0].groupId,
+      },
+    },
+  });
+  await prisma.user.delete({
+    where: {
+      id: fromUserId,
+    },
+  });
 }
 
 export async function verifyLogin(

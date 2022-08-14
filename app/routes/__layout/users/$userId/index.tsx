@@ -102,6 +102,18 @@ export default function Index() {
           </Table>
         </Section>
       )}
+      {user.role === "ANONYMOUS" && (
+        <>
+          <Spacer size={128} />
+          <Footer>
+            <p>This is a user without an account.</p>
+            <p>
+              If this is you, you can{" "}
+              <Link to={`/users/${user.id}/claim`}>claim its data</Link>.
+            </p>
+          </Footer>
+        </>
+      )}
     </Wrapper>
   );
 }
@@ -136,3 +148,15 @@ const Stats = styled.div`
 `;
 
 const Section = styled.div``;
+
+const Footer = styled.div`
+  text-align: center;
+
+  > p {
+    margin: 0;
+  }
+
+  a {
+    text-decoration: underline;
+  }
+`;

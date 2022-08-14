@@ -1,11 +1,10 @@
 import type { LoaderArgs } from "@remix-run/node";
 import { json } from "@remix-run/node";
-import { useCatch, useLoaderData, Outlet } from "@remix-run/react";
+import { useCatch, useLoaderData, Outlet, Link } from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { getGroupDetails } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
-import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Spacer } from "~/components/Spacer";
 
