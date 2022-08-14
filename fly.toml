@@ -14,7 +14,7 @@ source = "data"
 destination = "/data"
 
 [env]
-  ENABLE_MAPS=true
+  ENABLE_MAPS="true"
 
 [[services]]
 internal_port = 8_080
