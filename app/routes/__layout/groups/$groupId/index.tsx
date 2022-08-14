@@ -43,6 +43,10 @@ export default function GroupDetailsPage() {
   const suggestedPicker = orderedPickers[0];
   const alternativePickers = orderedPickers.slice(1);
 
+  const allLunches = details.group.groupLocations
+    .flatMap((loc) => loc.lunches.map((lunch) => ({ loc, ...lunch })))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
   return (
     <div>
       <Stats>
@@ -179,32 +183,30 @@ export default function GroupDetailsPage() {
           </tr>
         </Table.Head>
         <tbody>
-          {details.group.groupLocations.flatMap((loc) =>
-            loc.lunches.map((lunch) => (
-              <tr key={lunch.id}>
-                <Table.Cell>
-                  <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
-                    {new Date(lunch.date).toLocaleDateString()}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link
-                    to={`/groups/${details.group.id}/locations/${loc.locationId}`}
-                  >
-                    {loc.location.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell>
-                  <Link to={`/users/${lunch.choosenBy.id}`}>
-                    {lunch.choosenBy.name}
-                  </Link>
-                </Table.Cell>
-                <Table.Cell numeric>
-                  {formatNumber(getAverageNumber(lunch.scores, "score"))}
-                </Table.Cell>
-              </tr>
-            ))
-          )}
+          {allLunches.map((lunch) => (
+            <tr key={lunch.id}>
+              <Table.Cell>
+                <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
+                  {new Date(lunch.date).toLocaleDateString()}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>
+                <Link
+                  to={`/groups/${details.group.id}/locations/${lunch.loc.locationId}`}
+                >
+                  {lunch.loc.location.name}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>
+                <Link to={`/users/${lunch.choosenBy.id}`}>
+                  {lunch.choosenBy.name}
+                </Link>
+              </Table.Cell>
+              <Table.Cell numeric>
+                {formatNumber(getAverageNumber(lunch.scores, "score"))}
+              </Table.Cell>
+            </tr>
+          ))}
         </tbody>
       </Table>
       <Spacer size={48} />
