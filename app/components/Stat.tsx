@@ -58,6 +58,9 @@ const Value = styled.span<{ size: StatSize }>`
   font-weight: bold;
   font-size: ${({ size }) => (size === "normal" ? 24 : 18)}px;
   white-space: nowrap;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  overflow: hidden;
 `;
 
 const Detail = styled.span`

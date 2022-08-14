@@ -240,7 +240,7 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
               name="score"
               min={0}
               max={10}
-              step={0.1}
+              step={0.25}
               type="number"
               ref={scoreRef}
               aria-invalid={fetcher.data?.errors?.score ? true : undefined}

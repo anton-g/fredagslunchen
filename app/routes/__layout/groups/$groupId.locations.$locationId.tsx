@@ -39,7 +39,7 @@ export default function LocationDetailsPage() {
           <tr>
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Average score</Table.Heading>
+            <Table.Heading numeric>Avg score</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>

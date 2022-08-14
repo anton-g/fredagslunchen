@@ -114,7 +114,7 @@ export default function GroupDetailsPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Average score</Table.Heading>
+            <Table.Heading numeric>Avg score</Table.Heading>
             <Table.Heading>Favorite lunch</Table.Heading>
             <Table.Heading>Worst lunch</Table.Heading>
           </tr>
@@ -175,7 +175,7 @@ export default function GroupDetailsPage() {
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Location</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Average score</Table.Heading>
+            <Table.Heading numeric>Avg score</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
