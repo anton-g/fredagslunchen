@@ -16,5 +16,5 @@ function hydrateWrapper() {
 if (window.requestIdleCallback) {
   window.requestIdleCallback(hydrateWrapper);
 } else {
-  window.setTimeout(hydrate, 1);
+  window.setTimeout(hydrateWrapper, 1);
 }
