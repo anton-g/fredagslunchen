@@ -1,6 +1,7 @@
 // @ts-check
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
+const { faker } = require("@faker-js/faker");
 
 const prisma = new PrismaClient();
 
@@ -134,7 +135,7 @@ async function seed() {
             lunches: {
               create: [
                 {
-                  date: new Date(),
+                  date: faker.date.recent(7),
                   choosenBy: { connect: { id: userBasse.id } },
                   scores: {
                     create: [
@@ -159,7 +160,7 @@ async function seed() {
             lunches: {
               create: [
                 {
-                  date: new Date(),
+                  date: faker.date.recent(4),
                   choosenBy: { connect: { id: userTessan.id } },
                   scores: {
                     create: [
@@ -200,7 +201,7 @@ async function seed() {
             lunches: {
               create: [
                 {
-                  date: new Date(),
+                  date: faker.date.recent(14),
                   choosenBy: { connect: { id: userKatten.id } },
                   scores: {
                     create: [
@@ -224,7 +225,7 @@ async function seed() {
             lunches: {
               create: [
                 {
-                  date: new Date(),
+                  date: faker.date.recent(64),
                   choosenBy: { connect: { id: userMartin.id } },
                   scores: {
                     create: [
