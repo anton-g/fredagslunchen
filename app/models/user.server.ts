@@ -218,8 +218,6 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
     throw Error("Can't merge users that don't share a group");
   }
 
-  // TODO handle all collisions. Right now PKs might conflict.
-
   // Update group locations
   await prisma.groupLocation.updateMany({
     where: {
@@ -234,6 +232,15 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
   await prisma.score.updateMany({
     where: {
       userId: fromUserId,
+      NOT: {
+        lunch: {
+          scores: {
+            some: {
+              userId: toUserId,
+            },
+          },
+        },
+      },
     },
     data: {
       userId: toUserId,

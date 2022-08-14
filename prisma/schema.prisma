@@ -110,11 +110,13 @@ model Score {
   id    Int   @id @default(autoincrement())
   score Float
 
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String
 
   lunch   Lunch @relation(fields: [lunchId], references: [id], onDelete: Cascade)
   lunchId Int
 
   comment String?
+
+  @@unique([userId, lunchId])
 }
