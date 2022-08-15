@@ -1,4 +1,4 @@
-import { validateEmail } from "./utils";
+import { shorten, validateEmail } from "./utils";
 
 test("validateEmail returns false for non-emails", () => {
   expect(validateEmail(undefined)).toBe(false);
@@ -10,4 +10,17 @@ test("validateEmail returns false for non-emails", () => {
 
 test("validateEmail returns true for emails", () => {
   expect(validateEmail("kody@example.com")).toBe(true);
+});
+
+test("shorten returns shortened string", () => {
+  expect(shorten("a string longer than 18 chars")).toBe(
+    "a string longer th..."
+  );
+  expect(shorten("a string longer than 18 chars", { ellipsis: false })).toBe(
+    "a string longer th"
+  );
+  expect(shorten("a string longer than 2 chars", { length: 2 })).toBe("a...");
+  expect(
+    shorten("a string longer than 2 chars", { length: 2, ellipsis: false })
+  ).toBe("a");
 });

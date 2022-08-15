@@ -119,3 +119,18 @@ export const getAverageNumber = <T, K extends keyof T>(array: T[], key: K) => {
         array.length
     : -1;
 };
+
+type ShortenOptions = { length?: number; ellipsis?: boolean };
+export const shorten = (
+  input?: string | null,
+  options: ShortenOptions = {}
+) => {
+  if (!input) return "";
+
+  const { ellipsis, length } = { length: 18, ellipsis: true, ...options };
+
+  const suffix = ellipsis ? "..." : "";
+  return input.length > length
+    ? input.substring(0, length).trim() + suffix
+    : input;
+};
