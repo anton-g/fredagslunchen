@@ -60,3 +60,36 @@ export async function createScoreWithNewAnonymousUser({
 
   return createScore({ score, comment, lunchId, userId: member.userId });
 }
+
+export async function deleteScore({
+  id,
+  requestedByUserId,
+}: {
+  id: Lunch["id"];
+  requestedByUserId: User["id"];
+}) {
+  await prisma.score.deleteMany({
+    where: {
+      id,
+      OR: [
+        {
+          userId: requestedByUserId,
+        },
+        {
+          lunch: {
+            groupLocation: {
+              group: {
+                members: {
+                  some: {
+                    userId: requestedByUserId,
+                    role: "ADMIN",
+                  },
+                },
+              },
+            },
+          },
+        },
+      ],
+    },
+  });
+}

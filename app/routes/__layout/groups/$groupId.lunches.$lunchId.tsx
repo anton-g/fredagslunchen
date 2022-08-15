@@ -1,10 +1,9 @@
-import type { Group, Lunch, User } from "@prisma/client";
+import type { ReactNode } from "react";
+import { useEffect, useRef, useState } from "react";
+import styled from "styled-components";
+import type { Group, Lunch, Score, User } from "@prisma/client";
+import { json, redirect } from "@remix-run/node";
 import type { ActionFunction, LoaderArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
-import { formatNumber, getAverageNumber } from "~/utils";
-import { formatTimeAgo } from "~/utils";
-import { json } from "@remix-run/node";
 import {
   Form,
   Link,
@@ -13,9 +12,15 @@ import {
   useLoaderData,
 } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
+import type { RecursivelyConvertDatesToStrings } from "~/utils";
+import {
+  formatNumber,
+  getAverageNumber,
+  shorten,
+  formatTimeAgo,
+} from "~/utils";
+import { Cross2Icon } from "@radix-ui/react-icons";
 import { requireUserId } from "~/session.server";
-import styled from "styled-components";
 import { deleteLunch, getGroupLunch } from "~/models/lunch.server";
 import { Spacer } from "~/components/Spacer";
 import { Stat } from "~/components/Stat";
@@ -25,9 +30,7 @@ import { ComboBox, Item, Label } from "~/components/ComboBox";
 import { TextArea } from "~/components/TextArea";
 import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
-import { useEffect, useRef, useState } from "react";
 import { Tooltip } from "~/components/Tooltip";
-import { Cross2Icon } from "@radix-ui/react-icons";
 import { Dialog } from "~/components/Dialog";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
@@ -46,7 +49,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ groupLunch, isAdmin });
+  return json({ groupLunch, isAdmin, userId });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -65,7 +68,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin } = useLoaderData<typeof loader>();
+  const { groupLunch, isAdmin, userId } = useLoaderData<typeof loader>();
 
   const scores = groupLunch.scores;
 
@@ -117,17 +120,37 @@ export default function LunchDetailsPage() {
                 <Table.Heading>By</Table.Heading>
                 <Table.Heading numeric>Score</Table.Heading>
                 <Table.Heading>Comment</Table.Heading>
+                <Table.Heading></Table.Heading>
               </tr>
             </Table.Head>
             <tbody>
               {scores.map((score) => (
-                <tr key={score.id}>
+                <ScoreRow key={score.id}>
                   <Table.Cell>
                     <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell>{score.comment}</Table.Cell>
-                </tr>
+                  <Table.Cell title={score.comment ?? undefined}>
+                    {shorten(score.comment)}
+                  </Table.Cell>
+                  <Table.Cell
+                    style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
+                  >
+                    {(isAdmin || score.userId === userId) && (
+                      <ScoreDeleteAction
+                        scoreId={score.id}
+                        description={
+                          <>
+                            {score.user.name} gave{" "}
+                            {groupLunch.groupLocation.location.name} a score of{" "}
+                            {score.score}.<br />
+                            This action is <strong>irreversible.</strong>
+                          </>
+                        }
+                      />
+                    )}
+                  </Table.Cell>
+                </ScoreRow>
               ))}
             </tbody>
           </Table>
@@ -194,6 +217,64 @@ const Stats = styled.div`
 
 const Subtitle = styled.h3`
   margin: 0;
+`;
+
+const ScoreDeleteAction = ({
+  description,
+  scoreId,
+}: {
+  description: ReactNode;
+  scoreId: Score["id"];
+}) => {
+  const fetcher = useFetcher();
+
+  return (
+    <Dialog>
+      <Tooltip>
+        <Tooltip.Trigger asChild>
+          <Dialog.Trigger asChild>
+            <DeleteButton aria-label="Delete score">
+              <Cross2Icon></Cross2Icon>
+            </DeleteButton>
+          </Dialog.Trigger>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Delete score</Tooltip.Content>
+      </Tooltip>
+      <Dialog.Content>
+        <Dialog.Close />
+        <Dialog.Title>Are you sure you want to delete this score?</Dialog.Title>
+        <Dialog.Description>{description}</Dialog.Description>
+        <fetcher.Form method="post" action="/scores/delete">
+          <Button variant="large">I am sure</Button>
+          <input type="hidden" name="scoreId" value={scoreId} />
+        </fetcher.Form>
+      </Dialog.Content>
+    </Dialog>
+  );
+};
+
+const DeleteButton = styled.button`
+  all: unset;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  padding: 2px;
+  opacity: 0;
+
+  &:focus {
+    outline: auto;
+    opacity: 1;
+  }
+  &:hover {
+    border-color: ${({ theme }) => theme.colors.primary};
+  }
+`;
+
+const ScoreRow = styled.tr`
+  &:hover {
+    ${DeleteButton} {
+      opacity: 1;
+    }
+  }
 `;
 
 type NewScoreFormProps = {

@@ -121,7 +121,8 @@ describe("smoke tests", () => {
     cy.cleanupGroup({ name: testGroup.name });
   });
 
-  it("should allow you to create and delete a new lunch and score for existing location", () => {
+  // TODO test with new location
+  it("should allow you to create and delete lunch and score", () => {
     const testGroup = {
       name: faker.lorem.words(2),
     };
@@ -157,6 +158,12 @@ describe("smoke tests", () => {
     cy.findByRole("cell", { name: /name/i });
     cy.findByRole("cell", { name: testScore.score });
     cy.findByRole("cell", { name: testScore.comment });
+
+    cy.findByRole("button", { name: /delete score/i }).click();
+    cy.findByRole("button", { name: /i am sure/i }).click();
+    cy.findByRole("cell", { name: /name/i }).should("not.exist");
+    cy.findByRole("cell", { name: testScore.score }).should("not.exist");
+    cy.findByRole("cell", { name: testScore.comment }).should("not.exist");
 
     cy.findByRole("button", { name: /delete lunch/i }).click();
     cy.findByRole("button", { name: /i am sure/i }).click();

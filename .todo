@@ -16,9 +16,6 @@
 - Delete group location
   - Require group admin?
 - Delete user
-- Delete score
-  - As group member
-  - As group admin
 - About/help page
 - Admin page
   - See all locations
@@ -28,3 +25,4 @@
   - See all users
 - Discover page
   - Top locations
+- Check security of all models
