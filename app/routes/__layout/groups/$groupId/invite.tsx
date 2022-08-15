@@ -1,9 +1,4 @@
-import {
-  CopyIcon,
-  Cross1Icon,
-  Cross2Icon,
-  UpdateIcon,
-} from "@radix-ui/react-icons";
+import { CopyIcon, Cross2Icon, UpdateIcon } from "@radix-ui/react-icons";
 import type { ActionFunction, LoaderArgs } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
 import {
@@ -12,7 +7,6 @@ import {
   useCatch,
   useFetcher,
   useLoaderData,
-  useLocation,
 } from "@remix-run/react";
 import * as React from "react";
 import styled from "styled-components";

@@ -1,15 +1,22 @@
 import type { Group, Lunch, User } from "@prisma/client";
-import type { LoaderArgs } from "@remix-run/node";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import type { RecursivelyConvertDatesToStrings } from "~/utils";
 import { formatNumber, getAverageNumber } from "~/utils";
 import { formatTimeAgo } from "~/utils";
 import { json } from "@remix-run/node";
-import { Link, useCatch, useFetcher, useLoaderData } from "@remix-run/react";
+import {
+  Form,
+  Link,
+  useCatch,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react";
 import invariant from "tiny-invariant";
 
 import { requireUserId } from "~/session.server";
 import styled from "styled-components";
-import { getGroupLunch } from "~/models/lunch.server";
+import { deleteLunch, getGroupLunch } from "~/models/lunch.server";
 import { Spacer } from "~/components/Spacer";
 import { Stat } from "~/components/Stat";
 import { Table } from "~/components/Table";
@@ -19,25 +26,46 @@ import { TextArea } from "~/components/TextArea";
 import { Stack } from "~/components/Stack";
 import { Button } from "~/components/Button";
 import { useEffect, useRef, useState } from "react";
+import { Tooltip } from "~/components/Tooltip";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Dialog } from "~/components/Dialog";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request);
+  const userId = await requireUserId(request);
   invariant(params.groupId, "groupId not found");
   invariant(params.lunchId, "lunchId not found");
 
   const groupLunch = await getGroupLunch({
-    groupId: params.groupId,
     id: parseInt(params.lunchId),
   });
+
+  const isAdmin = groupLunch?.groupLocation.group.members.some(
+    (m) => m.userId === userId && m.role === "ADMIN"
+  );
 
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ groupLunch });
+  return json({ groupLunch, isAdmin });
+};
+
+export const action: ActionFunction = async ({ request, params }) => {
+  if (request.method !== "DELETE") return null;
+
+  const userId = await requireUserId(request);
+  invariant(params.lunchId, "lunchId not found");
+  invariant(params.groupId, "groupId not found");
+
+  await deleteLunch({
+    id: parseInt(params.lunchId),
+    requestedByUserId: userId,
+  });
+
+  return redirect(`/groups/${params.groupId}`);
 };
 
 export default function LunchDetailsPage() {
-  const { groupLunch } = useLoaderData<typeof loader>();
+  const { groupLunch, isAdmin } = useLoaderData<typeof loader>();
 
   const scores = groupLunch.scores;
 
@@ -115,6 +143,12 @@ export default function LunchDetailsPage() {
             lunchId={groupLunch.id}
             groupId={groupLunch.groupLocationGroupId}
           />
+        </>
+      )}
+      {isAdmin && (
+        <>
+          <Spacer size={48} />
+          <AdminActions />
         </>
       )}
       <Spacer size={128} />
@@ -278,5 +312,50 @@ const CommentLabel = styled.label`
 
   textarea {
     flex-grow: 1;
+  }
+`;
+
+const AdminActions = () => {
+  return (
+    <Wrapper axis="horizontal" gap={16}>
+      <Dialog>
+        <Tooltip>
+          <Tooltip.Trigger asChild>
+            <Dialog.Trigger asChild>
+              <Button variant="round" aria-label="Delete lunch">
+                <Cross2Icon />
+              </Button>
+            </Dialog.Trigger>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Delete lunch</Tooltip.Content>
+        </Tooltip>
+        <Dialog.Content>
+          <Dialog.Close />
+          <Dialog.Title>
+            Are you sure you want to delete this lunch?
+          </Dialog.Title>
+          <DialogDescription>
+            This will delete this lunch including all scores. This action is{" "}
+            <strong>irreversible</strong>.
+          </DialogDescription>
+          <Form method="delete">
+            <Button variant="large" style={{ marginLeft: "auto" }}>
+              I am sure
+            </Button>
+          </Form>
+        </Dialog.Content>
+      </Dialog>
+    </Wrapper>
+  );
+};
+
+const Wrapper = styled(Stack)`
+  justify-content: center;
+`;
+
+const DialogDescription = styled(Dialog.Description)`
+  > p {
+    margin: 0;
+    margin-bottom: 16px;
   }
 `;

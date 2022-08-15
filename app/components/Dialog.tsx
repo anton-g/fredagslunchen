@@ -32,9 +32,7 @@ const DialogContentWrapper = styled(DialogPrimitive.Content)`
 `;
 
 const DialogOverlay = styled(DialogPrimitive.Overlay)`
-  background-color: ${({ theme }) => theme.colors.secondary};
-  opacity: 0.3;
-  backdrop-filter: blur(3px);
+  backdrop-filter: blur(4px);
   position: fixed;
   inset: 0;
   z-index: 2;
