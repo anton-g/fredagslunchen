@@ -33,9 +33,16 @@ export const action: ActionFunction = async ({ request, params }) => {
     );
   }
 
-  if (!score || isNaN(score) || score < 0 || score > 10) {
+  if (!score || isNaN(score)) {
     return json<ActionData>(
       { errors: { score: "Score is required" } },
+      { status: 400 }
+    );
+  }
+
+  if (score <= 0 || score >= 10) {
+    return json<ActionData>(
+      { errors: { score: "Score must be between 0 and 10" } },
       { status: 400 }
     );
   }
@@ -59,6 +66,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json({ ok: true });
   }
 
+  // Score for new anonymous user
   const groupId = formData.get("groupId");
 
   if (typeof groupId !== "string" || groupId.length === 0) {

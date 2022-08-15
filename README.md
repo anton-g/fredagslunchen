@@ -1,5 +1,7 @@
 # Fredagslunchen
 
+[![🚀 Deploy](https://github.com/anton-g/fredagslunchen/actions/workflows/deploy.yml/badge.svg?branch=main)](https://github.com/anton-g/fredagslunchen/actions/workflows/deploy.yml)
+
 Fredagslunchen is a app where you can create groups to rate your lunches together.
 
 ## Development
@@ -45,6 +47,10 @@ prisma db push
 Commit your changes by creating a new migration.
 
 > **Note:** This will force you to reset your local db. See [Schema prototyping with db push](https://www.prisma.io/docs/guides/database/prototyping-schema-db-push#prototyping-with-an-existing-migration-history) for more details.
+
+### "Component library"
+
+We have an overview of all available components on the `/kitchensink` route. If you add a new component, add an example of how it's used on this route as well.
 
 ## Deployment
 
