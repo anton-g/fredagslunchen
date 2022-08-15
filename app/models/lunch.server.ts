@@ -1,15 +1,10 @@
-import type { Group, Location, Lunch } from "@prisma/client";
+import type { Group, Location, Lunch, User } from "@prisma/client";
 
 import { prisma } from "~/db.server";
 
 export type { Location } from "@prisma/client";
 
-export async function getGroupLunch({
-  id,
-  groupId,
-}: Pick<Location, "id"> & {
-  groupId: Group["id"];
-}) {
+export async function getGroupLunch({ id }: Pick<Location, "id">) {
   return await prisma.lunch.findUnique({
     where: { id },
     include: {
@@ -65,6 +60,30 @@ export async function createLunch({
       choosenByUserId,
       groupLocationGroupId: groupId,
       groupLocationLocationId: locationId,
+    },
+  });
+}
+
+export async function deleteLunch({
+  id,
+  requestedByUserId,
+}: {
+  id: Lunch["id"];
+  requestedByUserId: User["id"];
+}) {
+  await prisma.lunch.deleteMany({
+    where: {
+      id,
+      groupLocation: {
+        group: {
+          members: {
+            some: {
+              userId: requestedByUserId,
+              role: "ADMIN",
+            },
+          },
+        },
+      },
     },
   });
 }
