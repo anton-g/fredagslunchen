@@ -55,6 +55,15 @@ const styles = css<{ variant?: ButtonVariant }>`
       transform: translate3d(0rem, 0rem, -1em);
     }
   }
+
+  &:disabled {
+    transform: translate(0rem, 0rem);
+    cursor: not-allowed;
+
+    ::before {
+      transform: translate3d(0rem, 0rem, -1em);
+    }
+  }
 `;
 
 const Button = styled.button<{ variant?: ButtonVariant }>`
