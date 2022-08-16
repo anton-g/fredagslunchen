@@ -258,10 +258,14 @@ export async function createGroupInviteToken({
   groupId: Group["id"];
   userId: User["id"];
 }) {
-  // TODO only allow this if user is in group?
-  return prisma.group.update({
+  return prisma.group.updateMany({
     where: {
       id: groupId,
+      members: {
+        some: {
+          userId,
+        },
+      },
     },
     data: {
       inviteToken: nanoid(),
