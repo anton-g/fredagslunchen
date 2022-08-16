@@ -291,6 +291,26 @@ export async function deleteGroupInviteToken({
   });
 }
 
+export async function deleteGroup({
+  id,
+  requestedByUserId,
+}: {
+  id: Group["id"];
+  requestedByUserId: User["id"];
+}) {
+  return prisma.group.deleteMany({
+    where: {
+      id,
+      members: {
+        some: {
+          userId: requestedByUserId,
+          role: "ADMIN",
+        },
+      },
+    },
+  });
+}
+
 type StatsType = {
   averageScore: number;
   bestLocation: {
