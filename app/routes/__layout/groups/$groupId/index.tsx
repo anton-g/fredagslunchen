@@ -1,23 +1,30 @@
-import type { LoaderArgs } from "@remix-run/node";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
 import { formatNumber, getAverageNumber } from "~/utils";
 import { json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
+import { Form, useCatch, useLoaderData } from "@remix-run/react";
 import invariant from "tiny-invariant";
-
+import type { Group } from "~/models/group.server";
+import { deleteGroup } from "~/models/group.server";
 import { getGroupDetails } from "~/models/group.server";
 import { requireUserId } from "~/session.server";
 import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { Table } from "~/components/Table";
 import { Spacer } from "~/components/Spacer";
-import { LinkButton } from "~/components/Button";
+import { Button, LinkButton } from "~/components/Button";
 import { Stat } from "~/components/Stat";
 import { HoverCard } from "~/components/HoverCard";
 import { Map } from "~/components/Map";
 import { Card } from "~/components/Card";
 import { useOnScreen } from "~/hooks/useOnScreen";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { getEnv } from "~/env.server";
+import { Dialog } from "~/components/Dialog";
+import { Tooltip } from "~/components/Tooltip";
+import { Cross2Icon } from "@radix-ui/react-icons";
+import { Input } from "~/components/Input";
+import { Stack } from "~/components/Stack";
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request);
@@ -27,11 +34,30 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!details) {
     throw new Response("Not Found", { status: 404 });
   }
-  return json({ details, ENV: getEnv() });
+
+  const isAdmin = details.group.members.some(
+    (m) => m.userId === userId && m.role === "ADMIN"
+  );
+
+  return json({ details, ENV: getEnv(), isAdmin });
+};
+
+export const action: ActionFunction = async ({ request, params }) => {
+  if (request.method !== "DELETE") return null;
+
+  const userId = await requireUserId(request);
+  invariant(params.groupId, "groupId not found");
+
+  await deleteGroup({
+    id: params.groupId,
+    requestedByUserId: userId,
+  });
+
+  return redirect("/groups");
 };
 
 export default function GroupDetailsPage() {
-  const { details, ENV } = useLoaderData<typeof loader>();
+  const { details, ENV, isAdmin } = useLoaderData<typeof loader>();
 
   const orderedPickers = details.group.members
     .slice()
@@ -236,6 +262,12 @@ export default function GroupDetailsPage() {
           </LazyCard>
         </>
       )}
+      {isAdmin && (
+        <>
+          <Spacer size={64} />
+          <AdminActions groupName={details.group.name} />
+        </>
+      )}
     </div>
   );
 }
@@ -302,4 +334,66 @@ const LazyCard: React.FC = ({ children }) => {
 const MapCard = styled(Card)`
   padding: 0;
   min-height: 400px;
+`;
+
+const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
+  const [confirmNameValue, setConfirmNameValue] = useState("");
+
+  return (
+    <Wrapper axis="horizontal" gap={16}>
+      <Dialog>
+        <Tooltip>
+          <Tooltip.Trigger asChild>
+            <Dialog.Trigger asChild>
+              <Button variant="round" aria-label="Delete group">
+                <Cross2Icon />
+              </Button>
+            </Dialog.Trigger>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Delete group</Tooltip.Content>
+        </Tooltip>
+        <Dialog.Content>
+          <Dialog.Close />
+          <Dialog.Title>
+            Are you sure you want to delete the group {groupName}?
+          </Dialog.Title>
+          <DialogDescription>
+            This will delete this group including all locations, lunches and
+            scores. This action is <strong>irreversible</strong> and{" "}
+            <strong>cannot be undone.</strong>
+          </DialogDescription>
+          <label htmlFor="name">
+            Please type <strong>{groupName}</strong> to confirm.
+          </label>
+          <Input
+            id="name"
+            required
+            name="name"
+            onChange={(e) => setConfirmNameValue(e.target.value)}
+          />
+          <Spacer size={16} />
+          <Form method="delete">
+            <Button
+              variant="large"
+              style={{ marginLeft: "auto" }}
+              disabled={confirmNameValue !== groupName}
+            >
+              I am sure
+            </Button>
+          </Form>
+        </Dialog.Content>
+      </Dialog>
+    </Wrapper>
+  );
+};
+
+const Wrapper = styled(Stack)`
+  justify-content: center;
+`;
+
+const DialogDescription = styled(Dialog.Description)`
+  > p {
+    margin: 0;
+    margin-bottom: 16px;
+  }
 `;
