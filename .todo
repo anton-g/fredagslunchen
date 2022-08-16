@@ -1,5 +1,4 @@
 - Move tokens to ENV
-  - Fathom
   - Mapbox
 - Create location from New lunch page
 - Write tests
@@ -26,3 +25,9 @@
 - Discover page
   - Top locations
 - Check security of all models
+- Database backups
+  - Litestream?
+  - Cron? https://litestream.io/alternatives/cron/
+- Group settings
+  - Location (lng, lat)
+  - Group admins

@@ -5,8 +5,8 @@ import { load } from "fathom-client";
 function hydrateWrapper() {
   hydrate(<RemixBrowser />, document);
 
-  if (ENV.NODE_ENV !== "development") {
-    load("LJDPSTZM", {
+  if (ENV.NODE_ENV !== "development" && ENV.FATHOM_SITE_ID) {
+    load(ENV.FATHOM_SITE_ID, {
       spa: "history",
       excludedDomains: ["localhost"],
     });
