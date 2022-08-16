@@ -216,20 +216,22 @@ export default function GroupDetailsPage() {
           <Spacer size={8} />
           <LazyCard>
             <Map
-              locations={details.group.groupLocations.map((x) => ({
-                address: x.location.address,
-                averageScore: getAverageNumber(
-                  x.lunches.flatMap((y) => y.scores),
-                  "score"
-                ),
-                highestScore: 0,
-                id: x.locationId,
-                lat: x.location.lat,
-                lon: x.location.lon,
-                lowestScore: 0,
-                lunchCount: x.lunches.length,
-                name: x.location.name,
-              }))}
+              locations={details.group.groupLocations
+                .filter((x) => x.lunches.length > 0)
+                .map((x) => ({
+                  address: x.location.address,
+                  averageScore: getAverageNumber(
+                    x.lunches.flatMap((y) => y.scores),
+                    "score"
+                  ),
+                  highestScore: 0,
+                  id: x.locationId,
+                  lat: x.location.lat,
+                  lon: x.location.lon,
+                  lowestScore: 0,
+                  lunchCount: x.lunches.length,
+                  name: x.location.name,
+                }))}
             />
           </LazyCard>
         </>
