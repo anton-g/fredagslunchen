@@ -2,6 +2,7 @@ function getEnv() {
   return {
     NODE_ENV: process.env.NODE_ENV,
     ENABLE_MAPS: process.env.ENABLE_MAPS === "true",
+    FATHOM_SITE_ID: process.env.FATHOM_SITE_ID,
   };
 }
 
