@@ -165,6 +165,7 @@ export default function Kitchensink() {
         <Component title="Button">
           <Stack gap={24} axis="horizontal">
             <Button>Normal</Button>
+            <Button disabled>Disabled</Button>
             <Button>
               With icon
               <Spacer size={4} />
