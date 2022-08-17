@@ -5,28 +5,89 @@ describe("smoke tests", () => {
     cy.cleanupUser();
   });
 
-  it("should allow you to register and login", () => {
-    const loginForm = {
+  it("should allow you to register, login, logout and reset forgotten password", () => {
+    const testUser = {
       name: faker.name.firstName(),
       email: `${faker.internet.userName()}@example.com`,
       password: faker.internet.password(),
+      updatedPassword: faker.internet.password(),
     };
-    cy.then(() => ({ email: loginForm.email })).as("user");
+    cy.then(() => ({ email: testUser.email })).as("user");
 
     cy.visit("/");
     cy.findByRole("link", { name: /join/i }).click();
 
-    cy.findByRole("textbox", { name: /name/i }).type(loginForm.name);
-    cy.findByLabelText(/email/i).type(loginForm.email);
-    cy.findByLabelText(/password/i).type(loginForm.password);
+    cy.findByRole("textbox", { name: /name/i }).type(testUser.name);
+    cy.findByLabelText(/email/i).type(testUser.email);
+    cy.findByLabelText(/password/i).type(testUser.password);
     cy.findByRole("button", { name: /create account/i }).click();
 
-    cy.findByRole("link", { name: /you/i }).click();
+    cy.findByRole("link", { name: /you$/i }).click();
     cy.findByRole("button", { name: /logout/i }).click();
     cy.findByRole("link", { name: /login/i }).click();
 
-    cy.findByLabelText(/email/i).type(loginForm.email);
-    cy.findByLabelText(/password/i).type(loginForm.password);
+    cy.findByLabelText(/email/i).type(testUser.email);
+    cy.findByLabelText(/password/i).type(testUser.password);
+    cy.findByRole("button", { name: /log in/i }).click();
+
+    cy.findByRole("button", { name: /logout/i }).click();
+
+    cy.findByRole("link", { name: /login/i }).click();
+    cy.findByRole("link", { name: /forgot your password/i }).click();
+
+    cy.findByRole("textbox", { name: /email/i }).type(testUser.email);
+    cy.findByRole("button", { name: /reset password/i }).click();
+
+    cy.findByText(/we've sent an email/i);
+
+    cy.wait(200);
+    cy.readFile("mocks/msw.local.json").then(
+      (data: {
+        email: {
+          from: string;
+          template_id: string;
+          personalizations: {
+            to: [{ email: string }];
+            dynamic_template_data: { link: string };
+          }[];
+        };
+      }) => {
+        const { email } = data;
+
+        expect(email.from).to.include({
+          email: "info@fredagslunchen.club",
+        });
+        expect(email.template_id).to.equal(
+          "d-f041adf649d942beb0b0654d81515e9d"
+        );
+
+        const personalization = email.personalizations[0];
+
+        const to = personalization.to[0];
+        expect(to).to.include({ email: testUser.email });
+        const url = new URL(personalization.dynamic_template_data.link);
+        const resetToken = url.searchParams.get("token");
+
+        expect(resetToken).to.have.lengthOf.above(0);
+        cy.then(() => resetToken).as("token");
+      }
+    );
+
+    cy.get<string>("@token").then((token) => {
+      cy.visit(`/reset-password?token=${token}`);
+    });
+
+    cy.findByLabelText(/new password/i).type(testUser.updatedPassword);
+    cy.findByLabelText(/confirm password/i).type(testUser.updatedPassword);
+    cy.findByRole("button", { name: /save password/i }).click();
+
+    cy.findByLabelText(/email/i).type(testUser.email);
+    cy.findByLabelText(/password/i).type(testUser.password);
+    cy.findByRole("button", { name: /log in/i }).click();
+
+    cy.findByText(/invalid email or password/i);
+
+    cy.findByLabelText(/password/i).type(testUser.updatedPassword);
     cy.findByRole("button", { name: /log in/i }).click();
   });
 

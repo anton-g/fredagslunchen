@@ -4,6 +4,7 @@ function getEnv() {
     ENABLE_MAPS: process.env.ENABLE_MAPS === "true",
     FATHOM_SITE_ID: process.env.FATHOM_SITE_ID,
     MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
+    SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
   };
 }
 

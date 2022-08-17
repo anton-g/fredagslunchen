@@ -1,6 +1,7 @@
 import type { Email, Group, Password, Prisma, User } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import invariant from "tiny-invariant";
+import sub from "date-fns/sub";
+import { nanoid } from "nanoid";
 
 import { prisma } from "~/db.server";
 import { getAverageNumber } from "~/utils";
@@ -103,7 +104,7 @@ export async function createUser(
   password: string,
   inviteToken?: string | null
 ) {
-  const hashedPassword = await bcrypt.hash(password, 10);
+  const hashedPassword = await hashPassword(password);
 
   const user = await prisma.user.create({
     data: {
@@ -302,6 +303,84 @@ export async function verifyLogin(
   return userWithoutPassword;
 }
 
+export async function createResetPasswordToken(email: Email["email"]) {
+  // TODO investigate value in hashing the tokens
+  const token = nanoid();
+
+  const users = await prisma.user.updateMany({
+    where: {
+      email: {
+        email,
+      },
+      OR: [
+        {
+          passwordResetTime: {
+            lte: sub(new Date(), { minutes: 10 }),
+          },
+        },
+        {
+          passwordResetTime: null,
+        },
+      ],
+    },
+    data: {
+      passwordResetTime: new Date(),
+      passwordResetToken: token,
+    },
+  });
+
+  if (users.count === 0) {
+    return null;
+  }
+
+  if (users.count > 1) {
+    throw "something went really wrong";
+  }
+
+  return token;
+}
+
+export async function changeUserPassword({
+  token,
+  newPassword,
+}: {
+  token: string;
+  newPassword: string;
+}) {
+  const userWithPasswordResetToken = await prisma.user.findFirst({
+    where: {
+      passwordResetToken: token,
+      passwordResetTime: {
+        gte: sub(new Date(), { minutes: 10 }),
+      },
+    },
+  });
+
+  if (
+    !userWithPasswordResetToken ||
+    !userWithPasswordResetToken.passwordResetToken
+  ) {
+    return null;
+  }
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  return await prisma.user.update({
+    where: {
+      id: userWithPasswordResetToken.id,
+    },
+    data: {
+      passwordResetTime: null,
+      passwordResetToken: null,
+      password: {
+        update: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  });
+}
+
 // TODO stats generation duplicated in group.server.ts
 function generateUserStats(
   user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>
@@ -336,3 +415,5 @@ function generateUserStats(
     bestChoosenLunch,
   };
 }
+
+const hashPassword = (password: string) => bcrypt.hash(password, 10);
