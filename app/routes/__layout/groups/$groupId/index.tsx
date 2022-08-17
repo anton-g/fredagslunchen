@@ -39,7 +39,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     (m) => m.userId === userId && m.role === "ADMIN"
   );
 
-  return json({ details, ENV: getEnv(), isAdmin });
+  return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin });
 };
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -57,7 +57,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 };
 
 export default function GroupDetailsPage() {
-  const { details, ENV, isAdmin } = useLoaderData<typeof loader>();
+  const { details, isMapsEnabled, isAdmin } = useLoaderData<typeof loader>();
 
   const orderedPickers = details.group.members
     .slice()
@@ -236,7 +236,7 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
-      {ENV.ENABLE_MAPS && (
+      {isMapsEnabled && (
         <>
           <Subtitle>Map</Subtitle>
           <Spacer size={8} />

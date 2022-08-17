@@ -4,7 +4,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node";
 import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useSearchParams } from "@remix-run/react";
+import { Form, Link, useActionData, useSearchParams } from "@remix-run/react";
 import * as React from "react";
 
 import { createUserSession, getUserId } from "~/session.server";
@@ -142,6 +142,9 @@ export default function LoginPage() {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <Checkbox id="remember" name="remember" />
             <label htmlFor="remember">Remember me</label>
+            <ForgotPasswordLink to="/forgot-password">
+              Forgot your password?
+            </ForgotPasswordLink>
           </div>
           <SubmitButton type="submit">Log in</SubmitButton>
         </Stack>
@@ -152,4 +155,11 @@ export default function LoginPage() {
 
 const SubmitButton = styled(Button)`
   margin-left: auto;
+`;
+
+const ForgotPasswordLink = styled(Link)`
+  margin-left: auto;
+  &:hover {
+    text-decoration: underline;
+  }
 `;

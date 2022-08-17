@@ -124,7 +124,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect(`/groups/${groupId}/locations/${location.locationId}`);
 };
 
-export default function NewLunchPage() {
+export default function NewLocationPage() {
   const user = useUser();
   const actionData = useActionData() as ActionData;
   const loaderData = useLoaderData<typeof loader>();

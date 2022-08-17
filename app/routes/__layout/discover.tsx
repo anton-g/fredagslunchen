@@ -15,11 +15,11 @@ import { formatNumber } from "~/utils";
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request);
   const locations = await getAllLocationsStats();
-  return json({ locations, ENV: getEnv() });
+  return json({ locations, isMapsEnabled: getEnv().ENABLE_MAPS });
 };
 
 export default function DiscoverPage() {
-  const { locations, ENV } = useLoaderData<typeof loader>();
+  const { locations, isMapsEnabled } = useLoaderData<typeof loader>();
 
   return (
     <main>
@@ -49,7 +49,7 @@ export default function DiscoverPage() {
             })}
         </tbody>
       </Table>
-      {ENV.ENABLE_MAPS && (
+      {isMapsEnabled && (
         <>
           <Spacer size={24} />
           <Subtitle>Map</Subtitle>

@@ -9,3 +9,4 @@ node_modules
 cypress/.DS_Store
 /prisma/data.db
 /prisma/data.db-journal
+*.local.*
