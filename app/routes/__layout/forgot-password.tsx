@@ -42,6 +42,8 @@ export const action: ActionFunction = async ({ request }) => {
   const token = await createResetPasswordToken(email);
   if (token) await sendPasswordResetEmail(email, token);
 
+  console.info("Sent password reset mail", email, token);
+
   return json({
     ok: true,
   });
