@@ -15,7 +15,7 @@ export async function sendPasswordResetEmail(
 
   const msg = {
     to: email,
-    from: "info@fredagslunchen.club",
+    from: { email: "info@fredagslunchen.club", name: "Fredagslunchen" },
     templateId: "d-f041adf649d942beb0b0654d81515e9d",
     dynamicTemplateData: {
       link: `https://fredagslunchen.club/reset-password?token=${token}`,
