@@ -1,4 +1,5 @@
-import { ActionFunction, LoaderArgs, redirect } from "@remix-run/server-runtime"
+import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
+import { redirect } from "@remix-run/server-runtime"
 import { useLoaderData, Link, Form } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"

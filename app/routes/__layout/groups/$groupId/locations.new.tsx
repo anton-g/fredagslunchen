@@ -1,4 +1,3 @@
-import type { Prisma } from "@prisma/client"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData } from "@remix-run/react"
