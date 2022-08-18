@@ -1,5 +1,5 @@
-import * as SwitchPrimitive from "@radix-ui/react-switch";
-import styled from "styled-components";
+import * as SwitchPrimitive from "@radix-ui/react-switch"
+import styled from "styled-components"
 
 const StyledSwitch = styled(SwitchPrimitive.Root)`
   all: unset;
@@ -13,7 +13,7 @@ const StyledSwitch = styled(SwitchPrimitive.Root)`
   &:focus {
     outline: inherit;
   }
-`;
+`
 
 const StyledThumb = styled(SwitchPrimitive.Thumb)`
   display: block;
@@ -28,7 +28,7 @@ const StyledThumb = styled(SwitchPrimitive.Thumb)`
   &[data-state="checked"] {
     transform: translateX(19px);
   }
-`;
+`
 
-export const Switch = StyledSwitch;
-export const SwitchThumb = StyledThumb;
+export const Switch = StyledSwitch
+export const SwitchThumb = StyledThumb

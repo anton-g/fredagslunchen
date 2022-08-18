@@ -1,7 +1,7 @@
-import { Link as RemixLink } from "@remix-run/react";
-import styled, { css } from "styled-components";
+import { Link as RemixLink } from "@remix-run/react"
+import styled, { css } from "styled-components"
 
-type ButtonVariant = "normal" | "round" | "large";
+type ButtonVariant = "normal" | "round" | "large"
 
 const styles = css<{ variant?: ButtonVariant }>`
   color: ${({ theme }) => theme.colors.primary};
@@ -64,22 +64,22 @@ const styles = css<{ variant?: ButtonVariant }>`
       transform: translate3d(0rem, 0rem, -1em);
     }
   }
-`;
+`
 
 const Button = styled.button<{ variant?: ButtonVariant }>`
   ${styles}
-`;
+`
 
 Button.defaultProps = {
   variant: "normal",
-};
+}
 
 const LinkButton = styled(RemixLink)<{ variant?: ButtonVariant }>`
   ${styles}
-`;
+`
 
 LinkButton.defaultProps = {
   variant: "normal",
-};
+}
 
-export { Button, LinkButton };
+export { Button, LinkButton }

@@ -1,12 +1,12 @@
-import * as DialogPrimitive from "@radix-ui/react-dialog";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import type { ReactNode } from "react";
-import styled from "styled-components";
-import { Card } from "./Card";
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import type { ReactNode } from "react"
+import styled from "styled-components"
+import { Card } from "./Card"
 
 const Dialog = ({ children }: { children: ReactNode }) => (
   <DialogPrimitive.Root>{children}</DialogPrimitive.Root>
-);
+)
 
 const DialogContent = ({ children }: { children: ReactNode }) => {
   return (
@@ -16,8 +16,8 @@ const DialogContent = ({ children }: { children: ReactNode }) => {
         <Card>{children}</Card>
       </DialogContentWrapper>
     </DialogPrimitive.Portal>
-  );
-};
+  )
+}
 
 const DialogContentWrapper = styled(DialogPrimitive.Content)`
   color: ${({ theme }) => theme.colors.primary};
@@ -29,14 +29,14 @@ const DialogContentWrapper = styled(DialogPrimitive.Content)`
   max-width: 450px;
   max-height: 85vh;
   z-index: 3;
-`;
+`
 
 const DialogOverlay = styled(DialogPrimitive.Overlay)`
   backdrop-filter: blur(4px);
   position: fixed;
   inset: 0;
   z-index: 2;
-`;
+`
 
 const DialogClose = () => {
   return (
@@ -45,8 +45,8 @@ const DialogClose = () => {
         <Cross2Icon />
       </CloseButton>
     </DialogPrimitive.Close>
-  );
-};
+  )
+}
 
 const CloseButton = styled.button`
   all: unset;
@@ -65,16 +65,16 @@ const CloseButton = styled.button`
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
   }
-`;
+`
 
 const DialogTitle = styled(DialogPrimitive.Title)`
   margin: 0;
-`;
+`
 
-Dialog.Trigger = DialogPrimitive.Trigger;
-Dialog.Content = DialogContent;
-Dialog.Title = DialogTitle;
-Dialog.Description = DialogPrimitive.Description;
-Dialog.Close = DialogClose;
+Dialog.Trigger = DialogPrimitive.Trigger
+Dialog.Content = DialogContent
+Dialog.Title = DialogTitle
+Dialog.Description = DialogPrimitive.Description
+Dialog.Close = DialogClose
 
-export { Dialog };
+export { Dialog }

@@ -2,55 +2,55 @@ import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
-} from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useSearchParams } from "@remix-run/react";
-import * as React from "react";
-import { getUserId } from "~/session.server";
-import { changeUserPassword as resetUserPassword } from "~/models/user.server";
-import { Stack } from "~/components/Stack";
-import { Button } from "~/components/Button";
-import styled from "styled-components";
-import { Input } from "~/components/Input";
+} from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
+import { Form, useActionData, useSearchParams } from "@remix-run/react"
+import * as React from "react"
+import { getUserId } from "~/session.server"
+import { changeUserPassword as resetUserPassword } from "~/models/user.server"
+import { Stack } from "~/components/Stack"
+import { Button } from "~/components/Button"
+import styled from "styled-components"
+import { Input } from "~/components/Input"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const userId = await getUserId(request);
-  if (userId) return redirect("/");
+  const userId = await getUserId(request)
+  if (userId) return redirect("/")
 
-  const url = new URL(request.url);
-  const token = url.searchParams.get("token");
+  const url = new URL(request.url)
+  const token = url.searchParams.get("token")
 
-  if (!token) return redirect("/forgot-password");
+  if (!token) return redirect("/forgot-password")
 
-  return json({});
-};
+  return json({})
+}
 
 interface ActionData {
   errors?: {
-    password?: string;
-    confirmPassword?: string;
-    token?: string;
-  };
+    password?: string
+    confirmPassword?: string
+    token?: string
+  }
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const password = formData.get("password");
-  const confirmPassword = formData.get("confirm-password");
-  const token = formData.get("token");
+  const formData = await request.formData()
+  const password = formData.get("password")
+  const confirmPassword = formData.get("confirm-password")
+  const token = formData.get("token")
 
   if (typeof password !== "string" || password.length === 0) {
     return json<ActionData>(
       { errors: { password: "Password is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (password.length < 8) {
     return json<ActionData>(
       { errors: { password: "Password is too short" } },
       { status: 400 }
-    );
+    )
   }
 
   // TODO maybe only do this client side?
@@ -58,46 +58,46 @@ export const action: ActionFunction = async ({ request }) => {
     return json<ActionData>(
       { errors: { confirmPassword: "Password doesn't match" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof token !== "string" || token.length === 0) {
     return json<ActionData>(
       { errors: { token: "Reset token is required" } },
       { status: 400 }
-    );
+    )
   }
 
   await resetUserPassword({
     token,
     newPassword: password,
-  });
+  })
 
-  return redirect("/login");
-};
+  return redirect("/login")
+}
 
 export const meta: MetaFunction = () => {
   return {
     title: "Forgot password",
-  };
-};
+  }
+}
 
 export default function ResetPasswordPage() {
-  const [searchParams] = useSearchParams();
-  const actionData = useActionData() as ActionData;
+  const [searchParams] = useSearchParams()
+  const actionData = useActionData() as ActionData
 
-  const passwordRef = React.useRef<HTMLInputElement>(null);
-  const confirmPasswordRef = React.useRef<HTMLInputElement>(null);
+  const passwordRef = React.useRef<HTMLInputElement>(null)
+  const confirmPasswordRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     if (actionData?.errors?.password) {
-      passwordRef.current?.focus();
+      passwordRef.current?.focus()
     } else if (actionData?.errors?.confirmPassword) {
-      confirmPasswordRef.current?.focus();
+      confirmPasswordRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
-  const resetToken = searchParams.get("token");
+  const resetToken = searchParams.get("token")
 
   return (
     <>
@@ -156,9 +156,9 @@ export default function ResetPasswordPage() {
         </Stack>
       </Form>
     </>
-  );
+  )
 }
 
 const SubmitButton = styled(Button)`
   margin-left: auto;
-`;
+`

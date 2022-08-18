@@ -1,113 +1,113 @@
-import type { Prisma } from "@prisma/client";
-import type { ActionFunction, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useEffect, useRef } from "react";
-import invariant from "tiny-invariant";
-import { Button } from "~/components/Button";
-import { ComboBox, Item, Label } from "~/components/ComboBox";
-import { Input } from "~/components/Input";
-import { Stack } from "~/components/Stack";
-import { getGroup } from "~/models/group.server";
+import type { Prisma } from "@prisma/client"
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
+import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import { useEffect, useRef } from "react"
+import invariant from "tiny-invariant"
+import { Button } from "~/components/Button"
+import { ComboBox, Item, Label } from "~/components/ComboBox"
+import { Input } from "~/components/Input"
+import { Stack } from "~/components/Stack"
+import { getGroup } from "~/models/group.server"
 
-import { createGroupLocation, getAllLocations } from "~/models/location.server";
-import { requireUserId } from "~/session.server";
-import { useUser } from "~/utils";
+import { createGroupLocation, getAllLocations } from "~/models/location.server"
+import { requireUserId } from "~/session.server"
+import { useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
 
-  const group = await getGroup({ userId, id: params.groupId });
+  const group = await getGroup({ userId, id: params.groupId })
   if (!group) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
 
-  const locations = await getAllLocations();
+  const locations = await getAllLocations()
 
-  return json({ group, locations });
-};
+  return json({ group, locations })
+}
 
 type ActionData = {
   errors?: {
-    name?: string;
-    address?: string;
-    lat?: string;
-    lon?: string;
-    discoveredBy?: string;
-    city?: string;
-    zipCode?: string;
-  };
-};
+    name?: string
+    address?: string
+    lat?: string
+    lon?: string
+    discoveredBy?: string
+    city?: string
+    zipCode?: string
+  }
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request);
+  await requireUserId(request)
 
-  const formData = await request.formData();
-  const locationId = formData.get("location-key");
-  const name = formData.get("location");
-  const address = formData.get("address");
-  const zipCode = formData.get("zipCode");
-  const city = formData.get("city");
-  const lat = formData.get("lat");
-  const lon = formData.get("lon");
-  const discoveredById = formData.get("discoveredBy-key");
-  const groupId = params.groupId;
-  invariant(groupId, "groupId not found");
+  const formData = await request.formData()
+  const locationId = formData.get("location-key")
+  const name = formData.get("location")
+  const address = formData.get("address")
+  const zipCode = formData.get("zipCode")
+  const city = formData.get("city")
+  const lat = formData.get("lat")
+  const lon = formData.get("lon")
+  const discoveredById = formData.get("discoveredBy-key")
+  const groupId = params.groupId
+  invariant(groupId, "groupId not found")
 
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
       { errors: { name: "Name is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof address !== "string" || address.length === 0) {
     return json<ActionData>(
       { errors: { address: "Street address is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof zipCode !== "string" || zipCode.length === 0) {
     return json<ActionData>(
       { errors: { zipCode: "Zip code is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof city !== "string" || city.length === 0) {
     return json<ActionData>(
       { errors: { city: "City is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof lat !== "string" || lat.length === 0) {
     return json<ActionData>(
       { errors: { lat: "Latitude is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof lon !== "string" || lon.length === 0) {
     return json<ActionData>(
       { errors: { lon: "Longitude is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof discoveredById !== "string" || discoveredById.length === 0) {
     return json<ActionData>(
       { errors: { discoveredBy: "Discovered by is required" } },
       { status: 400 }
-    );
+    )
   }
 
   const parsedId =
     locationId && typeof locationId === "string"
       ? parseInt(locationId)
-      : undefined;
+      : undefined
 
   const location = await createGroupLocation({
     groupId,
@@ -119,49 +119,49 @@ export const action: ActionFunction = async ({ request, params }) => {
     zipCode,
     discoveredById,
     locationId: parsedId,
-  });
+  })
 
-  return redirect(`/groups/${groupId}/locations/${location.locationId}`);
-};
+  return redirect(`/groups/${groupId}/locations/${location.locationId}`)
+}
 
 export default function NewLocationPage() {
-  const user = useUser();
-  const actionData = useActionData() as ActionData;
-  const loaderData = useLoaderData<typeof loader>();
-  const nameRef = useRef<HTMLInputElement>(null!);
-  const addressRef = useRef<HTMLInputElement>(null);
-  const zipCodeRef = useRef<HTMLInputElement>(null);
-  const cityRef = useRef<HTMLInputElement>(null);
-  const latRef = useRef<HTMLInputElement>(null);
-  const lonRef = useRef<HTMLInputElement>(null);
-  const discoveredByRef = useRef<HTMLInputElement>(null!);
+  const user = useUser()
+  const actionData = useActionData() as ActionData
+  const loaderData = useLoaderData<typeof loader>()
+  const nameRef = useRef<HTMLInputElement>(null!)
+  const addressRef = useRef<HTMLInputElement>(null)
+  const zipCodeRef = useRef<HTMLInputElement>(null)
+  const cityRef = useRef<HTMLInputElement>(null)
+  const latRef = useRef<HTMLInputElement>(null)
+  const lonRef = useRef<HTMLInputElement>(null)
+  const discoveredByRef = useRef<HTMLInputElement>(null!)
 
   useEffect(() => {
     if (actionData?.errors?.name) {
-      nameRef.current?.focus();
+      nameRef.current?.focus()
     } else if (actionData?.errors?.address) {
-      addressRef.current?.focus();
+      addressRef.current?.focus()
     } else if (actionData?.errors?.zipCode) {
-      zipCodeRef.current?.focus();
+      zipCodeRef.current?.focus()
     } else if (actionData?.errors?.city) {
-      cityRef.current?.focus();
+      cityRef.current?.focus()
     } else if (actionData?.errors?.lat) {
-      latRef.current?.focus();
+      latRef.current?.focus()
     } else if (actionData?.errors?.lon) {
-      lonRef.current?.focus();
+      lonRef.current?.focus()
     } else if (actionData?.errors?.discoveredBy) {
-      discoveredByRef.current?.focus();
+      discoveredByRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   const locations = loaderData.locations.filter(
     (l) => !loaderData.group.groupLocations.find((gl) => gl.locationId === l.id)
-  );
+  )
 
   const members = loaderData.group.members.map((x) => ({
     id: x.userId,
     name: x.user.name,
-  }));
+  }))
 
   return (
     <>
@@ -320,5 +320,5 @@ export default function NewLocationPage() {
         </Stack>
       </Form>
     </>
-  );
+  )
 }

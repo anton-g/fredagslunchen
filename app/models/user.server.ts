@@ -1,12 +1,12 @@
-import type { Email, Group, Password, Prisma, User } from "@prisma/client";
-import bcrypt from "bcryptjs";
-import sub from "date-fns/sub";
-import { nanoid } from "nanoid";
+import type { Email, Group, Password, Prisma, User } from "@prisma/client"
+import bcrypt from "bcryptjs"
+import sub from "date-fns/sub"
+import { nanoid } from "nanoid"
 
-import { prisma } from "~/db.server";
-import { getAverageNumber } from "~/utils";
+import { prisma } from "~/db.server"
+import { getAverageNumber } from "~/utils"
 
-export type { User } from "@prisma/client";
+export type { User } from "@prisma/client"
 
 const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
@@ -59,21 +59,21 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
         },
       },
     },
-  });
-};
+  })
+}
 
 export async function getFullUserById({
   id,
   requestUserId,
 }: {
-  id: User["id"];
-  requestUserId: User["id"];
+  id: User["id"]
+  requestUserId: User["id"]
 }) {
-  const user = await fetchUserDetails({ id });
+  const user = await fetchUserDetails({ id })
 
-  if (!user) return null;
+  if (!user) return null
 
-  const stats = generateUserStats(user);
+  const stats = generateUserStats(user)
 
   const filteredUser: typeof user = {
     ...user,
@@ -82,20 +82,20 @@ export async function getFullUserById({
         (x) => x.userId === requestUserId
       )
     ),
-  };
+  }
 
   return {
     ...filteredUser,
     stats,
-  };
+  }
 }
 
 export async function getUserById(id: User["id"]) {
-  return prisma.user.findUnique({ where: { id } });
+  return prisma.user.findUnique({ where: { id } })
 }
 
 export async function getUserByEmail(email: Email["email"]) {
-  return prisma.user.findFirst({ where: { email: { email } } });
+  return prisma.user.findFirst({ where: { email: { email } } })
 }
 
 export async function createUser(
@@ -104,7 +104,7 @@ export async function createUser(
   password: string,
   inviteToken?: string | null
 ) {
-  const hashedPassword = await hashPassword(password);
+  const hashedPassword = await hashPassword(password)
 
   const user = await prisma.user.create({
     data: {
@@ -120,9 +120,9 @@ export async function createUser(
         },
       },
     },
-  });
+  })
 
-  let group = undefined;
+  let group = undefined
   if (inviteToken) {
     group = await prisma.group.update({
       where: {
@@ -142,10 +142,10 @@ export async function createUser(
       select: {
         id: true,
       },
-    });
+    })
   }
 
-  return { user, groupId: group?.id };
+  return { user, groupId: group?.id }
 }
 
 export async function createAnonymousUser(name: string, groupId: Group["id"]) {
@@ -159,13 +159,13 @@ export async function createAnonymousUser(name: string, groupId: Group["id"]) {
         },
       },
     },
-  });
+  })
 
-  return user;
+  return user
 }
 
 export async function deleteUserByEmail(email: Email["email"]) {
-  return prisma.user.delete({ where: {} });
+  return prisma.user.delete({ where: {} })
 }
 
 export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
@@ -180,17 +180,17 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
         },
       },
     },
-  });
+  })
 
   if (!fromUser) {
-    throw Error("No fromUser found");
+    throw Error("No fromUser found")
   }
 
   // Anonymous users should only ever have one group
   if (fromUser.groups.length !== 1) {
     throw Error(
       "Something went wrong. Tried to merge user with more than 1 group."
-    );
+    )
   }
 
   const toUser = await prisma.user.findUnique({
@@ -204,19 +204,19 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
         },
       },
     },
-  });
+  })
 
   if (!toUser) {
-    throw Error("No toUser found");
+    throw Error("No toUser found")
   }
 
   // Make sure users share group
   const sharesGroup = fromUser.groups.some((group) =>
     toUser.groups.find((g) => g.groupId === group.groupId)
-  );
+  )
 
   if (!sharesGroup) {
-    throw Error("Can't merge users that don't share a group");
+    throw Error("Can't merge users that don't share a group")
   }
 
   // Update group locations
@@ -227,7 +227,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
     data: {
       discoveredById: toUserId,
     },
-  });
+  })
 
   // Update scores
   await prisma.score.updateMany({
@@ -246,7 +246,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
     data: {
       userId: toUserId,
     },
-  });
+  })
 
   // Update choosen by
   await prisma.lunch.updateMany({
@@ -256,7 +256,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
     data: {
       choosenByUserId: toUserId,
     },
-  });
+  })
 
   // Delete anonymous user
   await prisma.groupMember.delete({
@@ -266,12 +266,12 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
         groupId: fromUser.groups[0].groupId,
       },
     },
-  });
+  })
   await prisma.user.delete({
     where: {
       id: fromUserId,
     },
-  });
+  })
 }
 
 export async function verifyLogin(
@@ -283,29 +283,26 @@ export async function verifyLogin(
     include: {
       password: true,
     },
-  });
+  })
 
   if (!userWithPassword || !userWithPassword.password) {
-    return null;
+    return null
   }
 
-  const isValid = await bcrypt.compare(
-    password,
-    userWithPassword.password.hash
-  );
+  const isValid = await bcrypt.compare(password, userWithPassword.password.hash)
 
   if (!isValid) {
-    return null;
+    return null
   }
 
-  const { password: _password, ...userWithoutPassword } = userWithPassword;
+  const { password: _password, ...userWithoutPassword } = userWithPassword
 
-  return userWithoutPassword;
+  return userWithoutPassword
 }
 
 export async function createResetPasswordToken(email: Email["email"]) {
   // TODO investigate value in hashing the tokens
-  const token = nanoid();
+  const token = nanoid()
 
   const users = await prisma.user.updateMany({
     where: {
@@ -327,25 +324,25 @@ export async function createResetPasswordToken(email: Email["email"]) {
       passwordResetTime: new Date(),
       passwordResetToken: token,
     },
-  });
+  })
 
   if (users.count === 0) {
-    return null;
+    return null
   }
 
   if (users.count > 1) {
-    throw "something went really wrong";
+    throw "something went really wrong"
   }
 
-  return token;
+  return token
 }
 
 export async function changeUserPassword({
   token,
   newPassword,
 }: {
-  token: string;
-  newPassword: string;
+  token: string
+  newPassword: string
 }) {
   const userWithPasswordResetToken = await prisma.user.findFirst({
     where: {
@@ -354,16 +351,16 @@ export async function changeUserPassword({
         gte: sub(new Date(), { minutes: 10 }),
       },
     },
-  });
+  })
 
   if (
     !userWithPasswordResetToken ||
     !userWithPasswordResetToken.passwordResetToken
   ) {
-    return null;
+    return null
   }
 
-  const hashedPassword = await hashPassword(newPassword);
+  const hashedPassword = await hashPassword(newPassword)
 
   return await prisma.user.update({
     where: {
@@ -378,42 +375,42 @@ export async function changeUserPassword({
         },
       },
     },
-  });
+  })
 }
 
 // TODO stats generation duplicated in group.server.ts
 function generateUserStats(
   user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>
 ) {
-  const lunchCount = user.scores.length;
-  const averageScore = getAverageNumber(user.scores, "score");
-  const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score);
-  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-";
+  const lunchCount = user.scores.length
+  const averageScore = getAverageNumber(user.scores, "score")
+  const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score)
+  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
   const highestScore =
     sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "-";
+    "-"
 
   const bestChoosenLunch = user.choosenLunches.reduce<
     typeof user.choosenLunches[0] | null
   >((acc, cur) => {
-    if (!acc) return cur;
+    if (!acc) return cur
 
     if (
       getAverageNumber(cur.scores, "score") >
       getAverageNumber(acc.scores, "score")
     ) {
-      return cur;
+      return cur
     }
 
-    return acc;
-  }, null);
+    return acc
+  }, null)
   return {
     lunchCount,
     averageScore,
     lowestScore,
     highestScore,
     bestChoosenLunch,
-  };
+  }
 }
 
-const hashPassword = (password: string) => bcrypt.hash(password, 10);
+const hashPassword = (password: string) => bcrypt.hash(password, 10)

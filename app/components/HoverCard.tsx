@@ -1,14 +1,14 @@
-import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
-import styled, { keyframes } from "styled-components";
-import { Card } from "./Card";
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
+import styled, { keyframes } from "styled-components"
+import { Card } from "./Card"
 
-type HoverCardProps = HoverCardPrimitive.HoverCardProps;
+type HoverCardProps = HoverCardPrimitive.HoverCardProps
 
 const HoverCard = ({ children, ...props }: HoverCardProps) => {
   return (
     <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
-  );
-};
+  )
+}
 
 const HoverCardContent = ({
   children,
@@ -19,28 +19,28 @@ const HoverCardContent = ({
       <Card>{children}</Card>
       <StyledArrow offset={8} />
     </StyledContent>
-  );
-};
+  )
+}
 
 const slideUpAndFade = keyframes`
   0% { opacity: 0; transform: translateY(2px) };
   100% { opacity: 1; transform: translateY(0) };
-`;
+`
 
 const slideRightAndFade = keyframes`
   0% { opacity: 0; transform: translateX(-2px) };
   100% { opacity: 1; transform: translateX(0) };
-`;
+`
 
 const slideDownAndFade = keyframes`
   0% { opacity: 0; transform: translateY(-2px) };
   100% { opacity: 1; transform: translateY(0) };
-`;
+`
 
 const slideLeftAndFade = keyframes`
   0% { opacity: 0; transform: translateX(2px) };
   100% { opacity: 1; transform: translateX(0) };
-`;
+`
 
 const StyledContent = styled(HoverCardPrimitive.Content)`
   @media (prefers-reduced-motion: no-preference) {
@@ -63,13 +63,13 @@ const StyledContent = styled(HoverCardPrimitive.Content)`
       }
     }
   }
-`;
+`
 
 const StyledArrow = styled(HoverCardPrimitive.Arrow)`
   fill: black;
-`;
+`
 
-HoverCard.Trigger = HoverCardPrimitive.Trigger;
-HoverCard.Content = HoverCardContent;
+HoverCard.Trigger = HoverCardPrimitive.Trigger
+HoverCard.Content = HoverCardContent
 
-export { HoverCard };
+export { HoverCard }

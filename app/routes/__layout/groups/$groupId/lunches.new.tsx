@@ -1,73 +1,73 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData, useLoaderData } from "@remix-run/react";
-import { useEffect, useRef } from "react";
-import invariant from "tiny-invariant";
-import { Button } from "~/components/Button";
-import { ComboBox, Description, Item, Label } from "~/components/ComboBox";
-import { Input } from "~/components/Input";
-import { Stack } from "~/components/Stack";
-import { getGroup } from "~/models/group.server";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
+import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import { useEffect, useRef } from "react"
+import invariant from "tiny-invariant"
+import { Button } from "~/components/Button"
+import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
+import { Input } from "~/components/Input"
+import { Stack } from "~/components/Stack"
+import { getGroup } from "~/models/group.server"
 
-import { createLunch } from "~/models/lunch.server";
-import { requireUserId } from "~/session.server";
-import { useUser } from "~/utils";
+import { createLunch } from "~/models/lunch.server"
+import { requireUserId } from "~/session.server"
+import { useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
 
-  const group = await getGroup({ userId, id: params.groupId });
+  const group = await getGroup({ userId, id: params.groupId })
   if (!group) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
 
-  const url = new URL(request.url);
-  const preSelectedLocationId = url.searchParams.get("loc");
+  const url = new URL(request.url)
+  const preSelectedLocationId = url.searchParams.get("loc")
 
   return json({
     group,
     preSelectedLocationId: preSelectedLocationId ?? undefined,
-  });
-};
+  })
+}
 
 type ActionData = {
   errors?: {
-    date?: string;
-    choosenById?: string;
-    locationId?: string;
-  };
-};
+    date?: string
+    choosenById?: string
+    locationId?: string
+  }
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request);
+  await requireUserId(request)
 
-  const formData = await request.formData();
-  const date = formData.get("date");
-  const locationId = formData.get("location-key");
-  const choosenById = formData.get("choosenBy-key");
-  const groupId = params.groupId;
-  invariant(groupId, "groupId not found");
+  const formData = await request.formData()
+  const date = formData.get("date")
+  const locationId = formData.get("location-key")
+  const choosenById = formData.get("choosenBy-key")
+  const groupId = params.groupId
+  invariant(groupId, "groupId not found")
 
   if (typeof date !== "string" || date.length === 0) {
     return json<ActionData>(
       { errors: { date: "Date is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof choosenById !== "string" || choosenById.length === 0) {
     return json<ActionData>(
       { errors: { choosenById: "Choosen by is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof locationId !== "string" || locationId.length === 0) {
     return json<ActionData>(
       { errors: { locationId: "Location is required" } },
       { status: 400 }
-    );
+    )
   }
 
   const lunch = await createLunch({
@@ -75,39 +75,39 @@ export const action: ActionFunction = async ({ request, params }) => {
     date: date,
     locationId: parseInt(locationId),
     groupId,
-  });
+  })
 
-  return redirect(`/groups/${groupId}/lunches/${lunch.id}`);
-};
+  return redirect(`/groups/${groupId}/lunches/${lunch.id}`)
+}
 
 export default function NewLunchPage() {
-  const user = useUser();
-  const actionData = useActionData() as ActionData;
-  const { group, preSelectedLocationId } = useLoaderData<typeof loader>();
-  const choosenByRef = useRef<HTMLInputElement>(null!);
-  const locationRef = useRef<HTMLInputElement>(null!);
-  const dateRef = useRef<HTMLInputElement>(null);
+  const user = useUser()
+  const actionData = useActionData() as ActionData
+  const { group, preSelectedLocationId } = useLoaderData<typeof loader>()
+  const choosenByRef = useRef<HTMLInputElement>(null!)
+  const locationRef = useRef<HTMLInputElement>(null!)
+  const dateRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (actionData?.errors?.date) {
-      dateRef.current?.focus();
+      dateRef.current?.focus()
     } else if (actionData?.errors?.choosenById) {
-      choosenByRef.current?.focus();
+      choosenByRef.current?.focus()
     } else if (actionData?.errors?.locationId) {
-      locationRef.current?.focus();
+      locationRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   const locations = group.groupLocations.map((x) => ({
     id: x.locationId,
     name: x.location.name,
     description: x.location.address,
-  }));
+  }))
 
   const members = group.members.map((member) => ({
     id: member.userId,
     name: member.user.name,
-  }));
+  }))
 
   return (
     <>
@@ -198,5 +198,5 @@ export default function NewLunchPage() {
         </Stack>
       </Form>
     </>
-  );
+  )
 }

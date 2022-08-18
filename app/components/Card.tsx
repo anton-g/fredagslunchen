@@ -1,12 +1,12 @@
-import type { ReactNode } from "react";
-import React from "react";
-import styled, { css } from "styled-components";
+import type { ReactNode } from "react"
+import React from "react"
+import styled, { css } from "styled-components"
 
 type CardProps = {
-  variant?: "normal" | "inverted";
-  children: ReactNode;
-  className?: string;
-};
+  variant?: "normal" | "inverted"
+  children: ReactNode
+  className?: string
+}
 
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ variant = "normal", children, className }, ref) => {
@@ -18,11 +18,11 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       >
         {children}
       </Wrapper>
-    );
+    )
   }
-);
+)
 
-Card.displayName = "Card";
+Card.displayName = "Card"
 
 const Wrapper = styled.div<{ inverted: boolean }>`
   ${({ theme, inverted }) =>
@@ -41,6 +41,6 @@ const Wrapper = styled.div<{ inverted: boolean }>`
   padding: 16px 24px;
   box-shadow: -5px 5px 0px 0px ${({ theme }) => theme.colors.primary};
   overflow: hidden;
-`;
+`
 
-export { Card };
+export { Card }

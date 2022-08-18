@@ -2,138 +2,133 @@ import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
-} from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+} from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
 import {
   Form,
   Link,
   useActionData,
   useLocation,
   useSearchParams,
-} from "@remix-run/react";
-import * as React from "react";
+} from "@remix-run/react"
+import * as React from "react"
 
-import { getUserId, createUserSession } from "~/session.server";
+import { getUserId, createUserSession } from "~/session.server"
 
-import { createUser, getUserByEmail } from "~/models/user.server";
-import { safeRedirect, validateEmail } from "~/utils";
-import { Stack } from "~/components/Stack";
-import { Button } from "~/components/Button";
-import { Input } from "~/components/Input";
-import styled from "styled-components";
-import { addUserToGroupWithInviteToken } from "~/models/group.server";
+import { createUser, getUserByEmail } from "~/models/user.server"
+import { safeRedirect, validateEmail } from "~/utils"
+import { Stack } from "~/components/Stack"
+import { Button } from "~/components/Button"
+import { Input } from "~/components/Input"
+import styled from "styled-components"
+import { addUserToGroupWithInviteToken } from "~/models/group.server"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
-  const userId = await getUserId(request);
+  const userId = await getUserId(request)
 
   if (userId) {
-    const url = new URL(request.url);
-    const inviteToken = url.searchParams.get("token");
+    const url = new URL(request.url)
+    const inviteToken = url.searchParams.get("token")
 
     if (inviteToken) {
       const group = await addUserToGroupWithInviteToken({
         inviteToken,
         userId,
-      });
+      })
 
-      return redirect(`/groups/${group.id}`);
+      return redirect(`/groups/${group.id}`)
     }
 
-    return redirect("/");
+    return redirect("/")
   }
-  return json({});
-};
+  return json({})
+}
 
 interface ActionData {
   errors: {
-    email?: string;
-    password?: string;
-    name?: string;
-  };
+    email?: string
+    password?: string
+    name?: string
+  }
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
-  const email = formData.get("email");
-  const name = formData.get("name");
-  const password = formData.get("password");
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/");
-  const url = new URL(request.url);
-  const inviteToken = url.searchParams.get("token");
+  const formData = await request.formData()
+  const email = formData.get("email")
+  const name = formData.get("name")
+  const password = formData.get("password")
+  const redirectTo = safeRedirect(formData.get("redirectTo"), "/")
+  const url = new URL(request.url)
+  const inviteToken = url.searchParams.get("token")
 
   if (!validateEmail(email)) {
     return json<ActionData>(
       { errors: { email: "Email is invalid" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
       { errors: { name: "Name is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof password !== "string" || password.length === 0) {
     return json<ActionData>(
       { errors: { password: "Password is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (password.length < 8) {
     return json<ActionData>(
       { errors: { password: "Password is too short" } },
       { status: 400 }
-    );
+    )
   }
 
-  const existingUser = await getUserByEmail(email);
+  const existingUser = await getUserByEmail(email)
   if (existingUser) {
     return json<ActionData>(
       { errors: { email: "A user already exists with this email" } },
       { status: 400 }
-    );
+    )
   }
 
-  const { user, groupId } = await createUser(
-    email,
-    name,
-    password,
-    inviteToken
-  );
+  const { user, groupId } = await createUser(email, name, password, inviteToken)
 
   return createUserSession({
     request,
     userId: user.id,
     remember: false,
     redirectTo: groupId ? `/groups/${groupId}` : redirectTo,
-  });
-};
+  })
+}
 
 export const meta: MetaFunction = () => {
   return {
     title: "Sign Up",
-  };
-};
+  }
+}
 
 export default function Join() {
-  const [searchParams] = useSearchParams();
-  const redirectTo = searchParams.get("redirectTo") ?? undefined;
-  const actionData = useActionData() as ActionData;
-  const emailRef = React.useRef<HTMLInputElement>(null);
-  const passwordRef = React.useRef<HTMLInputElement>(null);
-  const nameRef = React.useRef<HTMLInputElement>(null);
-  const location = useLocation();
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get("redirectTo") ?? undefined
+  const actionData = useActionData() as ActionData
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
+  const location = useLocation()
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {
-      emailRef.current?.focus();
+      emailRef.current?.focus()
     } else if (actionData?.errors?.password) {
-      passwordRef.current?.focus();
+      passwordRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   return (
     <div>
@@ -206,15 +201,15 @@ export default function Join() {
         </Stack>
       </Form>
     </div>
-  );
+  )
 }
 
 const SubmitButton = styled(Button)`
   margin-left: auto;
-`;
+`
 
 const PrivacyLink = styled(Link)`
   &:hover {
     text-decoration: underline;
   }
-`;
+`

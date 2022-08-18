@@ -1,18 +1,18 @@
-import { FocusScope } from "@react-aria/focus";
-import { DismissButton, useOverlay } from "@react-aria/overlays";
-import * as React from "react";
-import styled from "styled-components";
+import { FocusScope } from "@react-aria/focus"
+import { DismissButton, useOverlay } from "@react-aria/overlays"
+import * as React from "react"
+import styled from "styled-components"
 
 interface PopoverProps {
-  popoverRef?: React.RefObject<HTMLDivElement>;
-  children: React.ReactNode;
-  isOpen?: boolean;
-  onClose?: () => void;
+  popoverRef?: React.RefObject<HTMLDivElement>
+  children: React.ReactNode
+  isOpen?: boolean
+  onClose?: () => void
 }
 
 export function Popover(props: PopoverProps) {
-  let ref = React.useRef<HTMLDivElement>(null);
-  let { popoverRef = ref, isOpen, onClose, children } = props;
+  let ref = React.useRef<HTMLDivElement>(null)
+  let { popoverRef = ref, isOpen, onClose, children } = props
 
   let { overlayProps } = useOverlay(
     {
@@ -22,7 +22,7 @@ export function Popover(props: PopoverProps) {
       isDismissable: false,
     },
     popoverRef
-  );
+  )
 
   return (
     <FocusScope restoreFocus>
@@ -31,7 +31,7 @@ export function Popover(props: PopoverProps) {
         <DismissButton onDismiss={onClose} />
       </Wrapper>
     </FocusScope>
-  );
+  )
 }
 
 const Wrapper = styled.div`
@@ -43,4 +43,4 @@ const Wrapper = styled.div`
   border-radius: 4px;
   margin-top: 6px;
   background: ${({ theme }) => theme.colors.secondary};
-`;
+`

@@ -1,6 +1,6 @@
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node";
-import mapboxgl from "mapbox-gl";
-import { json } from "@remix-run/node";
+import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node"
+import mapboxgl from "mapbox-gl"
+import { json } from "@remix-run/node"
 import {
   Links,
   LiveReload,
@@ -9,13 +9,13 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
-} from "@remix-run/react";
-import GlobalStyle from "./styles/global";
+} from "@remix-run/react"
+import GlobalStyle from "./styles/global"
 
-import { getUser } from "./session.server";
-import { ThemeProvider } from "styled-components";
-import { theme } from "./styles/theme";
-import { getEnv } from "./env.server";
+import { getUser } from "./session.server"
+import { ThemeProvider } from "styled-components"
+import { theme } from "./styles/theme"
+import { getEnv } from "./env.server"
 
 export const links: LinksFunction = () => {
   return [
@@ -29,29 +29,29 @@ export const links: LinksFunction = () => {
       rel: "stylesheet",
       href: "https://api.tiles.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css",
     },
-  ];
-};
+  ]
+}
 
 // TODO check if we can switch to maplibre to avoid access tokens from MapBox
 if (ENV.MAPBOX_ACCESS_TOKEN) {
-  mapboxgl.accessToken = ENV.MAPBOX_ACCESS_TOKEN;
+  mapboxgl.accessToken = ENV.MAPBOX_ACCESS_TOKEN
 }
 
 export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Fredagslunchen",
   viewport: "width=device-width,initial-scale=1",
-});
+})
 
 export const loader = async ({ request }: LoaderArgs) => {
   return json({
     user: await getUser(request),
     ENV: getEnv(),
-  });
-};
+  })
+}
 
 export default function App() {
-  const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>()
 
   return (
     <html lang="en">
@@ -75,5 +75,5 @@ export default function App() {
         {ENV.NODE_ENV === "development" ? <LiveReload /> : null}
       </body>
     </html>
-  );
+  )
 }

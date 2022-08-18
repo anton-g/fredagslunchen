@@ -1,89 +1,84 @@
-import type { ReactNode } from "react";
-import { useEffect, useRef, useState } from "react";
-import styled from "styled-components";
-import type { Group, Lunch, Score, User } from "@prisma/client";
-import { json, redirect } from "@remix-run/node";
-import type { ActionFunction, LoaderArgs } from "@remix-run/node";
+import type { ReactNode } from "react"
+import { useEffect, useRef, useState } from "react"
+import styled from "styled-components"
+import type { Group, Lunch, Score, User } from "@prisma/client"
+import { json, redirect } from "@remix-run/node"
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import {
   Form,
   Link,
   useCatch,
   useFetcher,
   useLoaderData,
-} from "@remix-run/react";
-import invariant from "tiny-invariant";
-import type { RecursivelyConvertDatesToStrings } from "~/utils";
-import {
-  formatNumber,
-  getAverageNumber,
-  shorten,
-  formatTimeAgo,
-} from "~/utils";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { requireUserId } from "~/session.server";
-import { deleteLunch, getGroupLunch } from "~/models/lunch.server";
-import { Spacer } from "~/components/Spacer";
-import { Stat } from "~/components/Stat";
-import { Table } from "~/components/Table";
-import { Input } from "~/components/Input";
-import { ComboBox, Item, Label } from "~/components/ComboBox";
-import { TextArea } from "~/components/TextArea";
-import { Stack } from "~/components/Stack";
-import { Button } from "~/components/Button";
-import { Tooltip } from "~/components/Tooltip";
-import { Dialog } from "~/components/Dialog";
+} from "@remix-run/react"
+import invariant from "tiny-invariant"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import { requireUserId } from "~/session.server"
+import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
+import { Spacer } from "~/components/Spacer"
+import { Stat } from "~/components/Stat"
+import { Table } from "~/components/Table"
+import { Input } from "~/components/Input"
+import { ComboBox, Item, Label } from "~/components/ComboBox"
+import { TextArea } from "~/components/TextArea"
+import { Stack } from "~/components/Stack"
+import { Button } from "~/components/Button"
+import { Tooltip } from "~/components/Tooltip"
+import { Dialog } from "~/components/Dialog"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
-  invariant(params.lunchId, "lunchId not found");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
+  invariant(params.lunchId, "lunchId not found")
 
   const groupLunch = await getGroupLunch({
     id: parseInt(params.lunchId),
-  });
+  })
 
   const isAdmin = groupLunch?.groupLocation.group.members.some(
     (m) => m.userId === userId && m.role === "ADMIN"
-  );
+  )
 
   if (!groupLunch) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLunch, isAdmin, userId });
-};
+  return json({ groupLunch, isAdmin, userId })
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  if (request.method !== "DELETE") return null;
+  if (request.method !== "DELETE") return null
 
-  const userId = await requireUserId(request);
-  invariant(params.lunchId, "lunchId not found");
-  invariant(params.groupId, "groupId not found");
+  const userId = await requireUserId(request)
+  invariant(params.lunchId, "lunchId not found")
+  invariant(params.groupId, "groupId not found")
 
   await deleteLunch({
     id: parseInt(params.lunchId),
     requestedByUserId: userId,
-  });
+  })
 
-  return redirect(`/groups/${params.groupId}`);
-};
+  return redirect(`/groups/${params.groupId}`)
+}
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin, userId } = useLoaderData<typeof loader>();
+  const { groupLunch, isAdmin, userId } = useLoaderData<typeof loader>()
 
-  const scores = groupLunch.scores;
+  const scores = groupLunch.scores
 
   const sortedScores = groupLunch.scores
     .slice()
-    .sort((a, b) => a.score - b.score);
-  const lowestScore = sortedScores[0]?.score;
-  const highestScore = sortedScores[sortedScores.length - 1]?.score;
+    .sort((a, b) => a.score - b.score)
+  const lowestScore = sortedScores[0]?.score
+  const highestScore = sortedScores[sortedScores.length - 1]?.score
 
   const averageScore =
-    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-";
+    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-"
 
   const usersWithoutScores = groupLunch.groupLocation.group.members
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
-    .map((x) => x.user);
+    .map((x) => x.user)
 
   return (
     <div>
@@ -176,23 +171,23 @@ export default function LunchDetailsPage() {
       )}
       <Spacer size={128} />
     </div>
-  );
+  )
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  console.error(error)
 
-  return <div>An unexpected error occurred: {error.message}</div>;
+  return <div>An unexpected error occurred: {error.message}</div>
 }
 
 export function CatchBoundary() {
-  const caught = useCatch();
+  const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>;
+    return <div>Group not found</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`);
+  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }
 
 const Title = styled.h2`
@@ -206,27 +201,27 @@ const Title = styled.h2`
   a:hover {
     text-decoration: underline;
   }
-`;
+`
 
 const Stats = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px;
   width: 100%;
-`;
+`
 
 const Subtitle = styled.h3`
   margin: 0;
-`;
+`
 
 const ScoreDeleteAction = ({
   description,
   scoreId,
 }: {
-  description: ReactNode;
-  scoreId: Score["id"];
+  description: ReactNode
+  scoreId: Score["id"]
 }) => {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher()
 
   return (
     <Dialog>
@@ -250,8 +245,8 @@ const ScoreDeleteAction = ({
         </fetcher.Form>
       </Dialog.Content>
     </Dialog>
-  );
-};
+  )
+}
 
 const DeleteButton = styled.button`
   all: unset;
@@ -267,7 +262,7 @@ const DeleteButton = styled.button`
   &:hover {
     border-color: ${({ theme }) => theme.colors.primary};
   }
-`;
+`
 
 const ScoreRow = styled.tr`
   &:hover {
@@ -275,39 +270,39 @@ const ScoreRow = styled.tr`
       opacity: 1;
     }
   }
-`;
+`
 
 type NewScoreFormProps = {
-  users: RecursivelyConvertDatesToStrings<User>[];
-  lunchId: Lunch["id"];
-  groupId: Group["id"];
-};
+  users: RecursivelyConvertDatesToStrings<User>[]
+  lunchId: Lunch["id"]
+  groupId: Group["id"]
+}
 
 const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
-  const fetcher = useFetcher();
-  const [selectedFrom, setSelectedFrom] = useState<string | null>(null);
-  const [fromInputValue, setFromInputValue] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
-  const userRef = useRef<HTMLInputElement>(null!);
-  const scoreRef = useRef<HTMLInputElement>(null);
+  const fetcher = useFetcher()
+  const [selectedFrom, setSelectedFrom] = useState<string | null>(null)
+  const [fromInputValue, setFromInputValue] = useState<string | null>(null)
+  const formRef = useRef<HTMLFormElement>(null)
+  const userRef = useRef<HTMLInputElement>(null!)
+  const scoreRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (fetcher.type === "done" && fetcher.data.ok) {
-      formRef.current?.reset();
+      formRef.current?.reset()
     }
 
-    const errors = fetcher.data?.errors;
+    const errors = fetcher.data?.errors
     if (errors?.user) {
-      userRef.current?.focus();
+      userRef.current?.focus()
     } else if (errors?.score) {
-      scoreRef.current?.focus();
+      scoreRef.current?.focus()
     }
-  }, [fetcher]);
+  }, [fetcher])
 
   const isFromNewAnonymousUser =
     fromInputValue &&
     !users.some((x) => x.name === fromInputValue) &&
-    !selectedFrom;
+    !selectedFrom
 
   return (
     <fetcher.Form
@@ -383,8 +378,8 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
       </Stack>
       <input type="hidden" name="groupId" value={groupId} />
     </fetcher.Form>
-  );
-};
+  )
+}
 
 const CommentLabel = styled.label`
   display: flex;
@@ -394,7 +389,7 @@ const CommentLabel = styled.label`
   textarea {
     flex-grow: 1;
   }
-`;
+`
 
 const AdminActions = () => {
   return (
@@ -427,16 +422,16 @@ const AdminActions = () => {
         </Dialog.Content>
       </Dialog>
     </Wrapper>
-  );
-};
+  )
+}
 
 const Wrapper = styled(Stack)`
   justify-content: center;
-`;
+`
 
 const DialogDescription = styled(Dialog.Description)`
   > p {
     margin: 0;
     margin-bottom: 16px;
   }
-`;
+`

@@ -1,9 +1,9 @@
 // @ts-check
-const { PrismaClient } = require("@prisma/client");
-const bcrypt = require("bcryptjs");
-const { faker } = require("@faker-js/faker");
+const { PrismaClient } = require("@prisma/client")
+const bcrypt = require("bcryptjs")
+const { faker } = require("@faker-js/faker")
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient()
 
 async function seed() {
   // TODO cleanup the existing database
@@ -13,7 +13,7 @@ async function seed() {
   // await prisma.location.deleteMany().catch(() => {});
   // await prisma.user.deleteMany().catch(() => {});
 
-  const hashedPassword = await bcrypt.hash("woopwoop", 10);
+  const hashedPassword = await bcrypt.hash("woopwoop", 10)
 
   const userBasse = await prisma.user.create({
     data: {
@@ -30,7 +30,7 @@ async function seed() {
         },
       },
     },
-  });
+  })
 
   const userTessan = await prisma.user.create({
     data: {
@@ -42,7 +42,7 @@ async function seed() {
         },
       },
     },
-  });
+  })
 
   const userMartin = await prisma.user.create({
     data: {
@@ -54,7 +54,7 @@ async function seed() {
         },
       },
     },
-  });
+  })
 
   const userKatten = await prisma.user.create({
     data: {
@@ -66,7 +66,7 @@ async function seed() {
         },
       },
     },
-  });
+  })
 
   const locationWoken = await prisma.location.create({
     data: {
@@ -77,7 +77,7 @@ async function seed() {
       city: "Stockholm",
       zipCode: "11737",
     },
-  });
+  })
 
   const locationFranzen = await prisma.location.create({
     data: {
@@ -88,7 +88,7 @@ async function seed() {
       city: "Stockholm",
       zipCode: "11439",
     },
-  });
+  })
 
   const locationSandwich = await prisma.location.create({
     data: {
@@ -99,7 +99,7 @@ async function seed() {
       city: "Stockholm",
       zipCode: "11123",
     },
-  });
+  })
 
   await prisma.group.create({
     data: {
@@ -182,7 +182,7 @@ async function seed() {
         ],
       },
     },
-  });
+  })
 
   await prisma.group.create({
     data: {
@@ -246,16 +246,16 @@ async function seed() {
         ],
       },
     },
-  });
+  })
 
-  console.log(`Database has been seeded. 🌱`);
+  console.log(`Database has been seeded. 🌱`)
 }
 
 seed()
   .catch((e) => {
-    console.error(e);
-    process.exit(1);
+    console.error(e)
+    process.exit(1)
   })
   .finally(async () => {
-    await prisma.$disconnect();
-  });
+    await prisma.$disconnect()
+  })

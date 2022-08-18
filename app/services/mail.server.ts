@@ -1,7 +1,7 @@
-import type { Email, User } from "@prisma/client";
-import sgMail from "@sendgrid/mail";
+import type { Email, User } from "@prisma/client"
+import sgMail from "@sendgrid/mail"
 
-if (ENV.SENDGRID_API_KEY) sgMail.setApiKey(ENV.SENDGRID_API_KEY);
+if (ENV.SENDGRID_API_KEY) sgMail.setApiKey(ENV.SENDGRID_API_KEY)
 
 export async function sendPasswordResetEmail(
   email: Email["email"],
@@ -10,7 +10,7 @@ export async function sendPasswordResetEmail(
   if (!ENV.SENDGRID_API_KEY) {
     console.log(
       `Missing Sendgrid API Key. Ignoring password reset email: ${email} - ${token}`
-    );
+    )
   }
 
   const msg = {
@@ -20,7 +20,7 @@ export async function sendPasswordResetEmail(
     dynamicTemplateData: {
       link: `https://fredagslunchen.club/reset-password?token=${token}`,
     },
-  };
+  }
 
-  await sgMail.send(msg).catch((error) => console.error(error));
+  await sgMail.send(msg).catch((error) => console.error(error))
 }
