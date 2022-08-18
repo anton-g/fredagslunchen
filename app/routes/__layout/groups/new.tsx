@@ -1,47 +1,47 @@
-import type { ActionFunction } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
-import { Form, useActionData } from "@remix-run/react";
-import * as React from "react";
-import { Button } from "~/components/Button";
-import { Input } from "~/components/Input";
-import { Stack } from "~/components/Stack";
+import type { ActionFunction } from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
+import { Form, useActionData } from "@remix-run/react"
+import * as React from "react"
+import { Button } from "~/components/Button"
+import { Input } from "~/components/Input"
+import { Stack } from "~/components/Stack"
 
-import { createGroup } from "~/models/group.server";
-import { requireUserId } from "~/session.server";
+import { createGroup } from "~/models/group.server"
+import { requireUserId } from "~/session.server"
 
 type ActionData = {
   errors?: {
-    name?: string;
-  };
-};
+    name?: string
+  }
+}
 
 export const action: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request);
+  const userId = await requireUserId(request)
 
-  const formData = await request.formData();
-  const name = formData.get("name");
+  const formData = await request.formData()
+  const name = formData.get("name")
 
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
       { errors: { name: "Name is required" } },
       { status: 400 }
-    );
+    )
   }
 
-  const group = await createGroup({ name, userId });
+  const group = await createGroup({ name, userId })
 
-  return redirect(`/groups/${group.id}`);
-};
+  return redirect(`/groups/${group.id}`)
+}
 
 export default function NewGroupPage() {
-  const actionData = useActionData() as ActionData;
-  const nameRef = React.useRef<HTMLInputElement>(null);
+  const actionData = useActionData() as ActionData
+  const nameRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     if (actionData?.errors?.name) {
-      nameRef.current?.focus();
+      nameRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   return (
     <>
@@ -81,5 +81,5 @@ export default function NewGroupPage() {
         </Stack>
       </Form>
     </>
-  );
+  )
 }

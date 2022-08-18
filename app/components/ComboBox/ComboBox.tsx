@@ -1,35 +1,35 @@
-import * as React from "react";
-import styled from "styled-components";
-import type { ComboBoxProps } from "@react-types/combobox";
+import * as React from "react"
+import styled from "styled-components"
+import type { ComboBoxProps } from "@react-types/combobox"
 
-import { ListBox } from "./ListBox";
-import { Popover } from "./Popover";
-import { useFilter } from "@react-aria/i18n";
-import { useComboBoxState } from "@react-stately/combobox";
-import { useComboBox } from "@react-aria/combobox";
-import { useButton } from "@react-aria/button";
-import { ChevronDownIcon } from "@radix-ui/react-icons";
-import { Wrapper, Label } from "./shared";
-import { Input } from "../Input";
-import { useRef } from "react";
+import { ListBox } from "./ListBox"
+import { Popover } from "./Popover"
+import { useFilter } from "@react-aria/i18n"
+import { useComboBoxState } from "@react-stately/combobox"
+import { useComboBox } from "@react-aria/combobox"
+import { useButton } from "@react-aria/button"
+import { ChevronDownIcon } from "@radix-ui/react-icons"
+import { Wrapper, Label } from "./shared"
+import { Input } from "../Input"
+import { useRef } from "react"
 
-export { Item, Section } from "@react-stately/collections";
+export { Item, Section } from "@react-stately/collections"
 
 export const ComboBox = <T extends object>(
   props: ComboBoxProps<T> & {
-    inputRef?: React.MutableRefObject<HTMLInputElement>;
+    inputRef?: React.MutableRefObject<HTMLInputElement>
   }
 ) => {
-  const { contains } = useFilter({ sensitivity: "base" });
+  const { contains } = useFilter({ sensitivity: "base" })
   const state = useComboBoxState({
     ...props,
     defaultFilter: contains,
-  });
+  })
 
-  const buttonRef = useRef(null);
-  const inputRef = useRef<HTMLInputElement>(null!);
-  const listBoxRef = useRef(null);
-  const popoverRef = useRef(null);
+  const buttonRef = useRef(null)
+  const inputRef = useRef<HTMLInputElement>(null!)
+  const listBoxRef = useRef(null)
+  const popoverRef = useRef(null)
 
   const {
     buttonProps: triggerProps,
@@ -45,9 +45,9 @@ export const ComboBox = <T extends object>(
       popoverRef,
     },
     state
-  );
+  )
 
-  const { buttonProps } = useButton(triggerProps, buttonRef);
+  const { buttonProps } = useButton(triggerProps, buttonRef)
 
   return (
     <Wrapper>
@@ -56,11 +56,11 @@ export const ComboBox = <T extends object>(
         <ComboBoxInput
           {...inputProps}
           ref={(node) => {
-            if (!node) return;
+            if (!node) return
 
-            inputRef.current = node;
+            inputRef.current = node
             if (props.inputRef) {
-              props.inputRef.current = node;
+              props.inputRef.current = node
             }
           }}
           isFocused={state.isFocused}
@@ -87,12 +87,12 @@ export const ComboBox = <T extends object>(
         </Popover>
       )}
     </Wrapper>
-  );
-};
+  )
+}
 
 interface StyleProps {
-  isFocused?: boolean;
-  isOpen?: boolean;
+  isFocused?: boolean
+  isOpen?: boolean
 }
 
 const InputGroup = styled.div<StyleProps>`
@@ -102,13 +102,13 @@ const InputGroup = styled.div<StyleProps>`
   overflow: hidden;
   margin-top: 4px;
   border-radius: 4px;
-`;
+`
 
 const ComboBoxInput = styled(Input)<StyleProps>`
   outline: none;
   border-right: none;
   border-radius: 4px 0 0 4px;
-`;
+`
 
 const Button = styled.button`
   appearance: none;
@@ -116,4 +116,4 @@ const Button = styled.button`
   background: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.secondary};
   margin: 0;
-`;
+`

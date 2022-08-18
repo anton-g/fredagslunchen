@@ -1,15 +1,15 @@
-import type { Group, GroupLocation, Location } from "@prisma/client";
+import type { Group, GroupLocation, Location } from "@prisma/client"
 
-import { prisma } from "~/db.server";
-import { getAverageNumber } from "~/utils";
+import { prisma } from "~/db.server"
+import { getAverageNumber } from "~/utils"
 
-export type { Location } from "@prisma/client";
+export type { Location } from "@prisma/client"
 
 export function getGroupLocation({
   id,
   groupId,
 }: Pick<Location, "id"> & {
-  groupId: Group["id"];
+  groupId: Group["id"]
 }) {
   return prisma.groupLocation.findUnique({
     where: { locationId_groupId: { groupId, locationId: id } },
@@ -20,14 +20,14 @@ export function getGroupLocation({
       },
       location: true,
     },
-  });
+  })
 }
 
 type CreateGroupLocationInput = Omit<Location, "id"> & {
-  groupId: Group["id"];
-  discoveredById: GroupLocation["discoveredById"];
-  locationId?: Location["id"];
-};
+  groupId: Group["id"]
+  discoveredById: GroupLocation["discoveredById"]
+  locationId?: Location["id"]
+}
 
 export async function createGroupLocation({
   address,
@@ -68,11 +68,11 @@ export async function createGroupLocation({
         },
       },
     },
-  });
+  })
 }
 
 export function getAllLocations() {
-  return prisma.location.findMany({});
+  return prisma.location.findMany({})
 }
 
 export async function getAllLocationsStats() {
@@ -88,18 +88,18 @@ export async function getAllLocationsStats() {
         },
       },
     },
-  });
+  })
 
   const locationsWithStats = locations.map((loc) => {
-    const allLunches = loc.groupLocation.flatMap((gl) => gl.lunches);
+    const allLunches = loc.groupLocation.flatMap((gl) => gl.lunches)
     const allScores = allLunches
       .flatMap((l) => l.scores)
-      .sort((a, b) => b.score - a.score);
+      .sort((a, b) => b.score - a.score)
 
-    const averageScore = getAverageNumber(allScores, "score");
+    const averageScore = getAverageNumber(allScores, "score")
 
-    const highestScore = allScores[0]?.score || 0;
-    const lowestScore = allScores[allScores.length - 1]?.score || 0;
+    const highestScore = allScores[0]?.score || 0
+    const lowestScore = allScores[allScores.length - 1]?.score || 0
 
     return {
       address: loc.address,
@@ -111,8 +111,8 @@ export async function getAllLocationsStats() {
       averageScore,
       highestScore,
       lowestScore,
-    };
-  });
+    }
+  })
 
-  return locationsWithStats;
+  return locationsWithStats
 }

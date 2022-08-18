@@ -1,32 +1,32 @@
-import type { LoaderArgs } from "@remix-run/server-runtime";
-import { formatNumber, formatTimeAgo } from "~/utils";
-import { useLoaderData, Link } from "@remix-run/react";
-import { json } from "@remix-run/server-runtime";
-import styled from "styled-components";
-import { Spacer } from "~/components/Spacer";
-import { Table } from "~/components/Table";
-import { getFullUserById } from "~/models/user.server";
-import { requireUserId } from "~/session.server";
-import invariant from "tiny-invariant";
-import { SeedAvatar } from "~/components/Avatar";
-import { Stat } from "~/components/Stat";
+import type { LoaderArgs } from "@remix-run/server-runtime"
+import { formatNumber, formatTimeAgo } from "~/utils"
+import { useLoaderData, Link } from "@remix-run/react"
+import { json } from "@remix-run/server-runtime"
+import styled from "styled-components"
+import { Spacer } from "~/components/Spacer"
+import { Table } from "~/components/Table"
+import { getFullUserById } from "~/models/user.server"
+import { requireUserId } from "~/session.server"
+import invariant from "tiny-invariant"
+import { SeedAvatar } from "~/components/Avatar"
+import { Stat } from "~/components/Stat"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.userId, "userId not found");
+  const userId = await requireUserId(request)
+  invariant(params.userId, "userId not found")
 
   const user = await getFullUserById({
     id: params.userId,
     requestUserId: userId,
-  });
+  })
   if (!user) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
-  return json({ user, isYou: userId === params.userId });
-};
+  return json({ user, isYou: userId === params.userId })
+}
 
 export default function Index() {
-  const { user, isYou } = useLoaderData<typeof loader>();
+  const { user, isYou } = useLoaderData<typeof loader>()
 
   return (
     <Wrapper>
@@ -115,39 +115,39 @@ export default function Index() {
         </>
       )}
     </Wrapper>
-  );
+  )
 }
 
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
-`;
+`
 
 const TitleRow = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
-`;
+`
 
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
-`;
+`
 
 const Subtitle = styled.h3`
   margin: 0;
   font-size: 36px;
   margin-bottom: 16px;
-`;
+`
 
 const Stats = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px 48px;
   width: 100%;
-`;
+`
 
-const Section = styled.div``;
+const Section = styled.div``
 
 const Footer = styled.div`
   text-align: center;
@@ -159,4 +159,4 @@ const Footer = styled.div`
   a {
     text-decoration: underline;
   }
-`;
+`

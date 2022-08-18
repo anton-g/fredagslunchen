@@ -1,4 +1,4 @@
-import { createGlobalStyle } from "styled-components";
+import { createGlobalStyle } from "styled-components"
 
 export default createGlobalStyle`
   html,
@@ -30,4 +30,4 @@ export default createGlobalStyle`
     display: block;
     overflow: visible;
   }
-`;
+`

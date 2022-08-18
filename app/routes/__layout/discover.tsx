@@ -1,25 +1,25 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useLoaderData } from "@remix-run/react";
-import styled from "styled-components";
-import { Card } from "~/components/Card";
-import { Map } from "~/components/Map";
-import { Spacer } from "~/components/Spacer";
-import { Table } from "~/components/Table";
-import { getEnv } from "~/env.server";
+import type { LoaderArgs } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import { useLoaderData } from "@remix-run/react"
+import styled from "styled-components"
+import { Card } from "~/components/Card"
+import { Map } from "~/components/Map"
+import { Spacer } from "~/components/Spacer"
+import { Table } from "~/components/Table"
+import { getEnv } from "~/env.server"
 
-import { getAllLocationsStats } from "~/models/location.server";
-import { requireUserId } from "~/session.server";
-import { formatNumber } from "~/utils";
+import { getAllLocationsStats } from "~/models/location.server"
+import { requireUserId } from "~/session.server"
+import { formatNumber } from "~/utils"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request);
-  const locations = await getAllLocationsStats();
-  return json({ locations, isMapsEnabled: getEnv().ENABLE_MAPS });
-};
+  await requireUserId(request)
+  const locations = await getAllLocationsStats()
+  return json({ locations, isMapsEnabled: getEnv().ENABLE_MAPS })
+}
 
 export default function DiscoverPage() {
-  const { locations, isMapsEnabled } = useLoaderData<typeof loader>();
+  const { locations, isMapsEnabled } = useLoaderData<typeof loader>()
 
   return (
     <main>
@@ -45,7 +45,7 @@ export default function DiscoverPage() {
                     {formatNumber(loc.averageScore)}
                   </Table.Cell>
                 </tr>
-              );
+              )
             })}
         </tbody>
       </Table>
@@ -59,21 +59,21 @@ export default function DiscoverPage() {
         </>
       )}
     </main>
-  );
+  )
 }
 
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
-`;
+`
 
 const Subtitle = styled.h2`
   font-size: 36px;
   margin: 0;
   margin-bottom: 18px;
-`;
+`
 
 const MapCard = styled(Card)`
   padding: 0;
-`;
+`

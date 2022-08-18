@@ -1,57 +1,57 @@
-import type { ActionFunction } from "@remix-run/server-runtime";
-import { json } from "@remix-run/server-runtime";
+import type { ActionFunction } from "@remix-run/server-runtime"
+import { json } from "@remix-run/server-runtime"
 import {
   createScore,
   createScoreWithNewAnonymousUser,
-} from "~/models/score.server";
-import { requireUserId } from "~/session.server";
+} from "~/models/score.server"
+import { requireUserId } from "~/session.server"
 
 type ActionData = {
   errors?: {
-    score?: string;
-    user?: string;
-    lunchId?: string;
-    groupId?: string;
-  };
-};
+    score?: string
+    user?: string
+    lunchId?: string
+    groupId?: string
+  }
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request);
+  await requireUserId(request)
 
-  const formData = await request.formData();
-  const scoreString = formData.get("score");
-  const score = scoreString ? parseFloat(scoreString.toString()) : null;
-  const comment = formData.get("comment");
-  const user = formData.get("user");
-  const userId = formData.get("user-key");
-  const lunchId = formData.get("lunchId");
+  const formData = await request.formData()
+  const scoreString = formData.get("score")
+  const score = scoreString ? parseFloat(scoreString.toString()) : null
+  const comment = formData.get("comment")
+  const user = formData.get("user")
+  const userId = formData.get("user-key")
+  const lunchId = formData.get("lunchId")
 
   if (typeof user !== "string" || user.length === 0) {
     return json<ActionData>(
       { errors: { user: "User is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (!score || isNaN(score)) {
     return json<ActionData>(
       { errors: { score: "Score is required" } },
       { status: 400 }
-    );
+    )
   }
 
   if (score <= 0 || score >= 10) {
     return json<ActionData>(
       { errors: { score: "Score must be between 0 and 10" } },
       { status: 400 }
-    );
+    )
   }
 
   if (typeof lunchId !== "string" || lunchId.length === 0) {
     return json<ActionData>(
       { errors: { lunchId: "Lunch is required" } },
       { status: 400 }
-    );
+    )
   }
 
   // Score for existing user
@@ -61,19 +61,19 @@ export const action: ActionFunction = async ({ request, params }) => {
       score,
       comment: comment ? comment.toString() : null,
       lunchId: parseInt(lunchId),
-    });
+    })
 
-    return json({ ok: true });
+    return json({ ok: true })
   }
 
   // Score for new anonymous user
-  const groupId = formData.get("groupId");
+  const groupId = formData.get("groupId")
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>(
       { errors: { groupId: "Group is required" } },
       { status: 400 }
-    );
+    )
   }
 
   await createScoreWithNewAnonymousUser({
@@ -82,7 +82,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     groupId: groupId,
     score,
     newUserName: user,
-  });
+  })
 
-  return json({ ok: true });
-};
+  return json({ ok: true })
+}

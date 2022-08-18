@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components"
 
 const TextArea = styled.textarea`
   color: ${({ theme }) => theme.colors.primary};
@@ -14,6 +14,6 @@ const TextArea = styled.textarea`
   width: 100%;
   font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
     Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-`;
+`
 
-export { TextArea };
+export { TextArea }

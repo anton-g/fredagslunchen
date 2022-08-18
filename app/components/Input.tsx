@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components"
 
 const Input = styled.input`
   color: ${({ theme }) => theme.colors.primary};
@@ -15,6 +15,6 @@ const Input = styled.input`
   width: 100%;
   font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
     Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-`;
+`
 
-export { Input };
+export { Input }

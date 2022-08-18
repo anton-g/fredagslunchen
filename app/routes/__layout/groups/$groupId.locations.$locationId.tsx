@@ -1,34 +1,34 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { useCatch, useLoaderData } from "@remix-run/react";
-import invariant from "tiny-invariant";
+import type { LoaderArgs } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import { useCatch, useLoaderData } from "@remix-run/react"
+import invariant from "tiny-invariant"
 
-import { requireUserId } from "~/session.server";
-import { Link } from "react-router-dom";
-import { getGroupLocation } from "~/models/location.server";
-import { Table } from "~/components/Table";
-import styled from "styled-components";
-import { LinkButton } from "~/components/Button";
-import { Spacer } from "~/components/Spacer";
+import { requireUserId } from "~/session.server"
+import { Link } from "react-router-dom"
+import { getGroupLocation } from "~/models/location.server"
+import { Table } from "~/components/Table"
+import styled from "styled-components"
+import { LinkButton } from "~/components/Button"
+import { Spacer } from "~/components/Spacer"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
-  invariant(params.locationId, "locationId not found");
+  await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
+  invariant(params.locationId, "locationId not found")
 
   const groupLocation = await getGroupLocation({
     groupId: params.groupId,
     id: parseInt(params.locationId),
-  });
+  })
 
   if (!groupLocation) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLocation });
-};
+  return json({ groupLocation })
+}
 
 export default function LocationDetailsPage() {
-  const { groupLocation } = useLoaderData<typeof loader>();
+  const { groupLocation } = useLoaderData<typeof loader>()
 
   return (
     <div>
@@ -73,27 +73,27 @@ export default function LocationDetailsPage() {
         New lunch
       </LinkButton>
     </div>
-  );
+  )
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  console.error(error)
 
-  return <div>An unexpected error occurred: {error.message}</div>;
+  return <div>An unexpected error occurred: {error.message}</div>
 }
 
 export function CatchBoundary() {
-  const caught = useCatch();
+  const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>;
+    return <div>Group not found</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`);
+  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }
 
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
-`;
+`

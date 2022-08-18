@@ -1,41 +1,41 @@
-import { CubeIcon, RocketIcon } from "@radix-ui/react-icons";
-import type { LoaderArgs, MetaFunction } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import type { FC } from "react";
-import { Link, useLoaderData } from "@remix-run/react";
-import { Button, LinkButton } from "~/components/Button";
-import { Card } from "~/components/Card";
-import { Checkbox } from "~/components/Checkbox";
-import { Input } from "~/components/Input";
-import { Spacer } from "~/components/Spacer";
-import { Stack } from "~/components/Stack";
-import { Table } from "~/components/Table";
-import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar";
-import { Switch, SwitchThumb } from "~/components/Switch";
-import { Select } from "~/components/Select";
-import { ComboBox, Item, Description, Label } from "~/components/ComboBox";
-import { TextArea } from "~/components/TextArea";
-import { HoverCard } from "~/components/HoverCard";
-import { Map } from "~/components/Map";
-import { Tooltip } from "~/components/Tooltip";
-import { Dialog } from "~/components/Dialog";
-import { getEnv } from "~/env.server";
-import styled from "styled-components";
+import { CubeIcon, RocketIcon } from "@radix-ui/react-icons"
+import type { LoaderArgs, MetaFunction } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import type { FC } from "react"
+import { Link, useLoaderData } from "@remix-run/react"
+import { Button, LinkButton } from "~/components/Button"
+import { Card } from "~/components/Card"
+import { Checkbox } from "~/components/Checkbox"
+import { Input } from "~/components/Input"
+import { Spacer } from "~/components/Spacer"
+import { Stack } from "~/components/Stack"
+import { Table } from "~/components/Table"
+import { Avatar, RandomAvatar, SeedAvatar } from "~/components/Avatar"
+import { Switch, SwitchThumb } from "~/components/Switch"
+import { Select } from "~/components/Select"
+import { ComboBox, Item, Description, Label } from "~/components/ComboBox"
+import { TextArea } from "~/components/TextArea"
+import { HoverCard } from "~/components/HoverCard"
+import { Map } from "~/components/Map"
+import { Tooltip } from "~/components/Tooltip"
+import { Dialog } from "~/components/Dialog"
+import { getEnv } from "~/env.server"
+import styled from "styled-components"
 
 export const meta: MetaFunction = () => {
   return {
     title: "Kitchensink",
-  };
-};
+  }
+}
 
 export const loader = async ({ request }: LoaderArgs) => {
   return json({
     ENV: getEnv(),
-  });
-};
+  })
+}
 
 export default function Kitchensink() {
-  const { ENV } = useLoaderData<typeof loader>();
+  const { ENV } = useLoaderData<typeof loader>()
 
   return (
     <div style={{ padding: 24 }}>
@@ -194,7 +194,7 @@ export default function Kitchensink() {
         </Component>
       </Stack>
     </div>
-  );
+  )
 }
 
 const Component: FC<{ title: string }> = ({ title, children }) => {
@@ -203,14 +203,14 @@ const Component: FC<{ title: string }> = ({ title, children }) => {
       <h2>{title}</h2>
       {children}
     </div>
-  );
-};
+  )
+}
 
 const Box = styled.div`
   width: 100px;
   height: 50px;
   background-color: ${({ theme }) => theme.colors.primary};
-`;
+`
 
 const SelectExample = () => {
   return (
@@ -281,8 +281,8 @@ const SelectExample = () => {
         </Select.Item>
       </Select.Group>
     </Select>
-  );
-};
+  )
+}
 
 const TableExample = () => {
   return (
@@ -322,8 +322,8 @@ const TableExample = () => {
         </tr>
       </tbody>
     </Table>
-  );
-};
+  )
+}
 
 const people = [
   {
@@ -368,7 +368,7 @@ const people = [
     name: "Brent Mickelwright",
     username: "@brent_m",
   },
-];
+]
 
 const ComboBoxExample = () => {
   return (
@@ -382,8 +382,8 @@ const ComboBoxExample = () => {
         </Item>
       )}
     </ComboBox>
-  );
-};
+  )
+}
 
 const locationsMock = [
   {
@@ -419,4 +419,4 @@ const locationsMock = [
     lowestScore: 2,
     lunchCount: 4,
   },
-];
+]

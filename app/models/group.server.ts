@@ -1,15 +1,15 @@
-import type { User, Group, Prisma, Location, Email } from "@prisma/client";
-import { nanoid } from "nanoid";
+import type { User, Group, Prisma, Location, Email } from "@prisma/client"
+import { nanoid } from "nanoid"
 
-import { prisma } from "~/db.server";
-import { formatNumber, getAverageNumber } from "~/utils";
+import { prisma } from "~/db.server"
+import { formatNumber, getAverageNumber } from "~/utils"
 
-export type { Group } from "@prisma/client";
+export type { Group } from "@prisma/client"
 
 export function getGroup({
   id,
 }: Pick<Group, "id"> & {
-  userId: User["id"];
+  userId: User["id"]
 }) {
   return prisma.group.findUnique({
     where: { id },
@@ -32,12 +32,12 @@ export function getGroup({
         },
       },
     },
-  });
+  })
 }
 
 type GetGroupDetailsInput = Pick<Group, "id"> & {
-  userId: User["id"];
-};
+  userId: User["id"]
+}
 
 async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
   return await prisma.group.findUnique({
@@ -89,20 +89,20 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
         },
       },
     },
-  });
+  })
 }
 
 export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
-  const group = await fetchGroupDetails({ id, userId });
+  const group = await fetchGroupDetails({ id, userId })
 
-  if (!group) return null;
+  if (!group) return null
 
-  const stats = generateGroupStats(group);
+  const stats = generateGroupStats(group)
 
   const membersWithStats = group.members.map((member) => {
-    const stats = generateUserStats(member);
-    return { ...member, stats };
-  });
+    const stats = generateUserStats(member)
+    return { ...member, stats }
+  })
 
   return {
     group: {
@@ -117,7 +117,7 @@ export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
       mostNegative: stats.mostNegative,
       mostAvarage: stats.mostAverage,
     },
-  };
+  }
 }
 
 export function getUserGroups({ userId }: { userId: User["id"] }) {
@@ -135,14 +135,14 @@ export function getUserGroups({ userId }: { userId: User["id"] }) {
       },
       members: { include: { user: { select: { name: true } } } },
     },
-  });
+  })
 }
 
 export function createGroup({
   name,
   userId,
 }: Pick<Group, "name"> & {
-  userId: User["id"];
+  userId: User["id"]
 }) {
   return prisma.group.create({
     data: {
@@ -160,15 +160,15 @@ export function createGroup({
         ],
       },
     },
-  });
+  })
 }
 
 export async function addUserToGroupWithInviteToken({
   inviteToken,
   userId,
 }: {
-  inviteToken: NonNullable<Group["inviteToken"]>;
-  userId: User["id"];
+  inviteToken: NonNullable<Group["inviteToken"]>
+  userId: User["id"]
 }) {
   return await prisma.group.update({
     where: {
@@ -188,24 +188,24 @@ export async function addUserToGroupWithInviteToken({
     select: {
       id: true,
     },
-  });
+  })
 }
 
 export async function addUserEmailToGroup({
   groupId,
   email,
 }: {
-  groupId: Group["id"];
-  email: Email["email"];
+  groupId: Group["id"]
+  email: Email["email"]
 }) {
   try {
     const user = await prisma.user.findFirst({
       where: {
         email: { email },
       },
-    });
+    })
 
-    if (!user) return { error: "User does not exist" };
+    if (!user) return { error: "User does not exist" }
 
     const group = await prisma.group.update({
       where: {
@@ -222,10 +222,10 @@ export async function addUserEmailToGroup({
           },
         },
       },
-    });
-    return group;
+    })
+    return group
   } catch (err) {
-    return { error: "User does not exist" };
+    return { error: "User does not exist" }
   }
 }
 
@@ -233,8 +233,8 @@ export async function getGroupInviteToken({
   groupId,
   userId,
 }: {
-  groupId: Group["id"];
-  userId: User["id"];
+  groupId: Group["id"]
+  userId: User["id"]
 }) {
   return prisma.group.findFirst({
     where: {
@@ -248,15 +248,15 @@ export async function getGroupInviteToken({
     select: {
       inviteToken: true,
     },
-  });
+  })
 }
 
 export async function createGroupInviteToken({
   groupId,
   userId,
 }: {
-  groupId: Group["id"];
-  userId: User["id"];
+  groupId: Group["id"]
+  userId: User["id"]
 }) {
   return prisma.group.updateMany({
     where: {
@@ -270,15 +270,15 @@ export async function createGroupInviteToken({
     data: {
       inviteToken: nanoid(),
     },
-  });
+  })
 }
 
 export async function deleteGroupInviteToken({
   groupId,
   userId,
 }: {
-  groupId: Group["id"];
-  userId: User["id"];
+  groupId: Group["id"]
+  userId: User["id"]
 }) {
   // TODO only allow this if user is in group?
   return prisma.group.update({
@@ -288,15 +288,15 @@ export async function deleteGroupInviteToken({
     data: {
       inviteToken: null,
     },
-  });
+  })
 }
 
 export async function deleteGroup({
   id,
   requestedByUserId,
 }: {
-  id: Group["id"];
-  requestedByUserId: User["id"];
+  id: Group["id"]
+  requestedByUserId: User["id"]
 }) {
   return prisma.group.deleteMany({
     where: {
@@ -308,46 +308,46 @@ export async function deleteGroup({
         },
       },
     },
-  });
+  })
 }
 
 type StatsType = {
-  averageScore: number;
+  averageScore: number
   bestLocation: {
-    score: number;
-    name: Location["name"];
-    id: Location["id"];
-  };
+    score: number
+    name: Location["name"]
+    id: Location["id"]
+  }
   worstLocation: {
-    score: number;
-    name: Location["name"];
-    id: Location["id"];
-  };
+    score: number
+    name: Location["name"]
+    id: Location["id"]
+  }
   mostPositive: {
-    score: number;
-    name: User["name"];
-    id: User["id"];
-  } | null;
+    score: number
+    name: User["name"]
+    id: User["id"]
+  } | null
   mostNegative: {
-    score: number;
-    name: User["name"];
-    id: User["id"];
-  } | null;
+    score: number
+    name: User["name"]
+    id: User["id"]
+  } | null
   mostAverage: {
-    score: number;
-    name: User["name"];
-    id: User["id"];
-  } | null;
-};
+    score: number
+    name: User["name"]
+    id: User["id"]
+  } | null
+}
 
 // holy reduce
 const generateGroupStats = (
   group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>
 ): StatsType => {
-  const allLunches = group.groupLocations.flatMap((l) => l.lunches);
-  const allScores = allLunches.flatMap((l) => l.scores);
+  const allLunches = group.groupLocations.flatMap((l) => l.lunches)
+  const allScores = allLunches.flatMap((l) => l.scores)
 
-  const averageScore = getAverageNumber(allScores, "score");
+  const averageScore = getAverageNumber(allScores, "score")
 
   const memberStats = group.members
     .filter((member) => member.user.scores.length > 0)
@@ -356,9 +356,9 @@ const generateGroupStats = (
         avg: getAverageNumber(member.user.scores, "score"),
         id: member.userId,
         name: member.user.name,
-      };
+      }
     }, {})
-    .sort((a, b) => b.avg - a.avg);
+    .sort((a, b) => b.avg - a.avg)
 
   const groupStats = group.groupLocations
     .filter((gl) => gl.lunches.length > 0)
@@ -366,29 +366,29 @@ const generateGroupStats = (
       (acc, cur) => {
         const averageLocationScores = cur.lunches.map((lunch) => ({
           avg: getAverageNumber(lunch.scores, "score"),
-        }));
+        }))
 
-        const avg = getAverageNumber(averageLocationScores, "avg");
+        const avg = getAverageNumber(averageLocationScores, "avg")
 
         if (acc.bestLocation.score < avg) {
-          acc.bestLocation.score = avg;
-          acc.bestLocation.name = cur.location.name;
-          acc.bestLocation.id = cur.locationId;
+          acc.bestLocation.score = avg
+          acc.bestLocation.name = cur.location.name
+          acc.bestLocation.id = cur.locationId
         }
 
         if (acc.worstLocation.score > avg) {
-          acc.worstLocation.score = avg;
-          acc.worstLocation.name = cur.location.name;
-          acc.worstLocation.id = cur.locationId;
+          acc.worstLocation.score = avg
+          acc.worstLocation.name = cur.location.name
+          acc.worstLocation.id = cur.locationId
         }
 
-        return acc;
+        return acc
       },
       {
         bestLocation: { score: -1, name: "", id: 0 },
         worstLocation: { score: 11, name: "", id: 0 },
       }
-    );
+    )
 
   const mostPositive = memberStats[0]
     ? {
@@ -396,7 +396,7 @@ const generateGroupStats = (
         name: memberStats[0].name,
         id: memberStats[0].id,
       }
-    : null;
+    : null
 
   const mostNegative = memberStats[memberStats.length - 1]
     ? {
@@ -404,13 +404,13 @@ const generateGroupStats = (
         name: memberStats[memberStats.length - 1].name || "",
         id: memberStats[memberStats.length - 1].id || "",
       }
-    : null;
+    : null
 
   const averages = memberStats
     .slice()
     .sort(
       (a, b) => Math.abs(a.avg - averageScore) - Math.abs(b.avg - averageScore)
-    );
+    )
 
   const mostAverage = averages[0]
     ? {
@@ -418,7 +418,7 @@ const generateGroupStats = (
         name: averages[0].name,
         id: averages[0].id,
       }
-    : null;
+    : null
 
   return {
     ...groupStats,
@@ -426,39 +426,39 @@ const generateGroupStats = (
     mostNegative,
     mostPositive,
     mostAverage,
-  };
-};
+  }
+}
 
 const generateUserStats = (
   member: NonNullable<
     Prisma.PromiseReturnType<typeof fetchGroupDetails>
   >["members"][0]
 ) => {
-  const lunchCount = member.user.scores.length;
-  const choiceCount = member.user.choosenLunches.length;
-  const averageScore = getAverageNumber(member.user.scores, "score");
+  const lunchCount = member.user.scores.length
+  const choiceCount = member.user.choosenLunches.length
+  const averageScore = getAverageNumber(member.user.scores, "score")
   const sortedScores = member.user.scores
     .slice()
-    .sort((a, b) => a.score - b.score);
-  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-";
+    .sort((a, b) => a.score - b.score)
+  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
   const highestScore =
     sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "-";
+    "-"
 
   const bestChoosenLunch = member.user.choosenLunches.reduce<
     typeof member.user.choosenLunches[0] | null
   >((acc, cur) => {
-    if (!acc) return cur;
+    if (!acc) return cur
 
     if (
       getAverageNumber(cur.scores, "score") >
       getAverageNumber(acc.scores, "score")
     ) {
-      return cur;
+      return cur
     }
 
-    return acc;
-  }, null);
+    return acc
+  }, null)
 
   return {
     lunchCount,
@@ -467,5 +467,5 @@ const generateUserStats = (
     lowestScore,
     highestScore,
     bestChoosenLunch,
-  };
-};
+  }
+}

@@ -1,8 +1,8 @@
-import type { Group, Lunch, Score, User } from "@prisma/client";
+import type { Group, Lunch, Score, User } from "@prisma/client"
 
-import { prisma } from "~/db.server";
+import { prisma } from "~/db.server"
 
-export type { Score } from "@prisma/client";
+export type { Score } from "@prisma/client"
 
 export function createScore({
   score,
@@ -10,8 +10,8 @@ export function createScore({
   userId,
   lunchId,
 }: Pick<Score, "score" | "comment"> & {
-  userId: User["id"];
-  lunchId: Lunch["id"];
+  userId: User["id"]
+  lunchId: Lunch["id"]
 }) {
   return prisma.score.create({
     data: {
@@ -28,7 +28,7 @@ export function createScore({
         },
       },
     },
-  });
+  })
 }
 
 export async function createScoreWithNewAnonymousUser({
@@ -38,9 +38,9 @@ export async function createScoreWithNewAnonymousUser({
   lunchId,
   groupId,
 }: Pick<Score, "score" | "comment"> & {
-  newUserName: User["name"];
-  lunchId: Lunch["id"];
-  groupId: Group["id"];
+  newUserName: User["name"]
+  lunchId: Lunch["id"]
+  groupId: Group["id"]
 }) {
   const member = await prisma.groupMember.create({
     data: {
@@ -56,17 +56,17 @@ export async function createScoreWithNewAnonymousUser({
         },
       },
     },
-  });
+  })
 
-  return createScore({ score, comment, lunchId, userId: member.userId });
+  return createScore({ score, comment, lunchId, userId: member.userId })
 }
 
 export async function deleteScore({
   id,
   requestedByUserId,
 }: {
-  id: Lunch["id"];
-  requestedByUserId: User["id"];
+  id: Lunch["id"]
+  requestedByUserId: User["id"]
 }) {
   await prisma.score.deleteMany({
     where: {
@@ -91,5 +91,5 @@ export async function deleteScore({
         },
       ],
     },
-  });
+  })
 }

@@ -1,24 +1,24 @@
-import * as React from "react";
-import styled from "styled-components";
-import type { AriaListBoxOptions } from "@react-aria/listbox";
-import { useListBox, useOption } from "@react-aria/listbox";
-import type { Node } from "@react-types/shared";
-import { CheckIcon } from "@radix-ui/react-icons";
-import type { ListState } from "@react-stately/list";
+import * as React from "react"
+import styled from "styled-components"
+import type { AriaListBoxOptions } from "@react-aria/listbox"
+import { useListBox, useOption } from "@react-aria/listbox"
+import type { Node } from "@react-types/shared"
+import { CheckIcon } from "@radix-ui/react-icons"
+import type { ListState } from "@react-stately/list"
 
 interface ListBoxProps extends AriaListBoxOptions<unknown> {
-  listBoxRef?: React.RefObject<HTMLUListElement>;
-  state: ListState<unknown>;
+  listBoxRef?: React.RefObject<HTMLUListElement>
+  state: ListState<unknown>
 }
 
 interface OptionProps {
-  item: Node<unknown>;
-  state: ListState<unknown>;
+  item: Node<unknown>
+  state: ListState<unknown>
 }
 
 interface ListItemProps {
-  isFocused?: boolean;
-  isSelected?: boolean;
+  isFocused?: boolean
+  isSelected?: boolean
 }
 
 const ListItem = styled.li<ListItemProps>`
@@ -35,17 +35,17 @@ const ListItem = styled.li<ListItemProps>`
   justify-content: space-between;
   cursor: default;
   outline: none;
-`;
+`
 
 const ItemContent = styled.div`
   display: flex;
   align-items: center;
-`;
+`
 
 export function ListBox(props: ListBoxProps) {
-  let ref = React.useRef<HTMLUListElement>(null);
-  let { listBoxRef = ref, state } = props;
-  let { listBoxProps } = useListBox(props, state, listBoxRef);
+  let ref = React.useRef<HTMLUListElement>(null)
+  let { listBoxRef = ref, state } = props
+  let { listBoxProps } = useListBox(props, state, listBoxRef)
 
   return (
     <List {...listBoxProps} ref={listBoxRef}>
@@ -53,7 +53,7 @@ export function ListBox(props: ListBoxProps) {
         <Option key={item.key} item={item} state={state} />
       ))}
     </List>
-  );
+  )
 }
 
 const List = styled.ul`
@@ -63,20 +63,20 @@ const List = styled.ul`
   padding: 0;
   margin: 4px 0;
   outline: none;
-`;
+`
 
 interface OptionContextValue {
-  labelProps: React.HTMLAttributes<HTMLElement>;
-  descriptionProps: React.HTMLAttributes<HTMLElement>;
+  labelProps: React.HTMLAttributes<HTMLElement>
+  descriptionProps: React.HTMLAttributes<HTMLElement>
 }
 
 const OptionContext = React.createContext<OptionContextValue>({
   labelProps: {},
   descriptionProps: {},
-});
+})
 
 function Option({ item, state }: OptionProps) {
-  let ref = React.useRef<HTMLLIElement>(null);
+  let ref = React.useRef<HTMLLIElement>(null)
   let { optionProps, labelProps, descriptionProps, isSelected, isFocused } =
     useOption(
       {
@@ -84,7 +84,7 @@ function Option({ item, state }: OptionProps) {
       },
       state,
       ref
-    );
+    )
 
   return (
     <ListItem
@@ -102,22 +102,20 @@ function Option({ item, state }: OptionProps) {
         <CheckIcon aria-hidden="true" style={{ width: 18, height: 18 }} />
       )}
     </ListItem>
-  );
+  )
 }
 
 export function Label({ children }: { children: React.ReactNode }) {
-  let { labelProps } = React.useContext(OptionContext);
-  return <div {...labelProps}>{children}</div>;
+  let { labelProps } = React.useContext(OptionContext)
+  return <div {...labelProps}>{children}</div>
 }
 
 export function Description({ children }: { children: React.ReactNode }) {
-  let { descriptionProps } = React.useContext(OptionContext);
-  return (
-    <StyledDescription {...descriptionProps}>{children}</StyledDescription>
-  );
+  let { descriptionProps } = React.useContext(OptionContext)
+  return <StyledDescription {...descriptionProps}>{children}</StyledDescription>
 }
 
 const StyledDescription = styled.div`
   font-weight: normal;
   font-size: 12px;
-`;
+`

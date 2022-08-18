@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled from "styled-components"
 
 export default function PrivacyPage() {
   return (
@@ -65,17 +65,17 @@ export default function PrivacyPage() {
         us an email to info@fredagslunchen.club.
       </p>
     </main>
-  );
+  )
 }
 
 const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
-`;
+`
 
 const Subtitle = styled.h3`
   font-size: 36px;
   margin: 0;
   margin-bottom: 16px;
-`;
+`

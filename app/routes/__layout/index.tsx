@@ -1,26 +1,26 @@
-import { json } from "@remix-run/node";
-import type { LoaderArgs } from "@remix-run/node";
-import { Link, useLoaderData } from "@remix-run/react";
-import styled from "styled-components";
-import { LinkButton } from "~/components/Button";
-import { Spacer } from "~/components/Spacer";
-import { getUserId } from "~/session.server";
-import { getFullUserById } from "~/models/user.server";
+import { json } from "@remix-run/node"
+import type { LoaderArgs } from "@remix-run/node"
+import { Link, useLoaderData } from "@remix-run/react"
+import styled from "styled-components"
+import { LinkButton } from "~/components/Button"
+import { Spacer } from "~/components/Spacer"
+import { getUserId } from "~/session.server"
+import { getFullUserById } from "~/models/user.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const userId = await getUserId(request);
+  const userId = await getUserId(request)
 
   const user = userId
     ? await getFullUserById({ id: userId, requestUserId: userId })
-    : null;
+    : null
 
   return json({
     user,
-  });
-};
+  })
+}
 
 export default function Index() {
-  const { user } = useLoaderData<typeof loader>();
+  const { user } = useLoaderData<typeof loader>()
 
   if (!user) {
     return (
@@ -35,10 +35,10 @@ export default function Index() {
         <Spacer size={8} />
         <p style={{ fontWeight: "bold" }}>Enjoy Fredagslunchen.</p>
       </Wrapper>
-    );
+    )
   }
 
-  if (user.groups.length > 0) return null;
+  if (user.groups.length > 0) return null
 
   return (
     <Wrapper>
@@ -55,7 +55,7 @@ export default function Index() {
         Create your first group
       </LinkButton>
     </Wrapper>
-  );
+  )
 }
 
 const Wrapper = styled.div`
@@ -73,9 +73,9 @@ const Wrapper = styled.div`
       text-decoration: underline;
     }
   }
-`;
+`
 
 const Title = styled.h2`
   font-size: 24px;
   margin: 0;
-`;
+`

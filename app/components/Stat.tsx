@@ -1,16 +1,16 @@
-import { Link } from "@remix-run/react";
-import { forwardRef } from "react";
-import styled from "styled-components";
+import { Link } from "@remix-run/react"
+import { forwardRef } from "react"
+import styled from "styled-components"
 
-type StatSize = "small" | "normal";
+type StatSize = "small" | "normal"
 
 type StatProps = {
-  label: string;
-  value: number | string;
-  to?: string;
-  detail?: string;
-  size?: StatSize;
-};
+  label: string
+  value: number | string
+  to?: string
+  detail?: string
+  size?: StatSize
+}
 
 // eslint-disable-next-line react/display-name
 export const Stat = forwardRef<HTMLDivElement, StatProps>(
@@ -29,9 +29,9 @@ export const Stat = forwardRef<HTMLDivElement, StatProps>(
           {detail && <Detail>{detail}</Detail>}
         </div>
       </StatWrapper>
-    );
+    )
   }
-);
+)
 
 const StatWrapper = styled.div<{ size: StatSize }>`
   display: flex;
@@ -42,7 +42,7 @@ const StatWrapper = styled.div<{ size: StatSize }>`
     font-size: ${({ size }) => (size === "normal" ? 14 : 12)}px;
     margin: 0;
   }
-`;
+`
 
 const StatLink = styled(Link)<{ size: StatSize }>`
   font-weight: bold;
@@ -52,7 +52,7 @@ const StatLink = styled(Link)<{ size: StatSize }>`
   &:hover {
     text-decoration: underline;
   }
-`;
+`
 
 const Value = styled.span<{ size: StatSize }>`
   font-weight: bold;
@@ -61,10 +61,10 @@ const Value = styled.span<{ size: StatSize }>`
   max-width: 100%;
   text-overflow: ellipsis;
   overflow: hidden;
-`;
+`
 
 const Detail = styled.span`
   font-size: 12px;
   font-weight: normal;
   margin-left: 4px;
-`;
+`

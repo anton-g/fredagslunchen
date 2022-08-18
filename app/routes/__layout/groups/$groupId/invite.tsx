@@ -1,92 +1,86 @@
-import { CopyIcon, Cross2Icon, UpdateIcon } from "@radix-ui/react-icons";
-import type { ActionFunction, LoaderArgs } from "@remix-run/node";
-import { json, redirect } from "@remix-run/node";
+import { CopyIcon, Cross2Icon, UpdateIcon } from "@radix-ui/react-icons"
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import { json, redirect } from "@remix-run/node"
 import {
   Form,
   useActionData,
   useCatch,
   useFetcher,
   useLoaderData,
-} from "@remix-run/react";
-import * as React from "react";
-import styled from "styled-components";
-import invariant from "tiny-invariant";
-import { Button } from "~/components/Button";
-import { Input } from "~/components/Input";
-import { Stack } from "~/components/Stack";
-import { Tooltip } from "~/components/Tooltip";
-import {
-  addUserEmailToGroup,
-  getGroupInviteToken,
-} from "~/models/group.server";
+} from "@remix-run/react"
+import * as React from "react"
+import styled from "styled-components"
+import invariant from "tiny-invariant"
+import { Button } from "~/components/Button"
+import { Input } from "~/components/Input"
+import { Stack } from "~/components/Stack"
+import { Tooltip } from "~/components/Tooltip"
+import { addUserEmailToGroup, getGroupInviteToken } from "~/models/group.server"
 
-import { requireUserId } from "~/session.server";
+import { requireUserId } from "~/session.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId is required");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId is required")
   const group = await getGroupInviteToken({
     groupId: params.groupId,
     userId,
-  });
+  })
 
-  if (!group) return new Response("Not found", { status: 404 });
+  if (!group) return new Response("Not found", { status: 404 })
 
-  const { origin } = new URL(request.url);
+  const { origin } = new URL(request.url)
 
   return json({
     groupInviteToken: group.inviteToken,
     groupId: params.groupId,
     userId,
     baseUrl: origin,
-  });
-};
+  })
+}
 
 type ActionData = {
   errors?: {
-    email?: string;
-  };
-};
+    email?: string
+  }
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request);
-  const groupId = params.groupId;
-  invariant(groupId, "groupId not found");
+  await requireUserId(request)
+  const groupId = params.groupId
+  invariant(groupId, "groupId not found")
 
-  const formData = await request.formData();
-  const email = formData.get("email");
+  const formData = await request.formData()
+  const email = formData.get("email")
 
   if (typeof email !== "string" || email.length === 0) {
     return json<ActionData>(
       { errors: { email: "Email is required" } },
       { status: 400 }
-    );
+    )
   }
 
-  const group = await addUserEmailToGroup({ groupId, email });
+  const group = await addUserEmailToGroup({ groupId, email })
 
   if ("error" in group) {
-    return json<ActionData>(
-      { errors: { email: group.error } },
-      { status: 400 }
-    );
+    return json<ActionData>({ errors: { email: group.error } }, { status: 400 })
   }
 
-  return redirect(`/groups/${group.id}`);
-};
+  return redirect(`/groups/${group.id}`)
+}
 
 export default function InvitePage() {
-  const fetcher = useFetcher();
+  const fetcher = useFetcher()
   const { groupInviteToken, groupId, userId, baseUrl } =
-    useLoaderData<typeof loader>();
-  const actionData = useActionData() as ActionData;
-  const emailRef = React.useRef<HTMLInputElement>(null);
+    useLoaderData<typeof loader>()
+  const actionData = useActionData() as ActionData
+  const emailRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     if (actionData?.errors?.email) {
-      emailRef.current?.focus();
+      emailRef.current?.focus()
     }
-  }, [actionData]);
+  }, [actionData])
 
   return (
     <>
@@ -170,7 +164,7 @@ export default function InvitePage() {
                     onClick={() => {
                       navigator.clipboard.writeText(
                         `${baseUrl}/join?token=${groupInviteToken}`
-                      );
+                      )
                     }}
                   >
                     <CopyIcon />
@@ -192,26 +186,26 @@ export default function InvitePage() {
         </fetcher.Form>
       )}
     </>
-  );
+  )
 }
 
 const InviteDescription = styled.p`
   margin: 0;
   margin-bottom: 16px;
-`;
+`
 
 export function CatchBoundary() {
-  const caught = useCatch();
+  const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>;
+    return <div>Group not found</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`);
+  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  console.error(error)
 
-  return <div>An unexpected error occurred: {error.message}</div>;
+  return <div>An unexpected error occurred: {error.message}</div>
 }

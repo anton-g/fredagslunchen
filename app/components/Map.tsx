@@ -1,33 +1,33 @@
-import { Link } from "@remix-run/react";
-import { useState } from "react";
-import MapPrimitive, { Layer, Popup, Source } from "react-map-gl";
-import styled from "styled-components";
-import { formatNumber } from "~/utils";
-import { Spacer } from "./Spacer";
-import { Stat } from "./Stat";
+import { Link } from "@remix-run/react"
+import { useState } from "react"
+import MapPrimitive, { Layer, Popup, Source } from "react-map-gl"
+import styled from "styled-components"
+import { formatNumber } from "~/utils"
+import { Spacer } from "./Spacer"
+import { Stat } from "./Stat"
 
 type Location = {
-  id: number;
-  lon: string;
-  lat: string;
-  name: string;
-  address: string;
-  lunchCount: number;
-  averageScore: number;
-  highestScore?: number;
-  lowestScore?: number;
-};
+  id: number
+  lon: string
+  lat: string
+  name: string
+  address: string
+  lunchCount: number
+  averageScore: number
+  highestScore?: number
+  lowestScore?: number
+}
 
 type MapProps = {
-  locations: Location[];
-};
+  locations: Location[]
+}
 
 // TODO make generic with popup as render prop child?
 export const Map = ({ locations }: MapProps) => {
-  const [cursor, setCursor] = useState<"auto" | "pointer">("auto");
+  const [cursor, setCursor] = useState<"auto" | "pointer">("auto")
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
-  );
+  )
 
   const geojson = {
     type: "FeatureCollection" as const,
@@ -48,7 +48,7 @@ export const Map = ({ locations }: MapProps) => {
           : undefined,
       },
     })),
-  };
+  }
 
   return (
     <MapPrimitive
@@ -62,8 +62,8 @@ export const Map = ({ locations }: MapProps) => {
       mapStyle="mapbox://styles/mapbox/light-v10"
       interactiveLayerIds={["places"]}
       onClick={(e) => {
-        if (!e.features?.length) return;
-        setSelectedLocation(e.features[0].properties as Location);
+        if (!e.features?.length) return
+        setSelectedLocation(e.features[0].properties as Location)
       }}
       onMouseEnter={() => setCursor("pointer")}
       onMouseLeave={() => setCursor("auto")}
@@ -106,8 +106,8 @@ export const Map = ({ locations }: MapProps) => {
         </StyledPopup>
       )}
     </MapPrimitive>
-  );
-};
+  )
+}
 
 const StyledPopup = styled(Popup)`
   &.mapboxgl-popup-anchor-top .mapboxgl-popup-tip,
@@ -131,7 +131,7 @@ const StyledPopup = styled(Popup)`
     border: 2px solid black;
     border-radius: 4px;
   }
-`;
+`
 
 const LocationPopupContent = ({ location }: { location: Location }) => {
   return (
@@ -164,17 +164,17 @@ const LocationPopupContent = ({ location }: { location: Location }) => {
         )}
       </Stats>
     </div>
-  );
-};
+  )
+}
 
 const LocationTitle = styled.h4`
   margin: 0;
   font-size: 24px;
-`;
+`
 
 const Stats = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px 24px;
   width: 100%;
-`;
+`

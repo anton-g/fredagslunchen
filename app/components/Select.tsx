@@ -1,16 +1,16 @@
-import type { ReactNode } from "react";
+import type { ReactNode } from "react"
 import {
   CheckIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-} from "@radix-ui/react-icons";
-import * as SelectPrimitive from "@radix-ui/react-select";
-import styled, { css } from "styled-components";
+} from "@radix-ui/react-icons"
+import * as SelectPrimitive from "@radix-ui/react-select"
+import styled, { css } from "styled-components"
 
 type SelectProps = {
-  defaultValue?: string;
-  children: ReactNode;
-};
+  defaultValue?: string
+  children: ReactNode
+}
 
 const Select = ({ defaultValue, children }: SelectProps) => (
   <SelectPrimitive.Root defaultValue={defaultValue}>
@@ -30,7 +30,7 @@ const Select = ({ defaultValue, children }: SelectProps) => (
       </SelectScrollDownButton>
     </SelectContent>
   </SelectPrimitive.Root>
-);
+)
 
 const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
   all: unset;
@@ -46,7 +46,7 @@ const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
   gap: 5px;
   background-color: ${({ theme }) => theme.colors.secondary};
   color: ${({ theme }) => theme.colors.primary};
-`;
+`
 
 const SelectContent = styled(SelectPrimitive.Content)`
   overflow: hidden;
@@ -56,11 +56,11 @@ const SelectContent = styled(SelectPrimitive.Content)`
   border-radius: 6px;
   /* box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2); */
-`;
+`
 
 const SelectViewport = styled(SelectPrimitive.Viewport)`
   padding: 5px;
-`;
+`
 
 const SelectItem = styled(SelectPrimitive.Item)`
   all: unset;
@@ -82,7 +82,7 @@ const SelectItem = styled(SelectPrimitive.Item)`
     background-color: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.secondary};
   }
-`;
+`
 
 const SelectLabel = styled(SelectPrimitive.Label)`
   padding: 0 25px;
@@ -90,13 +90,13 @@ const SelectLabel = styled(SelectPrimitive.Label)`
   line-height: 25px;
   text-decoration: underline;
   color: ${({ theme }) => theme.colors.primary};
-`;
+`
 
 const SelectSeparator = styled(SelectPrimitive.Separator)`
   height: 1px;
   background-color: ${({ theme }) => theme.colors.primary};
   margin: 5px;
-`;
+`
 
 const SelectItemIndicator = styled(SelectPrimitive.ItemIndicator)`
   position: absolute;
@@ -105,7 +105,7 @@ const SelectItemIndicator = styled(SelectPrimitive.ItemIndicator)`
   display: inline-flex;
   align-items: center;
   justify-content: center;
-`;
+`
 
 const scrollButtonStyles = css`
   display: flex;
@@ -115,34 +115,34 @@ const scrollButtonStyles = css`
   background-color: ${({ theme }) => theme.colors.secondary};
   color: ${({ theme }) => theme.colors.primary};
   cursor: default;
-`;
+`
 
 const SelectScrollUpButton = styled(SelectPrimitive.ScrollUpButton)`
   ${scrollButtonStyles}
-`;
+`
 
 const SelectScrollDownButton = styled(SelectPrimitive.ScrollDownButton)`
   ${scrollButtonStyles}
-`;
+`
 
-const SelectValue = SelectPrimitive.Value;
-const SelectIcon = SelectPrimitive.Icon;
-const SelectGroup = SelectPrimitive.Group;
-const SelectItemText = SelectPrimitive.ItemText;
+const SelectValue = SelectPrimitive.Value
+const SelectIcon = SelectPrimitive.Icon
+const SelectGroup = SelectPrimitive.Group
+const SelectItemText = SelectPrimitive.ItemText
 
 const Indicator = () => {
   return (
     <SelectItemIndicator>
       <CheckIcon />
     </SelectItemIndicator>
-  );
-};
+  )
+}
 
-Select.Group = SelectGroup;
-Select.Separator = SelectSeparator;
-Select.Label = SelectLabel;
-Select.Item = SelectItem;
-Select.ItemText = SelectItemText;
-Select.ItemIndicator = Indicator;
+Select.Group = SelectGroup
+Select.Separator = SelectSeparator
+Select.Label = SelectLabel
+Select.Item = SelectItem
+Select.ItemText = SelectItemText
+Select.ItemIndicator = Indicator
 
-export { Select };
+export { Select }

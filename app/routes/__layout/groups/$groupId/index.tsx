@@ -1,63 +1,63 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node";
-import { redirect } from "@remix-run/node";
-import { formatNumber, getAverageNumber } from "~/utils";
-import { json } from "@remix-run/node";
-import { Form, useCatch, useLoaderData } from "@remix-run/react";
-import invariant from "tiny-invariant";
-import type { Group } from "~/models/group.server";
-import { deleteGroup } from "~/models/group.server";
-import { getGroupDetails } from "~/models/group.server";
-import { requireUserId } from "~/session.server";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
-import { Table } from "~/components/Table";
-import { Spacer } from "~/components/Spacer";
-import { Button, LinkButton } from "~/components/Button";
-import { Stat } from "~/components/Stat";
-import { HoverCard } from "~/components/HoverCard";
-import { Map } from "~/components/Map";
-import { Card } from "~/components/Card";
-import { useOnScreen } from "~/hooks/useOnScreen";
-import { useRef, useState } from "react";
-import { getEnv } from "~/env.server";
-import { Dialog } from "~/components/Dialog";
-import { Tooltip } from "~/components/Tooltip";
-import { Cross2Icon } from "@radix-ui/react-icons";
-import { Input } from "~/components/Input";
-import { Stack } from "~/components/Stack";
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import { redirect } from "@remix-run/node"
+import { formatNumber, getAverageNumber } from "~/utils"
+import { json } from "@remix-run/node"
+import { Form, useCatch, useLoaderData } from "@remix-run/react"
+import invariant from "tiny-invariant"
+import type { Group } from "~/models/group.server"
+import { deleteGroup } from "~/models/group.server"
+import { getGroupDetails } from "~/models/group.server"
+import { requireUserId } from "~/session.server"
+import { Link } from "react-router-dom"
+import styled from "styled-components"
+import { Table } from "~/components/Table"
+import { Spacer } from "~/components/Spacer"
+import { Button, LinkButton } from "~/components/Button"
+import { Stat } from "~/components/Stat"
+import { HoverCard } from "~/components/HoverCard"
+import { Map } from "~/components/Map"
+import { Card } from "~/components/Card"
+import { useOnScreen } from "~/hooks/useOnScreen"
+import { useRef, useState } from "react"
+import { getEnv } from "~/env.server"
+import { Dialog } from "~/components/Dialog"
+import { Tooltip } from "~/components/Tooltip"
+import { Cross2Icon } from "@radix-ui/react-icons"
+import { Input } from "~/components/Input"
+import { Stack } from "~/components/Stack"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
 
-  const details = await getGroupDetails({ userId, id: params.groupId });
+  const details = await getGroupDetails({ userId, id: params.groupId })
   if (!details) {
-    throw new Response("Not Found", { status: 404 });
+    throw new Response("Not Found", { status: 404 })
   }
 
   const isAdmin = details.group.members.some(
     (m) => m.userId === userId && m.role === "ADMIN"
-  );
+  )
 
-  return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin });
-};
+  return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin })
+}
 
 export const action: ActionFunction = async ({ request, params }) => {
-  if (request.method !== "DELETE") return null;
+  if (request.method !== "DELETE") return null
 
-  const userId = await requireUserId(request);
-  invariant(params.groupId, "groupId not found");
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
 
   await deleteGroup({
     id: params.groupId,
     requestedByUserId: userId,
-  });
+  })
 
-  return redirect("/groups");
-};
+  return redirect("/groups")
+}
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin } = useLoaderData<typeof loader>();
+  const { details, isMapsEnabled, isAdmin } = useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members
     .slice()
@@ -65,13 +65,13 @@ export default function GroupDetailsPage() {
       (a, b) =>
         b.stats.lunchCount / b.stats.choiceCount -
         a.stats.lunchCount / a.stats.choiceCount
-    );
-  const suggestedPicker = orderedPickers[0];
-  const alternativePickers = orderedPickers.slice(1);
+    )
+  const suggestedPicker = orderedPickers[0]
+  const alternativePickers = orderedPickers.slice(1)
 
   const allLunches = details.group.groupLocations
     .flatMap((loc) => loc.lunches.map((lunch) => ({ loc, ...lunch })))
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
 
   return (
     <div>
@@ -269,47 +269,47 @@ export default function GroupDetailsPage() {
         </>
       )}
     </div>
-  );
+  )
 }
 
 export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error);
+  console.error(error)
 
-  return <div>An unexpected error occurred: {error.message}</div>;
+  return <div>An unexpected error occurred: {error.message}</div>
 }
 
 export function CatchBoundary() {
-  const caught = useCatch();
+  const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>;
+    return <div>Group not found</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`);
+  throw new Error(`Unexpected caught response with status: ${caught.status}`)
 }
 
 const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-`;
+`
 
 const Stats = styled.div`
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
   gap: 24px;
   width: 100%;
-`;
+`
 
 const Subtitle = styled.h3`
   margin: 0;
-`;
+`
 
 const SectionHeader = styled.div`
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-`;
+`
 
 const PickerAlternativesList = styled.ol`
   display: flex;
@@ -322,22 +322,22 @@ const PickerAlternativesList = styled.ol`
   > li {
     font-size: 16px;
   }
-`;
+`
 
 const LazyCard: React.FC = ({ children }) => {
-  const ref = useRef<HTMLDivElement>(null!);
-  const isOnScreen = useOnScreen(ref);
+  const ref = useRef<HTMLDivElement>(null!)
+  const isOnScreen = useOnScreen(ref)
 
-  return <MapCard ref={ref}>{isOnScreen && children}</MapCard>;
-};
+  return <MapCard ref={ref}>{isOnScreen && children}</MapCard>
+}
 
 const MapCard = styled(Card)`
   padding: 0;
   min-height: 400px;
-`;
+`
 
 const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
-  const [confirmNameValue, setConfirmNameValue] = useState("");
+  const [confirmNameValue, setConfirmNameValue] = useState("")
 
   return (
     <Wrapper axis="horizontal" gap={16}>
@@ -384,16 +384,16 @@ const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
         </Dialog.Content>
       </Dialog>
     </Wrapper>
-  );
-};
+  )
+}
 
 const Wrapper = styled(Stack)`
   justify-content: center;
-`;
+`
 
 const DialogDescription = styled(Dialog.Description)`
   > p {
     margin: 0;
     margin-bottom: 16px;
   }
-`;
+`

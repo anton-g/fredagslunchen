@@ -1,24 +1,24 @@
-import type { LoaderArgs } from "@remix-run/node";
-import { json } from "@remix-run/node";
-import { NavLink, useLoaderData } from "@remix-run/react";
-import styled from "styled-components";
-import { SeedAvatar } from "~/components/Avatar";
-import { LinkButton } from "~/components/Button";
-import { Card } from "~/components/Card";
-import { Spacer } from "~/components/Spacer";
+import type { LoaderArgs } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import { NavLink, useLoaderData } from "@remix-run/react"
+import styled from "styled-components"
+import { SeedAvatar } from "~/components/Avatar"
+import { LinkButton } from "~/components/Button"
+import { Card } from "~/components/Card"
+import { Spacer } from "~/components/Spacer"
 
-import { getUserGroups } from "~/models/group.server";
-import { requireUserId } from "~/session.server";
-import { formatTimeAgo } from "~/utils";
+import { getUserGroups } from "~/models/group.server"
+import { requireUserId } from "~/session.server"
+import { formatTimeAgo } from "~/utils"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  const userId = await requireUserId(request);
-  const groups = await getUserGroups({ userId });
-  return json({ groups });
-};
+  const userId = await requireUserId(request)
+  const groups = await getUserGroups({ userId })
+  return json({ groups })
+}
 
 export default function GroupsPage() {
-  const data = useLoaderData<typeof loader>();
+  const data = useLoaderData<typeof loader>()
 
   return (
     <main>
@@ -67,7 +67,7 @@ export default function GroupsPage() {
       <Spacer size={48} />
       <NewGroupLink to="new">+ New group</NewGroupLink>
     </main>
-  );
+  )
 }
 
 const GroupList = styled.ul`
@@ -77,13 +77,13 @@ const GroupList = styled.ul`
   display: flex;
   flex-direction: column;
   gap: 24px;
-`;
+`
 
 const GroupTitle = styled.h2`
   margin: 0;
   font-size: 36px;
-`;
+`
 
 const NewGroupLink = styled(LinkButton)`
   margin-left: auto;
-`;
+`

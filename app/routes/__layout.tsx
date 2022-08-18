@@ -1,10 +1,10 @@
-import { Form, Link, Outlet } from "@remix-run/react";
-import styled from "styled-components";
+import { Form, Link, Outlet } from "@remix-run/react"
+import styled from "styled-components"
 
-import { useOptionalUser } from "~/utils";
+import { useOptionalUser } from "~/utils"
 
 export default function Index() {
-  const user = useOptionalUser();
+  const user = useOptionalUser()
 
   return (
     <Wrapper>
@@ -35,7 +35,7 @@ export default function Index() {
         <Outlet />
       </Content>
     </Wrapper>
-  );
+  )
 }
 
 const Wrapper = styled.div`
@@ -43,13 +43,13 @@ const Wrapper = styled.div`
   flex-direction: column;
   align-items: center;
   margin-top: 24px;
-`;
+`
 
 const Header = styled.header`
   display: flex;
   flex-direction: column;
   align-items: center;
-`;
+`
 
 const Logo = styled.h1`
   margin-bottom: 28px;
@@ -60,18 +60,18 @@ const Logo = styled.h1`
     padding: 8px 48px;
     text-decoration: none;
   }
-`;
+`
 
 const NavBar = styled.nav`
   display: flex;
   gap: 16px;
-`;
+`
 
 const StyledForm = styled(Form)`
   position: absolute;
   right: 24px;
   top: 16px;
-`;
+`
 
 const LinkButton = styled.button`
   background: none;
@@ -80,7 +80,7 @@ const LinkButton = styled.button`
   text-decoration: underline;
   cursor: pointer;
   font-size: 16px;
-`;
+`
 
 const Content = styled.main`
   margin-top: 48px;
@@ -88,7 +88,7 @@ const Content = styled.main`
   width: 100%;
   margin-bottom: 124px;
   padding: 0 16px;
-`;
+`
 
 const StyledLink = styled(Link)`
   background-color: ${({ theme }) => theme.colors.primary};
@@ -100,4 +100,4 @@ const StyledLink = styled(Link)`
   &:nth-child(even) {
     transform: rotateZ(-2deg);
   }
-`;
+`
