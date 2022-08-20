@@ -8,9 +8,7 @@ const handlers = [
     const body = req.body
     console.info("🔶 mocked email contents:", body.personalizations[0])
 
-    console.log({ isE2E, f: body.from })
     if (isE2E && body.from) {
-      console.log("running e2e")
       await updateFixture({ email: body })
     }
 

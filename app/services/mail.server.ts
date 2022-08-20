@@ -11,6 +11,7 @@ export async function sendPasswordResetEmail(
     console.log(
       `Missing Sendgrid API Key. Ignoring password reset email: ${email} - ${token}`
     )
+    return
   }
 
   const msg = {
