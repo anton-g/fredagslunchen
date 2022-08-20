@@ -181,6 +181,7 @@ describe("smoke tests", () => {
   })
 
   // TODO test with new location
+  /*
   it("should allow you to create and delete lunch and score", () => {
     const testGroup = {
       name: faker.lorem.words(2),
@@ -231,4 +232,5 @@ describe("smoke tests", () => {
 
     cy.cleanupGroup({ name: testGroup.name })
   })
+  */
 })
