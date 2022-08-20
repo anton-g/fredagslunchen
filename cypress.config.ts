@@ -2,6 +2,7 @@ import { defineConfig } from "cypress"
 
 export default defineConfig({
   e2e: {
+    numTestsKeptInMemory: 1, // Try to keep down memory usage to see if GH Actions work better.
     setupNodeEvents: (on, config) => {
       const isDev = config.watchForFileChanges
       const port = process.env.PORT ?? (isDev ? "3000" : "8811")
