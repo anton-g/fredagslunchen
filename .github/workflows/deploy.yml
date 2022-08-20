@@ -121,7 +121,7 @@ jobs:
           CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SENDGRID_API_KEY: "SG.test"
-          DEBUG: "cypress*"
+          DEBUG: "cypress:server:util:process_profiler"
 
   build:
     name: 🐳 Build
