@@ -1,6 +1,6 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { redirect } from "@remix-run/node"
-import { formatNumber, getAverageNumber } from "~/utils"
+import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
 import { Form, useCatch, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
@@ -214,7 +214,7 @@ export default function GroupDetailsPage() {
             <tr key={lunch.id}>
               <Table.Cell>
                 <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
-                  {new Date(lunch.date).toLocaleDateString()}
+                  {formatTimeAgo(new Date(lunch.date))}
                 </Link>
               </Table.Cell>
               <Table.Cell>
