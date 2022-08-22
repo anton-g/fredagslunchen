@@ -71,8 +71,23 @@ export async function createGroupLocation({
   })
 }
 
-export function getAllLocations() {
-  return prisma.location.findMany({})
+export function getAllLocationsForGroup({ groupId }: { groupId: Group["id"] }) {
+  return prisma.location.findMany({
+    where: {
+      AND: [
+        {
+          global: true,
+        },
+        {
+          groupLocation: {
+            none: {
+              groupId: groupId,
+            },
+          },
+        },
+      ],
+    },
+  })
 }
 
 export async function getAllLocationsStats() {
