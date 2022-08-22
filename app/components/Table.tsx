@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import styled from "styled-components"
 import { Card } from "./Card"
 
+// TODO: Add body, row etc to component
 const Table = ({ children }: { children: ReactNode }) => {
   return (
     <Wrapper>

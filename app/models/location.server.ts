@@ -90,6 +90,22 @@ export function getAllLocationsForGroup({ groupId }: { groupId: Group["id"] }) {
   })
 }
 
+export function getAllLocations() {
+  return prisma.location.findMany({
+    include: {
+      groupLocation: {
+        include: {
+          lunches: {
+            include: {
+              _count: true,
+            },
+          },
+        },
+      },
+    },
+  })
+}
+
 export async function getAllLocationsStats() {
   const locations = await prisma.location.findMany({
     include: {
