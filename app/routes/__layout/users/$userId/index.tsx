@@ -10,6 +10,7 @@ import { requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
 import { SeedAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
+import { StatsGrid } from "~/components/StatsGrid"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -36,7 +37,7 @@ export default function Index() {
           <Title>{isYou ? "You" : user.name}</Title>
         </TitleRow>
         <Spacer size={24} />
-        <Stats>
+        <StatsGrid>
           <Stat label="Number of lunches" value={user.stats.lunchCount} />
           <Stat
             label="Average score"
@@ -50,7 +51,7 @@ export default function Index() {
           />
           <Stat label="Lowest score" value={user.stats.lowestScore} />
           <Stat label="Highest score" value={user.stats.highestScore} />
-        </Stats>
+        </StatsGrid>
       </Section>
       <Spacer size={64} />
       {user.scores.length > 0 && (
@@ -138,13 +139,6 @@ const Subtitle = styled.h3`
   margin: 0;
   font-size: 36px;
   margin-bottom: 16px;
-`
-
-const Stats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
-  gap: 24px 48px;
-  width: 100%;
 `
 
 const Section = styled.div``

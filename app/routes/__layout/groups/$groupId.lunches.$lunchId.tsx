@@ -27,6 +27,7 @@ import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import { Tooltip } from "~/components/Tooltip"
 import { Dialog } from "~/components/Dialog"
+import { StatsGrid } from "~/components/StatsGrid"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -94,7 +95,7 @@ export default function LunchDetailsPage() {
         </Link>
       </Title>
       <Spacer size={24} />
-      <Stats>
+      <StatsGrid>
         <Stat label="Average score" value={averageScore} />
         <Stat label="Highest score" value={highestScore || "-"} />
         <Stat label="Lowest score" value={lowestScore || "-"} />
@@ -103,7 +104,7 @@ export default function LunchDetailsPage() {
           value={groupLunch.choosenBy.name}
           to={`/users/${groupLunch.choosenByUserId}`}
         />
-      </Stats>
+      </StatsGrid>
       <Spacer size={24} />
       {scores.length > 0 && (
         <>
@@ -201,13 +202,6 @@ const Title = styled.h2`
   a:hover {
     text-decoration: underline;
   }
-`
-
-const Stats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
-  gap: 24px;
-  width: 100%;
 `
 
 const Subtitle = styled.h3`

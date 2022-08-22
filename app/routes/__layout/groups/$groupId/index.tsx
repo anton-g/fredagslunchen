@@ -25,6 +25,7 @@ import { Tooltip } from "~/components/Tooltip"
 import { Cross2Icon } from "@radix-ui/react-icons"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
+import { StatsGrid } from "~/components/StatsGrid"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -75,7 +76,7 @@ export default function GroupDetailsPage() {
 
   return (
     <div>
-      <Stats>
+      <StatsGrid>
         <Stat label="Average score" value={details.stats.averageScore} />
         <Stat
           label="Best location"
@@ -128,7 +129,7 @@ export default function GroupDetailsPage() {
               : undefined
           }
         />
-      </Stats>
+      </StatsGrid>
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
@@ -168,7 +169,7 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <Subtitle>Suggestions</Subtitle>
       <Spacer size={8} />
-      <Stats>
+      <StatsGrid>
         <HoverCard>
           <HoverCard.Trigger>
             <Stat label="Location picker" value={suggestedPicker.user.name} />
@@ -185,7 +186,7 @@ export default function GroupDetailsPage() {
             </HoverCard.Content>
           )}
         </HoverCard>
-      </Stats>
+      </StatsGrid>
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
@@ -292,13 +293,6 @@ const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 16px;
-`
-
-const Stats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(auto, 175px));
-  gap: 24px;
-  width: 100%;
 `
 
 const Subtitle = styled.h3`
