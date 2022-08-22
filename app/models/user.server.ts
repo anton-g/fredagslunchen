@@ -90,6 +90,32 @@ export async function getFullUserById({
   }
 }
 
+export async function getAllUsers() {
+  return prisma.user.findMany({
+    include: {
+      email: {
+        select: {
+          email: true,
+        },
+      },
+      groups: {
+        include: {
+          group: {
+            select: {
+              _count: true,
+            },
+          },
+        },
+      },
+      scores: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+}
+
 export async function getUserById(id: User["id"]) {
   return prisma.user.findUnique({ where: { id } })
 }

@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { Outlet } from "@remix-run/react"
+import { Link, Outlet } from "@remix-run/react"
 import { requireUserId } from "~/session.server"
 import { checkIsAdmin } from "~/models/user.server"
 import styled from "styled-components"
@@ -21,7 +21,9 @@ export const loader = async ({ request }: LoaderArgs) => {
 export default function AdminPage() {
   return (
     <div>
-      <Title>Admin</Title>
+      <Title>
+        <Link to="/admin">Admin</Link>
+      </Title>
       <Stack axis="horizontal" gap={16}>
         <NavLink to="/admin/users">users</NavLink>
         <NavLink to="/admin/groups">groups</NavLink>
