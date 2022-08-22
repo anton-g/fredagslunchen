@@ -378,6 +378,17 @@ export async function changeUserPassword({
   })
 }
 
+export async function checkIsAdmin(userId: User["id"]) {
+  const user = await prisma.user.findFirst({
+    where: {
+      role: "ADMIN",
+      id: userId,
+    },
+  })
+
+  return Boolean(user)
+}
+
 // TODO stats generation duplicated in group.server.ts
 function generateUserStats(
   user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>

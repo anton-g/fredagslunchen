@@ -1,4 +1,4 @@
-import { Link as RemixLink } from "@remix-run/react"
+import { Link as RemixLink, NavLink as RemixNavLink } from "@remix-run/react"
 import styled, { css } from "styled-components"
 
 type ButtonVariant = "normal" | "round" | "large"
@@ -82,4 +82,16 @@ LinkButton.defaultProps = {
   variant: "normal",
 }
 
-export { Button, LinkButton }
+const NavLink = styled(RemixNavLink)`
+  background-color: ${({ theme }) => theme.colors.primary};
+  color: ${({ theme }) => theme.colors.secondary};
+  padding: 2px 4px;
+
+  transform: rotateZ(2deg);
+
+  &:nth-child(even) {
+    transform: rotateZ(-2deg);
+  }
+`
+
+export { Button, LinkButton, NavLink }
