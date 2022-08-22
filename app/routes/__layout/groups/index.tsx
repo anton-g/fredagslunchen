@@ -38,10 +38,13 @@ export default function GroupsPage() {
                       style={{
                         display: "flex",
                         justifyContent: "space-between",
+                        flexWrap: "wrap",
                       }}
                     >
                       <GroupTitle>{group.name}</GroupTitle>
-                      <div style={{ display: "flex", gap: 8 }}>
+                      <div
+                        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                      >
                         {group.members.map((m) => (
                           <SeedAvatar
                             key={m.userId}
@@ -51,6 +54,7 @@ export default function GroupsPage() {
                         ))}
                       </div>
                     </div>
+                    <Spacer size={8} />
                     {group.groupLocations.reduce(
                       (total, gl) => total + gl._count.lunches,
                       0
