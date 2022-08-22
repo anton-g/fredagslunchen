@@ -34,6 +34,9 @@ export default function Index() {
       <Content>
         <Outlet />
       </Content>
+      <Footer>
+        <Link to="/about">about</Link>
+      </Footer>
     </Wrapper>
   )
 }
@@ -42,7 +45,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 24px;
+  padding-top: 24px;
+  min-height: 100%;
 `
 
 const Header = styled.header`
@@ -86,7 +90,7 @@ const Content = styled.main`
   margin-top: 48px;
   max-width: 670px;
   width: 100%;
-  margin-bottom: 124px;
+  margin-bottom: 108px;
   padding: 0 16px;
 `
 
@@ -99,5 +103,13 @@ const StyledLink = styled(Link)`
 
   &:nth-child(even) {
     transform: rotateZ(-2deg);
+  }
+`
+
+const Footer = styled.footer`
+  margin-top: auto;
+  margin-bottom: 16px;
+  > a {
+    text-decoration: underline;
   }
 `

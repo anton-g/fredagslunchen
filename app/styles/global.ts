@@ -7,6 +7,7 @@ export default createGlobalStyle`
     margin: 0;
     font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
       Helvetica Neue, sans-serif;
+    min-height: 100%;
     height: 100%;
     background: ${({ theme }) => theme.colors.secondary};
     color: ${({ theme }) => theme.colors.primary};
