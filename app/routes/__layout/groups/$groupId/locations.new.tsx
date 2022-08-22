@@ -1,6 +1,11 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useSearchParams,
+} from "@remix-run/react"
 import { useEffect, useRef } from "react"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
@@ -14,7 +19,7 @@ import {
   getAllLocationsForGroup,
 } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
-import { useUser } from "~/utils"
+import { safeRedirect, useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -124,13 +129,20 @@ export const action: ActionFunction = async ({ request, params }) => {
     global: false,
   })
 
-  return redirect(`/groups/${groupId}/locations/${location.locationId}`)
+  const redirectTo = safeRedirect(
+    formData.get("redirectTo") + `?loc=${location.locationId}`,
+    `/groups/${groupId}/locations/${location.locationId}`
+  )
+
+  return redirect(redirectTo)
 }
 
 export default function NewLocationPage() {
   const user = useUser()
   const actionData = useActionData() as ActionData
   const loaderData = useLoaderData<typeof loader>()
+  const [searchParams] = useSearchParams()
+  const redirectTo = searchParams.get("redirectTo") ?? undefined
   const nameRef = useRef<HTMLInputElement>(null!)
   const addressRef = useRef<HTMLInputElement>(null)
   const zipCodeRef = useRef<HTMLInputElement>(null)
@@ -327,6 +339,7 @@ export default function NewLocationPage() {
             )}
           </div>
 
+          <input type="hidden" name="redirectTo" value={redirectTo} />
           <div>
             <Button style={{ marginLeft: "auto" }} type="submit">
               Save

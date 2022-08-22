@@ -1,9 +1,14 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import {
+  Form,
+  useActionData,
+  useLoaderData,
+  useLocation,
+} from "@remix-run/react"
 import { useEffect, useRef } from "react"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, LinkButton } from "~/components/Button"
 import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
@@ -81,6 +86,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function NewLunchPage() {
+  const location = useLocation()
   const user = useUser()
   const actionData = useActionData() as ActionData
   const { group, preSelectedLocationId } = useLoaderData<typeof loader>()
@@ -190,11 +196,16 @@ export default function NewLunchPage() {
             )}
           </div>
 
-          <div>
+          <Stack gap={16} axis="horizontal">
+            <LinkButton
+              to={`/groups/${group.id}/locations/new?redirectTo=${location.pathname}`}
+            >
+              New location
+            </LinkButton>
             <Button style={{ marginLeft: "auto" }} type="submit">
               Save
             </Button>
-          </div>
+          </Stack>
         </Stack>
       </Form>
     </>
