@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 import styled from "styled-components"
 import { Card } from "./Card"
 
+// TODO: Add body, row etc to component
 const Table = ({ children }: { children: ReactNode }) => {
   return (
     <Wrapper>
@@ -13,6 +14,7 @@ const Table = ({ children }: { children: ReactNode }) => {
 const Wrapper = styled(Card)`
   width: 100%;
   overflow-x: scroll;
+  padding: 16px 12px;
 `
 
 const Root = styled.table`

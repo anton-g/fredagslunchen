@@ -1,9 +1,23 @@
-import { Form, Link, Outlet } from "@remix-run/react"
+import type { LoaderArgs } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import { Form, Link, Outlet, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
+import { NavLink } from "~/components/Button"
+import { checkIsAdmin } from "~/models/user.server"
+import { getUserId } from "~/session.server"
 
 import { useOptionalUser } from "~/utils"
 
+export const loader = async ({ request }: LoaderArgs) => {
+  const userId = await getUserId(request)
+
+  const isAdmin = userId ? await checkIsAdmin(userId) : false
+
+  return json({ isAdmin })
+}
+
 export default function Index() {
+  const { isAdmin } = useLoaderData<typeof loader>()
   const user = useOptionalUser()
 
   return (
@@ -15,9 +29,10 @@ export default function Index() {
         <NavBar>
           {user ? (
             <>
-              <StyledLink to={`/users/${user.id}`}>you</StyledLink>
-              <StyledLink to={"/groups"}>groups</StyledLink>
-              {/* <StyledLink to={"/discover"}>discover</StyledLink> */}
+              <NavLink to={`/users/${user.id}`}>you</NavLink>
+              <NavLink to={"/groups"}>groups</NavLink>
+              {isAdmin && <NavLink to={"/admin"}>admin</NavLink>}
+              {/* <NavLink to={"/discover"}>discover</NavLink> */}
               <StyledForm action="/logout" method="post">
                 {/* TODO logout on mobile*/}
                 <LinkButton type="submit">logout</LinkButton>
@@ -25,8 +40,8 @@ export default function Index() {
             </>
           ) : (
             <>
-              <StyledLink to={"/join"}>join</StyledLink>
-              <StyledLink to={"/login"}>login</StyledLink>
+              <NavLink to={"/join"}>join</NavLink>
+              <NavLink to={"/login"}>login</NavLink>
             </>
           )}
         </NavBar>
@@ -34,6 +49,9 @@ export default function Index() {
       <Content>
         <Outlet />
       </Content>
+      <Footer>
+        <Link to="/about">about</Link>
+      </Footer>
     </Wrapper>
   )
 }
@@ -42,7 +60,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 24px;
+  padding-top: 24px;
+  min-height: 100%;
 `
 
 const Header = styled.header`
@@ -86,18 +105,14 @@ const Content = styled.main`
   margin-top: 48px;
   max-width: 670px;
   width: 100%;
-  margin-bottom: 124px;
+  margin-bottom: 108px;
   padding: 0 16px;
 `
 
-const StyledLink = styled(Link)`
-  background-color: ${({ theme }) => theme.colors.primary};
-  color: ${({ theme }) => theme.colors.secondary};
-  padding: 2px 4px;
-
-  transform: rotateZ(2deg);
-
-  &:nth-child(even) {
-    transform: rotateZ(-2deg);
+const Footer = styled.footer`
+  margin-top: auto;
+  margin-bottom: 16px;
+  > a {
+    text-decoration: underline;
   }
 `

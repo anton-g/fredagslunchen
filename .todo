@@ -1,30 +1,37 @@
 - Create location from New lunch page
-- Write tests
-  - New lunch from location
-  - Invite user with email
-  - Invite user with link
-  - Creating anonymous user
-  - Claiming anonymous user
 - Edit user
-  - Reset password
-- Remove group member
-  - Require group admin
-- Delete group location
-  - Require group admin?
-- Delete user
-- About/help page
+  - Name
+  - Password
+  - Email
+- Mobile CSS
 - Admin page
   - See all locations
   - Merge locations (ie Sandhäxan and Sandhaxan)
   - See all groups
   - Number of users, number of lunches, number of scores
   - See all users
-- Discover page
-  - Top locations
+  - Approve locations
+- Feedback
+- Email verification
+
+- Write tests
+  - New lunch from location
+  - Invite user with email
+  - Invite user with link
+  - Creating anonymous user
+  - Claiming anonymous user
+- Remove group member
+  - Require group admin
+- Delete group location
+  - Require group admin?
+- Delete user
 - Check security of all models
-- Database backups
-  - Litestream?
-  - Cron? https://litestream.io/alternatives/cron/
 - Group settings
   - Location (lng, lat)
   - Group admins
+- Request score
+- Database backups
+  - Litestream?
+  - Cron? https://litestream.io/alternatives/cron/
+- Discover page
+  - Top locations

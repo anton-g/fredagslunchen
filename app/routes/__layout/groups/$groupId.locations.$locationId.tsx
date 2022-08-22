@@ -10,6 +10,7 @@ import { Table } from "~/components/Table"
 import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
+import { formatNumber } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await requireUserId(request)
@@ -58,8 +59,10 @@ export default function LocationDetailsPage() {
                 </Link>
               </Table.Cell>
               <Table.Cell numeric>
-                {lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                  lunch.scores.length}
+                {formatNumber(
+                  lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
+                    lunch.scores.length
+                )}
               </Table.Cell>
             </tr>
           ))}

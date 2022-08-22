@@ -12,7 +12,6 @@ type StatProps = {
   size?: StatSize
 }
 
-// eslint-disable-next-line react/display-name
 export const Stat = forwardRef<HTMLDivElement, StatProps>(
   ({ label, value, to, detail, size = "normal" }, ref) => {
     return (
@@ -32,6 +31,8 @@ export const Stat = forwardRef<HTMLDivElement, StatProps>(
     )
   }
 )
+
+Stat.displayName = "Stat"
 
 const StatWrapper = styled.div<{ size: StatSize }>`
   display: flex;

@@ -90,6 +90,32 @@ export async function getFullUserById({
   }
 }
 
+export async function getAllUsers() {
+  return prisma.user.findMany({
+    include: {
+      email: {
+        select: {
+          email: true,
+        },
+      },
+      groups: {
+        include: {
+          group: {
+            select: {
+              _count: true,
+            },
+          },
+        },
+      },
+      scores: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+}
+
 export async function getUserById(id: User["id"]) {
   return prisma.user.findUnique({ where: { id } })
 }
@@ -376,6 +402,17 @@ export async function changeUserPassword({
       },
     },
   })
+}
+
+export async function checkIsAdmin(userId: User["id"]) {
+  const user = await prisma.user.findFirst({
+    where: {
+      role: "ADMIN",
+      id: userId,
+    },
+  })
+
+  return Boolean(user)
 }
 
 // TODO stats generation duplicated in group.server.ts

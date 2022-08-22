@@ -138,6 +138,27 @@ export function getUserGroups({ userId }: { userId: User["id"] }) {
   })
 }
 
+export function getAllGroups() {
+  return prisma.group.findMany({
+    include: {
+      groupLocations: {
+        include: {
+          lunches: {
+            select: {
+              _count: {
+                select: {
+                  scores: true,
+                },
+              },
+            },
+          },
+        },
+      },
+      members: true,
+    },
+  })
+}
+
 export function createGroup({
   name,
   userId,

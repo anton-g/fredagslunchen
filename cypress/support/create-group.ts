@@ -26,6 +26,7 @@ async function createGroupCommand(name: string, userId: string) {
     zipCode: faker.address.zipCode(),
     lat: faker.address.latitude(),
     lon: faker.address.longitude(),
+    global: false,
   })
   await createLunch({
     date: faker.date.recent().toISOString(),

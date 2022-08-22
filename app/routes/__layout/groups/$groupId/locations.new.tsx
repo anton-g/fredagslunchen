@@ -9,7 +9,10 @@ import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { getGroup } from "~/models/group.server"
 
-import { createGroupLocation, getAllLocations } from "~/models/location.server"
+import {
+  createGroupLocation,
+  getAllLocationsForGroup,
+} from "~/models/location.server"
 import { requireUserId } from "~/session.server"
 import { useUser } from "~/utils"
 
@@ -22,7 +25,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const locations = await getAllLocations()
+  const locations = await getAllLocationsForGroup({ groupId: params.groupId })
 
   return json({ group, locations })
 }
@@ -118,6 +121,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     zipCode,
     discoveredById,
     locationId: parsedId,
+    global: false,
   })
 
   return redirect(`/groups/${groupId}/locations/${location.locationId}`)
@@ -162,6 +166,17 @@ export default function NewLocationPage() {
     name: x.user.name,
   }))
 
+  const handleLocationSelect = (key: any) => {
+    const selectedLocation = locations.find((x) => x.id === key)
+    if (!selectedLocation) return
+
+    addressRef.current!.value = selectedLocation.address
+    zipCodeRef.current!.value = selectedLocation.zipCode
+    cityRef.current!.value = selectedLocation.city
+    latRef.current!.value = selectedLocation.lat
+    lonRef.current!.value = selectedLocation.lon
+  }
+
   return (
     <>
       <h3>New location</h3>
@@ -184,6 +199,7 @@ export default function NewLocationPage() {
               inputRef={nameRef}
               allowsCustomValue={true}
               menuTrigger="focus"
+              onSelectionChange={handleLocationSelect}
             >
               {(item) => (
                 <Item textValue={item.name}>

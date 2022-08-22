@@ -98,6 +98,7 @@ async function seed() {
       address: "Gästrikegatan 13",
       city: "Stockholm",
       zipCode: "11123",
+      global: true,
     },
   })
 
