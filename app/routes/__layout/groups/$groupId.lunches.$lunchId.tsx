@@ -28,6 +28,7 @@ import { Button } from "~/components/Button"
 import { Tooltip } from "~/components/Tooltip"
 import { Dialog } from "~/components/Dialog"
 import { StatsGrid } from "~/components/StatsGrid"
+import { Help } from "~/components/Help"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -366,7 +367,20 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
       </Stack>
       <Stack axis="horizontal" gap={16}>
         {isFromNewAnonymousUser && (
-          <div>You're creating a new anonymous user.</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            You're creating a new anonymous user.
+            <Help>
+              <p>
+                Anonymous users are users without an account. Use these for
+                people that haven't yet created their account or the occational
+                guest that you don't really want in your group.
+              </p>
+              <p>
+                You can transfer the anonymous users data to their account
+                later.
+              </p>
+            </Help>
+          </div>
         )}
         <Button>Save score</Button>
       </Stack>
