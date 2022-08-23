@@ -99,6 +99,7 @@ const LinkButton = styled.button`
   text-decoration: underline;
   cursor: pointer;
   font-size: 16px;
+  color: ${({ theme }) => theme.colors.primary};
 `
 
 const Content = styled.main`

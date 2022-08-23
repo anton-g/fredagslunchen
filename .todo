@@ -1,10 +1,14 @@
+- Request score
 - Feedback
-- Admin page
-  - Merge locations (ie Sandhäxan and Sandhaxan)
 - Edit user
   - Name
   - Password
   - Email
+- Group settings
+  - Location (lng, lat)
+  - Group admins
+- Admin page
+  - Merge locations (ie Sandhäxan and Sandhaxan)
 - Write tests
   - New lunch from location
   - Invite user with email
@@ -15,10 +19,6 @@
   - Require group admin
 - Delete group location
   - Require group admin?
-- Group settings
-  - Location (lng, lat)
-  - Group admins
-- Request score
 - Delete user
 - Check security of all models
 - Database backups
@@ -26,3 +26,7 @@
   - Cron? https://litestream.io/alternatives/cron/
 - Discover page
   - Top locations
+- Premium / Supporter?
+  - Select color schemes
+  - Select avatar
+  - Discover?
