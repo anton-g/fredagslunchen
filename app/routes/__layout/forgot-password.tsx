@@ -1,11 +1,11 @@
+import { useEffect, useRef } from "react"
 import type {
   ActionFunction,
   LoaderFunction,
   MetaFunction,
 } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData } from "@remix-run/react"
-import * as React from "react"
+import { Form, useActionData, useTransition } from "@remix-run/react"
 
 import { getUserId } from "~/session.server"
 import { createResetPasswordToken } from "~/models/user.server"
@@ -55,9 +55,10 @@ export const meta: MetaFunction = () => {
 
 export default function ForgotPasswordPage() {
   const actionData = useActionData() as ActionData
-  const emailRef = React.useRef<HTMLInputElement>(null)
+  const emailRef = useRef<HTMLInputElement>(null)
+  const transition = useTransition()
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (actionData?.errors?.email) {
       emailRef.current?.focus()
     }
@@ -93,7 +94,9 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
             </div>
-            <SubmitButton type="submit">Reset password</SubmitButton>
+            <SubmitButton type="submit" disabled={transition.state !== "idle"}>
+              Reset password
+            </SubmitButton>
           </Stack>
         </Form>
       )}
