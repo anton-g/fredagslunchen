@@ -8,9 +8,12 @@ generator client {
 }
 
 model Email {
-  id    Int    @id @default(autoincrement())
-  email String @unique
-  user  User[]
+  id                      Int       @id @default(autoincrement())
+  email                   String    @unique
+  user                    User[]
+  verified                Boolean   @default(false)
+  verificationToken       String?   @unique
+  verificationRequestTime DateTime?
 }
 
 model User {

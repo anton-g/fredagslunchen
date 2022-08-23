@@ -1,5 +1,6 @@
 import type { Email, Group, Password, Prisma, User } from "@prisma/client"
 import bcrypt from "bcryptjs"
+import isAfter from "date-fns/isAfter"
 import sub from "date-fns/sub"
 import { nanoid } from "nanoid"
 
@@ -12,6 +13,11 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
     where: { id },
     include: {
+      email: {
+        select: {
+          verified: true,
+        },
+      },
       groups: {
         include: {
           group: {
@@ -137,12 +143,22 @@ export async function createUser(
       email: {
         create: {
           email,
+          verificationRequestTime: new Date(),
+          verificationToken: nanoid(),
         },
       },
       name,
       password: {
         create: {
           hash: hashedPassword,
+        },
+      },
+    },
+    include: {
+      email: {
+        select: {
+          verificationToken: true,
+          email: true,
         },
       },
     },
@@ -402,6 +418,66 @@ export async function changeUserPassword({
       },
     },
   })
+}
+
+export async function createEmailVerificationToken({ id }: { id: User["id"] }) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      email: true,
+    },
+  })
+
+  if (!user?.email || user.email.verified) return null
+
+  if (
+    user?.email?.verificationRequestTime &&
+    isAfter(user.email.verificationRequestTime, sub(new Date(), { hours: 1 }))
+  ) {
+    return null
+  }
+
+  const token = nanoid()
+
+  await prisma.email.update({
+    where: {
+      id: user?.email?.id,
+    },
+    data: {
+      verificationRequestTime: new Date(),
+      verificationToken: token,
+    },
+  })
+
+  return { token, email: user.email.email }
+}
+
+export async function verifyUserEmail({
+  token,
+}: {
+  token: NonNullable<Email["verificationToken"]>
+}) {
+  const email = await prisma.email.update({
+    where: {
+      verificationToken: token,
+    },
+    data: {
+      verificationRequestTime: null,
+      verificationToken: null,
+      verified: true,
+    },
+    include: {
+      user: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+
+  return email.user[0].id
 }
 
 export async function checkIsAdmin(userId: User["id"]) {

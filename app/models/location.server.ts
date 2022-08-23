@@ -5,6 +5,14 @@ import { getAverageNumber } from "~/utils"
 
 export type { Location } from "@prisma/client"
 
+export function getLocation({ id }: { id: Location["id"] }) {
+  return prisma.location.findUnique({
+    where: {
+      id,
+    },
+  })
+}
+
 export function getGroupLocation({
   id,
   groupId,
@@ -146,4 +154,15 @@ export async function getAllLocationsStats() {
   })
 
   return locationsWithStats
+}
+
+export async function updateLocation(update: Location) {
+  return prisma.location.update({
+    where: {
+      id: update.id,
+    },
+    data: {
+      ...update,
+    },
+  })
 }

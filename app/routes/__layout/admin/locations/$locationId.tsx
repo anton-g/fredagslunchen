@@ -1,38 +1,24 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
-import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useSearchParams,
-} from "@remix-run/react"
+import { redirect } from "@remix-run/node"
+import { json } from "@remix-run/node"
+import { Form, useActionData, useLoaderData } from "@remix-run/react"
 import { useEffect, useRef } from "react"
+import styled from "styled-components"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
-import { ComboBox, Item, Label } from "~/components/ComboBox"
+import { Checkbox } from "~/components/Checkbox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
-import { getGroup } from "~/models/group.server"
-
-import {
-  createGroupLocation,
-  getAllLocationsForGroup,
-} from "~/models/location.server"
+import { getLocation, updateLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
-import { safeRedirect, useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
-  invariant(params.groupId, "groupId not found")
+  await requireUserId(request)
+  invariant(params.locationId, "locationId not found")
 
-  const group = await getGroup({ userId, id: params.groupId })
-  if (!group) {
-    throw new Response("Not Found", { status: 404 })
-  }
+  const location = await getLocation({ id: parseInt(params.locationId) })
 
-  const locations = await getAllLocationsForGroup({ groupId: params.groupId })
-
-  return json({ group, locations })
+  return json({ location })
 }
 
 type ActionData = {
@@ -41,7 +27,6 @@ type ActionData = {
     address?: string
     lat?: string
     lon?: string
-    discoveredBy?: string
     city?: string
     zipCode?: string
   }
@@ -49,18 +34,16 @@ type ActionData = {
 
 export const action: ActionFunction = async ({ request, params }) => {
   await requireUserId(request)
+  invariant(params.locationId, "locationId not found")
 
   const formData = await request.formData()
-  const locationId = formData.get("location-key")
-  const name = formData.get("location")
+  const name = formData.get("name")
   const address = formData.get("address")
   const zipCode = formData.get("zipCode")
   const city = formData.get("city")
   const lat = formData.get("lat")
   const lon = formData.get("lon")
-  const discoveredById = formData.get("discoveredBy-key")
-  const groupId = params.groupId
-  invariant(groupId, "groupId not found")
+  const global = formData.get("global")
 
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
@@ -104,52 +87,31 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  if (typeof discoveredById !== "string" || discoveredById.length === 0) {
-    return json<ActionData>(
-      { errors: { discoveredBy: "Discovered by is required" } },
-      { status: 400 }
-    )
-  }
+  const parsedId = parseInt(params.locationId)
 
-  const parsedId =
-    locationId && typeof locationId === "string"
-      ? parseInt(locationId)
-      : undefined
-
-  const location = await createGroupLocation({
-    groupId,
+  await updateLocation({
+    id: parsedId,
     name,
     address,
     lat,
     lon,
     city,
     zipCode,
-    discoveredById,
-    locationId: parsedId,
-    global: false,
+    global: global === "on",
   })
 
-  const redirectTo = safeRedirect(
-    formData.get("redirectTo") + `?loc=${location.locationId}`,
-    `/groups/${groupId}/locations/${location.locationId}`
-  )
-
-  return redirect(redirectTo)
+  return redirect(`/admin/locations/`)
 }
 
-export default function NewLocationPage() {
-  const user = useUser()
+export default function AdminLocationDetailsPage() {
+  const { location } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
-  const loaderData = useLoaderData<typeof loader>()
-  const [searchParams] = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? undefined
   const nameRef = useRef<HTMLInputElement>(null!)
   const addressRef = useRef<HTMLInputElement>(null)
   const zipCodeRef = useRef<HTMLInputElement>(null)
   const cityRef = useRef<HTMLInputElement>(null)
   const latRef = useRef<HTMLInputElement>(null)
   const lonRef = useRef<HTMLInputElement>(null)
-  const discoveredByRef = useRef<HTMLInputElement>(null!)
 
   useEffect(() => {
     if (actionData?.errors?.name) {
@@ -164,34 +126,14 @@ export default function NewLocationPage() {
       latRef.current?.focus()
     } else if (actionData?.errors?.lon) {
       lonRef.current?.focus()
-    } else if (actionData?.errors?.discoveredBy) {
-      discoveredByRef.current?.focus()
     }
   }, [actionData])
 
-  const locations = loaderData.locations.filter(
-    (l) => !loaderData.group.groupLocations.find((gl) => gl.locationId === l.id)
-  )
-
-  const members = loaderData.group.members.map((x) => ({
-    id: x.userId,
-    name: x.user.name,
-  }))
-
-  const handleLocationSelect = (key: any) => {
-    const selectedLocation = locations.find((x) => x.id === key)
-    if (!selectedLocation) return
-
-    addressRef.current!.value = selectedLocation.address
-    zipCodeRef.current!.value = selectedLocation.zipCode
-    cityRef.current!.value = selectedLocation.city
-    latRef.current!.value = selectedLocation.lat
-    lonRef.current!.value = selectedLocation.lon
-  }
+  if (!location) return null
 
   return (
-    <>
-      <h3>New location</h3>
+    <div>
+      <Title>{location.name}</Title>
       <Form
         method="post"
         style={{
@@ -203,24 +145,18 @@ export default function NewLocationPage() {
       >
         <Stack gap={16}>
           <div>
-            <ComboBox
-              label="Name"
-              name="location"
-              defaultItems={locations}
-              defaultSelectedKey={user.id}
-              inputRef={nameRef}
-              allowsCustomValue={true}
-              menuTrigger="focus"
-              onSelectionChange={handleLocationSelect}
-            >
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
+            <label>
+              <span>Name</span>
+              <Input
+                ref={nameRef}
+                name="name"
+                defaultValue={location.name}
+                aria-invalid={actionData?.errors?.address ? true : undefined}
+                aria-errormessage={
+                  actionData?.errors?.address ? "address-error" : undefined
+                }
+              />
+            </label>
             {actionData?.errors?.name && (
               <div id="name-error">{actionData.errors.name}</div>
             )}
@@ -232,6 +168,7 @@ export default function NewLocationPage() {
               <Input
                 ref={addressRef}
                 name="address"
+                defaultValue={location.address}
                 aria-invalid={actionData?.errors?.address ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.address ? "address-error" : undefined
@@ -250,6 +187,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={zipCodeRef}
                   name="zipCode"
+                  defaultValue={location.zipCode}
                   aria-invalid={actionData?.errors?.zipCode ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.zipCode ? "zip-code-error" : undefined
@@ -267,6 +205,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={cityRef}
                   name="city"
+                  defaultValue={location.city}
                   aria-invalid={actionData?.errors?.city ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.city ? "city-error" : undefined
@@ -286,6 +225,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={latRef}
                   name="lat"
+                  defaultValue={location.lat}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lat ? "lat-error" : undefined
@@ -303,6 +243,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
+                  defaultValue={location.lon}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lon ? "lon-error" : undefined
@@ -316,30 +257,19 @@ export default function NewLocationPage() {
           </Stack>
 
           <div>
-            <ComboBox
-              label="Discovered by"
-              name="discoveredBy"
-              defaultItems={members}
-              defaultSelectedKey={user.id}
-              inputRef={discoveredByRef}
-              menuTrigger="focus"
-            >
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
-            {actionData?.errors?.discoveredBy && (
-              <div id="discoveredBy-error">
-                {actionData.errors.discoveredBy}
-              </div>
+            <Stack gap={8} axis="horizontal">
+              <Checkbox
+                id="global"
+                name="global"
+                defaultChecked={location.global}
+              />
+              <label htmlFor="global">Global</label>
+            </Stack>
+            {actionData?.errors?.address && (
+              <div id="address-error">{actionData.errors.address}</div>
             )}
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
           <div>
             <Button style={{ marginLeft: "auto" }} type="submit">
               Save
@@ -347,6 +277,12 @@ export default function NewLocationPage() {
           </div>
         </Stack>
       </Form>
-    </>
+    </div>
   )
 }
+
+const Title = styled.h4`
+  font-size: 36px;
+  margin: 0;
+  margin-bottom: 24px;
+`

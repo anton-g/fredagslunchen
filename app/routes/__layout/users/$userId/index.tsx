@@ -1,16 +1,22 @@
-import type { LoaderArgs } from "@remix-run/server-runtime"
+import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
 import { formatNumber, formatTimeAgo } from "~/utils"
-import { useLoaderData, Link } from "@remix-run/react"
+import { useLoaderData, Link, Form, useActionData } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
-import { getFullUserById } from "~/models/user.server"
+import {
+  createEmailVerificationToken,
+  getFullUserById,
+} from "~/models/user.server"
 import { requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
 import { SeedAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
 import { StatsGrid } from "~/components/StatsGrid"
+import { Button } from "~/components/Button"
+import { Stack } from "~/components/Stack"
+import { sendEmailVerificationEmail } from "~/services/mail.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -26,8 +32,27 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ user, isYou: userId === params.userId })
 }
 
+interface ActionData {
+  ok: boolean
+}
+
+export const action: ActionFunction = async ({ request }) => {
+  const userId = await requireUserId(request)
+
+  console.log("action")
+
+  const result = await createEmailVerificationToken({ id: userId })
+  console.log(result)
+  if (!result) return json<ActionData>({ ok: false })
+
+  await sendEmailVerificationEmail(result.email, result.token)
+
+  return json<ActionData>({ ok: true })
+}
+
 export default function Index() {
   const { user, isYou } = useLoaderData<typeof loader>()
+  const actionData = useActionData() as ActionData
 
   return (
     <Wrapper>
@@ -36,6 +61,17 @@ export default function Index() {
           <SeedAvatar seed={user.id} />
           <Title>{isYou ? "You" : user.name}</Title>
         </TitleRow>
+        {isYou && !user.email?.verified && (
+          <>
+            <Spacer size={24} />
+            <Form method="post">
+              <Stack gap={8} axis="horizontal">
+                <Button>Verify your email</Button>
+                {actionData?.ok && <span>Check your email (and spam)</span>}
+              </Stack>
+            </Form>
+          </>
+        )}
         <Spacer size={24} />
         <StatsGrid>
           <Stat label="Number of lunches" value={user.stats.lunchCount} />

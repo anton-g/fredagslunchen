@@ -1,19 +1,12 @@
-- Create location from New lunch page
+- Feedback
+- Admin page
+  - Merge locations (ie Sandhäxan and Sandhaxan)
+- Add help tooltips to unclear interactions
+  - Anonymous users
 - Edit user
   - Name
   - Password
   - Email
-- Mobile CSS
-- Admin page
-  - See all locations
-  - Merge locations (ie Sandhäxan and Sandhaxan)
-  - See all groups
-  - Number of users, number of lunches, number of scores
-  - See all users
-  - Approve locations
-- Feedback
-- Email verification
-
 - Write tests
   - New lunch from location
   - Invite user with email
@@ -24,12 +17,12 @@
   - Require group admin
 - Delete group location
   - Require group admin?
-- Delete user
-- Check security of all models
 - Group settings
   - Location (lng, lat)
   - Group admins
 - Request score
+- Delete user
+- Check security of all models
 - Database backups
   - Litestream?
   - Cron? https://litestream.io/alternatives/cron/
