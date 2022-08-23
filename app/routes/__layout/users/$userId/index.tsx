@@ -63,7 +63,7 @@ export default function Index() {
             <Spacer size={24} />
             <Form method="post">
               <Stack gap={8} axis="horizontal">
-                <Button>Verify your email</Button>
+                <Button disabled={actionData?.ok}>Verify your email</Button>
                 {actionData?.ok && <span>Check your email (and spam)</span>}
               </Stack>
             </Form>
