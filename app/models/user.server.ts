@@ -98,6 +98,11 @@ export async function getFullUserById({
 
 export async function getAllUsers() {
   return prisma.user.findMany({
+    where: {
+      role: {
+        not: "ANONYMOUS",
+      },
+    },
     include: {
       email: {
         select: {
@@ -113,6 +118,21 @@ export async function getAllUsers() {
           },
         },
       },
+      scores: {
+        select: {
+          id: true,
+        },
+      },
+    },
+  })
+}
+
+export async function getAllAnonymousUsers() {
+  return prisma.user.findMany({
+    where: {
+      role: "ANONYMOUS",
+    },
+    include: {
       scores: {
         select: {
           id: true,

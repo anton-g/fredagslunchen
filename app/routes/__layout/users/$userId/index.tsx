@@ -39,10 +39,7 @@ interface ActionData {
 export const action: ActionFunction = async ({ request }) => {
   const userId = await requireUserId(request)
 
-  console.log("action")
-
   const result = await createEmailVerificationToken({ id: userId })
-  console.log(result)
   if (!result) return json<ActionData>({ ok: false })
 
   await sendEmailVerificationEmail(result.email, result.token)

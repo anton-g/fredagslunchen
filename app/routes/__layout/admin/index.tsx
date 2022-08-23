@@ -1,12 +1,8 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { Link, Outlet, useLoaderData } from "@remix-run/react"
+import { useLoaderData } from "@remix-run/react"
 import { requireUserId } from "~/session.server"
-import { checkIsAdmin } from "~/models/user.server"
 import styled from "styled-components"
-import { Stack } from "~/components/Stack"
-import { NavLink } from "~/components/Button"
-import { Spacer } from "~/components/Spacer"
 import { getAdminStats } from "~/models/admin.server"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Stat } from "~/components/Stat"
@@ -26,6 +22,7 @@ export default function AdminPage() {
     <>
       <Title>Stats</Title>
       <StatsGrid>
+        <Stat label="Users" value={stats.userCount} />
         <Stat label="Groups" value={stats.groupCount} />
         <Stat label="Lunches" value={stats.lunchCount} />
         <Stat label="Scores" value={stats.scoreCount} />

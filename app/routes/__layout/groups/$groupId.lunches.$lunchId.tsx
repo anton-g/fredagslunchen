@@ -55,11 +55,10 @@ export const action: ActionFunction = async ({ request, params }) => {
   invariant(params.lunchId, "lunchId not found")
   invariant(params.groupId, "groupId not found")
 
-  const del = await deleteLunch({
+  await deleteLunch({
     id: parseInt(params.lunchId),
     requestedByUserId: userId,
   })
-  console.log(del)
 
   return redirect(`/groups/${params.groupId}`)
 }
