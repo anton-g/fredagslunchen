@@ -9,6 +9,7 @@ import {
   Scripts,
   ScrollRestoration,
   useLoaderData,
+  useLocation,
 } from "@remix-run/react"
 import GlobalStyle from "./styles/global"
 
@@ -16,6 +17,45 @@ import { getUser } from "./session.server"
 import { ThemeProvider } from "styled-components"
 import { theme } from "./styles/theme"
 import { getEnv } from "./env.server"
+import { useEffect, useRef } from "react"
+import { getDomainUrl, removeTrailingSlash } from "./utils"
+
+declare global {
+  interface Window {
+    fathom:
+      | {
+          trackPageview(): void
+        }
+      | undefined
+  }
+}
+
+type FathomQueue = Array<{ command: "trackPageview" }>
+
+function CanonicalLink({
+  origin,
+  fathomQueue,
+}: {
+  origin: string
+  fathomQueue: React.MutableRefObject<FathomQueue>
+}) {
+  const { pathname } = useLocation()
+  const canonicalUrl = removeTrailingSlash(`${origin}${pathname}`)
+
+  useEffect(() => {
+    if (window.fathom) {
+      window.fathom.trackPageview()
+    } else {
+      // Fathom hasn't finished loading yet! queue the command
+      fathomQueue.current.push({ command: "trackPageview" })
+    }
+    // Fathom looks uses the canonical URL to track visits, so we're using it
+    // as a dependency even though we're not using it explicitly
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [canonicalUrl])
+
+  return <link rel="canonical" href={canonicalUrl} />
+}
 
 export const links: LinksFunction = () => {
   return [
@@ -47,17 +87,26 @@ export const loader = async ({ request }: LoaderArgs) => {
   return json({
     user: await getUser(request),
     ENV: getEnv(),
+    requestInfo: {
+      origin: getDomainUrl(request),
+    },
   })
 }
 
 export default function App() {
   const data = useLoaderData<typeof loader>()
 
+  const fathomQueue = useRef<FathomQueue>([])
+
   return (
     <html lang="en">
       <head>
         <Meta />
         <Links />
+        <CanonicalLink
+          origin={data.requestInfo.origin}
+          fathomQueue={fathomQueue}
+        />
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
@@ -66,6 +115,27 @@ export default function App() {
           <GlobalStyle />
         </ThemeProvider>
         <ScrollRestoration />
+        {ENV.NODE_ENV === "development" ? null : (
+          <script
+            src="https://cdn.usefathom.com/script.js"
+            data-site={ENV.FATHOM_SITE_ID}
+            data-spa="history"
+            data-auto="false" // prevent tracking visit twice on initial page load
+            data-excluded-domains="localhost"
+            defer
+            onLoad={() => {
+              fathomQueue.current.forEach(({ command }) => {
+                if (window.fathom) {
+                  window.fathom[command]()
+                } else {
+                  // Fathom isn't available even though the script has loaded
+                  // this should never happen!
+                }
+              })
+              fathomQueue.current = []
+            }}
+          />
+        )}
         <Scripts />
         <script
           dangerouslySetInnerHTML={{
