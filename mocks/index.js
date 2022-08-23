@@ -1,4 +1,5 @@
 // TODO move to TS, see example at https://github.com/kentcdodds/kentcdodds.com/blob/main/mocks/index.js
+const util = require("util")
 const { rest } = require("msw")
 const { setupServer } = require("msw/node")
 const { isE2E, updateFixture } = require("./utils")
@@ -6,7 +7,10 @@ const { isE2E, updateFixture } = require("./utils")
 const handlers = [
   rest.post("https://api.sendgrid.com/v3/mail/send", async (req, res, ctx) => {
     const body = req.body
-    console.info("🔶 mocked email contents:", body.personalizations[0])
+    console.info(
+      "🔶 mocked email contents:",
+      util.inspect(body, false, null, true)
+    )
 
     if (isE2E && body.from) {
       await updateFixture({ email: body })
