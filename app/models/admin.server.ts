@@ -1,6 +1,12 @@
 import { prisma } from "~/db.server"
 
 export async function getAdminStats() {
+  const users = await prisma.user.aggregate({
+    _count: {
+      _all: true,
+    },
+  })
+
   const groups = await prisma.group.aggregate({
     _count: {
       _all: true,
@@ -32,6 +38,7 @@ export async function getAdminStats() {
   })
 
   return {
+    userCount: users._count._all,
     locationCount: locations._count._all,
     groupLocationCount: groupLocations._count._all,
     groupCount: groups._count._all,

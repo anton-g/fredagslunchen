@@ -2,20 +2,22 @@ import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
+import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
-import { getAllUsers } from "~/models/user.server"
+import { getAllAnonymousUsers, getAllUsers } from "~/models/user.server"
 import { requireUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
 
   const users = await getAllUsers()
+  const anonymousUsers = await getAllAnonymousUsers()
 
-  return json({ users })
+  return json({ users, anonymousUsers })
 }
 
 export default function AdminUsersPage() {
-  const { users } = useLoaderData<typeof loader>()
+  const { users, anonymousUsers } = useLoaderData<typeof loader>()
 
   return (
     <div>
@@ -25,8 +27,8 @@ export default function AdminUsersPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading>Email</Table.Heading>
-            <Table.Heading>Groups</Table.Heading>
-            <Table.Heading>Scores</Table.Heading>
+            <Table.Heading numeric>Groups</Table.Heading>
+            <Table.Heading numeric>Scores</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -35,6 +37,24 @@ export default function AdminUsersPage() {
               <Table.Cell>{user.name}</Table.Cell>
               <Table.Cell>{user.email?.email}</Table.Cell>
               <Table.Cell numeric>{user.groups.length}</Table.Cell>
+              <Table.Cell numeric>{user.scores.length}</Table.Cell>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Spacer size={24} />
+      <Title>Anonymous users</Title>
+      <Table>
+        <Table.Head>
+          <tr>
+            <Table.Heading>Name</Table.Heading>
+            <Table.Heading numeric>Scores</Table.Heading>
+          </tr>
+        </Table.Head>
+        <tbody>
+          {anonymousUsers.map((user) => (
+            <tr key={user.id}>
+              <Table.Cell>{user.name}</Table.Cell>
               <Table.Cell numeric>{user.scores.length}</Table.Cell>
             </tr>
           ))}

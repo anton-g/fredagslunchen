@@ -1,4 +1,11 @@
+import type { MetaFunction } from "@remix-run/node"
 import styled from "styled-components"
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "About Fredagslunchen",
+  }
+}
 
 export default function AboutPage() {
   return (

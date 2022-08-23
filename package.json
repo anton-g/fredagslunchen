@@ -54,7 +54,6 @@
     "@types/mapbox-gl": "^2.7.3",
     "bcryptjs": "^2.4.3",
     "date-fns": "^2.29.1",
-    "fathom-client": "^3.5.0",
     "mapbox-gl": "^2.9.2",
     "nanoid": "^3.3.4",
     "react": "^17.0.2",
