@@ -1,4 +1,11 @@
+import type { MetaFunction } from "@remix-run/node"
 import styled from "styled-components"
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "Privacy Policy",
+  }
+}
 
 export default function PrivacyPage() {
   return (

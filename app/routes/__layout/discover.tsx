@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -16,6 +16,12 @@ export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
   const locations = await getAllLocationsStats()
   return json({ locations, isMapsEnabled: getEnv().ENABLE_MAPS })
+}
+
+export const meta: MetaFunction = () => {
+  return {
+    title: "Discover",
+  }
 }
 
 export default function DiscoverPage() {
