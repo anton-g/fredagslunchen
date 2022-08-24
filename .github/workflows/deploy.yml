@@ -80,6 +80,7 @@ jobs:
         run: npm run test -- --coverage
 
   cypress:
+    if: ${{ false }} # disable for now
     name: ⚫️ Cypress
     runs-on: ubuntu-latest
     steps:
