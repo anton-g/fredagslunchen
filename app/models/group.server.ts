@@ -222,7 +222,7 @@ export async function addUserEmailToGroup({
   try {
     const user = await prisma.user.findFirst({
       where: {
-        email: { email },
+        email: { email: email.toLowerCase().trim() },
       },
     })
 
