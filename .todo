@@ -1,4 +1,5 @@
 - Investigate issue with map ENV
+- Fix Email not being deleted when User is deleted
 - Help component on mobile
 - Add form constraints where applicable
 - Edit user
@@ -9,6 +10,7 @@
   - Group admins
   - Remove group member
 - Leave group
+- News (changelog) (MDX?)
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
 - Better error boundaries

@@ -84,7 +84,7 @@ export default function InvitePage() {
 
   return (
     <>
-      <h3>Add existing user to group</h3>
+      {/* <h3>Add existing user to group</h3>
       <Form
         method="post"
         style={{
@@ -119,7 +119,7 @@ export default function InvitePage() {
             </Button>
           </div>
         </Stack>
-      </Form>
+      </Form> */}
       <h3 style={{ marginBottom: 0 }}>Invite with link</h3>
       {groupInviteToken ? (
         <>
@@ -145,7 +145,7 @@ export default function InvitePage() {
                   <Tooltip.Content>Remove invite link</Tooltip.Content>
                 </Tooltip>
               </fetcher.Form>
-              <fetcher.Form method="post" action="/groups/api/invite-token">
+              {/* <fetcher.Form method="post" action="/groups/api/invite-token">
                 <input type="hidden" name="groupId" value={groupId} />
                 <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
@@ -156,7 +156,7 @@ export default function InvitePage() {
                   </Tooltip.Trigger>
                   <Tooltip.Content>Refresh invite link</Tooltip.Content>
                 </Tooltip>
-              </fetcher.Form>
+              </fetcher.Form> */}
               <Tooltip>
                 <Tooltip.Trigger asChild>
                   <Button
