@@ -1,4 +1,5 @@
 - Request score
+- Invite link bug for logged in user
 - Help component on mobile
 - Add form constraints where applicable
 - Edit user
@@ -11,6 +12,7 @@
 - Leave group
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
+- Better error boundaries
 - Feedback
 - Demo group
 - Write tests
