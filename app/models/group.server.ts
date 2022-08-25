@@ -191,6 +191,25 @@ export async function addUserToGroupWithInviteToken({
   inviteToken: NonNullable<Group["inviteToken"]>
   userId: User["id"]
 }) {
+  const group = await prisma.group.findFirst({
+    where: {
+      inviteToken: inviteToken,
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (group) {
+    // User is already in the group
+    return group
+  }
+
   return await prisma.group.update({
     where: {
       inviteToken: inviteToken,
