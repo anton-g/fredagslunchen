@@ -2,7 +2,7 @@ import type { User, Group, Prisma, Location, Email } from "@prisma/client"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
-import { formatNumber, getAverageNumber } from "~/utils"
+import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
 
 export type { Group } from "@prisma/client"
 
@@ -222,7 +222,7 @@ export async function addUserEmailToGroup({
   try {
     const user = await prisma.user.findFirst({
       where: {
-        email: { email: email.toLowerCase().trim() },
+        email: { email: cleanEmail(email) },
       },
     })
 

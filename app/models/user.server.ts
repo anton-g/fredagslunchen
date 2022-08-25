@@ -5,7 +5,7 @@ import sub from "date-fns/sub"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
-import { getAverageNumber } from "~/utils"
+import { cleanEmail, getAverageNumber } from "~/utils"
 
 export type { User } from "@prisma/client"
 
@@ -147,8 +147,8 @@ export async function getUserById(id: User["id"]) {
 }
 
 export async function getUserByEmail(email: Email["email"]) {
-  return prisma.user.findFirst({
-    where: { email: { email: email.toLowerCase().trim() } },
+  return await prisma.user.findFirst({
+    where: { email: { email: cleanEmail(email) } },
   })
 }
 
@@ -164,7 +164,7 @@ export async function createUser(
     data: {
       email: {
         create: {
-          email: email.toLowerCase().trim(),
+          email: cleanEmail(email),
           verificationRequestTime: new Date(),
           verificationToken: nanoid(),
         },
