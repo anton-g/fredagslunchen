@@ -147,7 +147,9 @@ export async function getUserById(id: User["id"]) {
 }
 
 export async function getUserByEmail(email: Email["email"]) {
-  return prisma.user.findFirst({ where: { email: { email } } })
+  return prisma.user.findFirst({
+    where: { email: { email: email.toLowerCase().trim() } },
+  })
 }
 
 export async function createUser(
@@ -162,7 +164,7 @@ export async function createUser(
     data: {
       email: {
         create: {
-          email,
+          email: email.toLowerCase().trim(),
           verificationRequestTime: new Date(),
           verificationToken: nanoid(),
         },
