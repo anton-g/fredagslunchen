@@ -1,10 +1,10 @@
-import type { Group, Lunch, Score, User } from "@prisma/client"
+import type { Group, Lunch, Score, ScoreRequest, User } from "@prisma/client"
 
 import { prisma } from "~/db.server"
 
 export type { Score } from "@prisma/client"
 
-export function createScore({
+export async function createScore({
   score,
   comment,
   userId,
@@ -13,7 +13,7 @@ export function createScore({
   userId: User["id"]
   lunchId: Lunch["id"]
 }) {
-  return prisma.score.create({
+  const result = await prisma.score.create({
     data: {
       score,
       comment,
@@ -29,6 +29,15 @@ export function createScore({
       },
     },
   })
+
+  await prisma.scoreRequest.deleteMany({
+    where: {
+      lunchId,
+      userId,
+    },
+  })
+
+  return result
 }
 
 export async function createScoreWithNewAnonymousUser({
@@ -65,7 +74,7 @@ export async function deleteScore({
   id,
   requestedByUserId,
 }: {
-  id: Lunch["id"]
+  id: Score["id"]
   requestedByUserId: User["id"]
 }) {
   await prisma.score.deleteMany({
@@ -90,6 +99,43 @@ export async function deleteScore({
           },
         },
       ],
+    },
+  })
+}
+
+export async function createScoreRequest({
+  id,
+  requestedById,
+  lunchId,
+}: {
+  id: User["id"]
+  requestedById: User["id"]
+  lunchId: Lunch["id"]
+}) {
+  const user = await prisma.user.findUnique({
+    where: {
+      id,
+    },
+  })
+  if (user?.role === "ANONYMOUS") {
+    return {
+      error: "Can't request from anonymous user",
+    }
+  }
+
+  return await prisma.scoreRequest.create({
+    data: {
+      lunchId,
+      userId: id,
+      requestedByUserId: requestedById,
+    },
+  })
+}
+
+export async function deleteScoreRequest({ id }: { id: ScoreRequest["id"] }) {
+  await prisma.scoreRequest.delete({
+    where: {
+      id,
     },
   })
 }

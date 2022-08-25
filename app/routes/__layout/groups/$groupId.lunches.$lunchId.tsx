@@ -1,7 +1,7 @@
-import type { ReactNode } from "react"
+import type { MouseEventHandler, ReactNode } from "react"
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import type { Group, Lunch, Score, User } from "@prisma/client"
+import type { Group, Lunch, Score, ScoreRequest, User } from "@prisma/client"
 import { json, redirect } from "@remix-run/node"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import {
@@ -78,8 +78,14 @@ export default function LunchDetailsPage() {
   const averageScore =
     scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-"
 
-  const usersWithoutScores = groupLunch.groupLocation.group.members
+  const usersWithoutScoresOrRequests = groupLunch.groupLocation.group.members
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
+    .filter(
+      (x) =>
+        !groupLunch.scoreRequests.find(
+          (r) => r.userId !== userId && r.userId === x.userId
+        )
+    )
     .map((x) => x.user)
 
   return (
@@ -107,7 +113,7 @@ export default function LunchDetailsPage() {
         />
       </StatsGrid>
       <Spacer size={24} />
-      {scores.length > 0 && (
+      {(scores.length > 0 || groupLunch.scoreRequests.length > 0) && (
         <>
           <Subtitle>Scores</Subtitle>
           <Spacer size={16} />
@@ -149,19 +155,36 @@ export default function LunchDetailsPage() {
                   </Table.Cell>
                 </ScoreRow>
               ))}
+              {groupLunch.scoreRequests.map((request) => (
+                <ScoreRow key={request.userId}>
+                  <Table.Cell>
+                    <Link to={`/users/${request.userId}`}>
+                      {request.user.name}
+                    </Link>
+                  </Table.Cell>
+                  <Table.Cell numeric>Requested</Table.Cell>
+                  <Table.Cell></Table.Cell>
+                  <Table.Cell
+                    style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
+                  >
+                    <ScoreRequestDeleteAction requestId={request.id} />
+                  </Table.Cell>
+                </ScoreRow>
+              ))}
             </tbody>
           </Table>
         </>
       )}
       <Spacer size={24} />
-      {usersWithoutScores.length > 0 && (
+      {usersWithoutScoresOrRequests.length > 0 && (
         <>
           <Subtitle>New score</Subtitle>
           <Spacer size={8} />
           <NewScoreForm
-            users={usersWithoutScores}
+            users={usersWithoutScoresOrRequests}
             lunchId={groupLunch.id}
             groupId={groupLunch.groupLocationGroupId}
+            userId={userId}
           />
         </>
       )}
@@ -243,6 +266,23 @@ const ScoreDeleteAction = ({
   )
 }
 
+const ScoreRequestDeleteAction = ({
+  requestId,
+}: {
+  requestId: ScoreRequest["id"]
+}) => {
+  const fetcher = useFetcher()
+
+  return (
+    <fetcher.Form method="post" action="/scores/request/delete">
+      <input type="hidden" name="requestId" value={requestId} />
+      <DeleteButton aria-label="Delete request for score">
+        <Cross2Icon></Cross2Icon>
+      </DeleteButton>
+    </fetcher.Form>
+  )
+}
+
 const DeleteButton = styled.button`
   all: unset;
   border: 2px solid transparent;
@@ -271,10 +311,17 @@ type NewScoreFormProps = {
   users: RecursivelyConvertDatesToStrings<User>[]
   lunchId: Lunch["id"]
   groupId: Group["id"]
+  userId: User["id"]
 }
 
-const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
-  const fetcher = useFetcher()
+const NewScoreForm = ({
+  users,
+  lunchId,
+  groupId,
+  userId,
+}: NewScoreFormProps) => {
+  const scoreFetcher = useFetcher()
+  const requestFetcher = useFetcher()
   const [selectedFrom, setSelectedFrom] = useState<string | null>(null)
   const [fromInputValue, setFromInputValue] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -282,25 +329,45 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
   const scoreRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (fetcher.type === "done" && fetcher.data.ok) {
+    if (scoreFetcher.type === "done" && scoreFetcher.data.ok) {
       formRef.current?.reset()
     }
 
-    const errors = fetcher.data?.errors
+    const errors = scoreFetcher.data?.errors
     if (errors?.user) {
       userRef.current?.focus()
     } else if (errors?.score) {
       scoreRef.current?.focus()
     }
-  }, [fetcher])
+  }, [scoreFetcher])
 
-  const isFromNewAnonymousUser =
+  useEffect(() => {
+    if (requestFetcher.type === "done" && requestFetcher.data.ok) {
+      formRef.current?.reset()
+    }
+
+    const errors = requestFetcher.data?.errors
+    if (errors?.user) {
+      userRef.current?.focus()
+    }
+  }, [requestFetcher])
+
+  const handleRequestScore: MouseEventHandler<HTMLButtonElement> = (e) => {
+    e.preventDefault()
+    requestFetcher.submit(
+      { userId: selectedFrom || "", lunchId: `${lunchId}` },
+      { method: "post", action: "/scores/request" }
+    )
+  }
+
+  const isFromNewAnonymousUser = Boolean(
     fromInputValue &&
-    !users.some((x) => x.name === fromInputValue) &&
-    !selectedFrom
+      !users.some((x) => x.name === fromInputValue) &&
+      !selectedFrom
+  )
 
   return (
-    <fetcher.Form
+    <scoreFetcher.Form
       method="post"
       action="/scores/new"
       ref={formRef}
@@ -325,6 +392,7 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
               onSelectionChange={(key) => setSelectedFrom(key?.toString())}
               onBlur={(e: any) => setFromInputValue(e.target.value)}
               allowsCustomValue
+              defaultSelectedKey={userId}
             >
               {(item) => (
                 <Item textValue={item.name}>
@@ -334,8 +402,11 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
                 </Item>
               )}
             </ComboBox>
-            {fetcher.data?.errors?.user && (
-              <div id="user-error">{fetcher.data.errors.user}</div>
+            {scoreFetcher.data?.errors?.user && (
+              <div id="user-error">{scoreFetcher.data.errors.user}</div>
+            )}
+            {requestFetcher.data?.errors?.userId && (
+              <div id="user-error">{requestFetcher.data.errors.userId}</div>
             )}
           </Stack>
           <label>
@@ -348,14 +419,14 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
               step={0.25}
               type="number"
               ref={scoreRef}
-              aria-invalid={fetcher.data?.errors?.score ? true : undefined}
+              aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
               aria-errormessage={
-                fetcher.data?.errors?.score ? "score-error" : undefined
+                scoreFetcher.data?.errors?.score ? "score-error" : undefined
               }
             />
           </label>
-          {fetcher.data?.errors?.score && (
-            <div id="score-error">{fetcher.data.errors.score}</div>
+          {scoreFetcher.data?.errors?.score && (
+            <div id="score-error">{scoreFetcher.data.errors.score}</div>
           )}
         </Stack>
         <div style={{ width: "100%" }}>
@@ -365,27 +436,43 @@ const NewScoreForm = ({ users, lunchId, groupId }: NewScoreFormProps) => {
           </CommentLabel>
         </div>
       </Stack>
-      <Stack axis="horizontal" gap={16}>
-        {isFromNewAnonymousUser && (
-          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            You're creating a new anonymous user.
-            <Help>
-              <p>
-                Anonymous users are users without an account. Use these for
-                people that haven't yet created their account or the occational
-                guest that you don't really want in your group.
-              </p>
-              <p>
-                You can transfer the anonymous users data to their account
-                later.
-              </p>
-            </Help>
-          </div>
-        )}
+      <Stack
+        axis="horizontal"
+        gap={16}
+        style={{ width: "100%", justifyContent: "flex-end" }}
+      >
+        <Stack axis="horizontal" gap={8} style={{ marginRight: "auto" }}>
+          <Button form="request-form" onClick={handleRequestScore}>
+            Request score
+          </Button>
+          <Help>
+            By sending a score request the user will get a notification that
+            they should submit their score. This will ignore any score and
+            comment set above.
+          </Help>
+        </Stack>
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          {isFromNewAnonymousUser && (
+            <>
+              You're creating a new anonymous user.
+              <Help>
+                <p>
+                  Anonymous users are users without an account. Use these for
+                  people that haven't yet created their account or the
+                  occational guest that you don't really want in your group.
+                </p>
+                <p>
+                  You can transfer the anonymous users data to their account
+                  later.
+                </p>
+              </Help>
+            </>
+          )}
+        </div>
         <Button>Save score</Button>
       </Stack>
       <input type="hidden" name="groupId" value={groupId} />
-    </fetcher.Form>
+    </scoreFetcher.Form>
   )
 }
 

@@ -14,6 +14,16 @@ export async function getGroupLunch({ id }: Pick<Location, "id">) {
           user: true,
         },
       },
+      scoreRequests: {
+        include: {
+          user: {
+            select: {
+              name: true,
+              id: true,
+            },
+          },
+        },
+      },
       groupLocation: {
         include: {
           location: true,
