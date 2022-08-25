@@ -48,7 +48,7 @@ export default function GroupsPage() {
                         {group.members.map((m) => (
                           <SeedAvatar
                             key={m.userId}
-                            seed={m.user.name}
+                            seed={m.userId}
                             size="small"
                           />
                         ))}
