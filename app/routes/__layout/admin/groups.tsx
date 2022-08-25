@@ -2,6 +2,7 @@ import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
+import { HoverCard } from "~/components/HoverCard"
 import { Table } from "~/components/Table"
 import { getAllGroups } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
@@ -33,8 +34,19 @@ export default function AdminGroupsPage() {
         <tbody>
           {groups.map((group) => (
             <tr key={group.id}>
-              <Table.Cell>{group.name}</Table.Cell>
-              <Table.Cell numeric>{group.members.length}</Table.Cell>
+              <Table.Cell title={group.id}>{group.name}</Table.Cell>
+              <Table.Cell numeric>
+                <HoverCard>
+                  <HoverCard.Trigger>{group.members.length}</HoverCard.Trigger>
+                  <HoverCard.Content>
+                    <ul style={{ padding: "0px 8px" }}>
+                      {group.members.map((member) => (
+                        <li key={member.userId}>{member.user.name}</li>
+                      ))}
+                    </ul>
+                  </HoverCard.Content>
+                </HoverCard>
+              </Table.Cell>
               <Table.Cell numeric>{group.groupLocations.length}</Table.Cell>
               <Table.Cell numeric>
                 {group.groupLocations.reduce(
