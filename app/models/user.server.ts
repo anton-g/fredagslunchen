@@ -35,6 +35,7 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
         include: {
           lunch: {
             include: {
+              choosenBy: true,
               groupLocation: {
                 include: {
                   location: true,
@@ -49,7 +50,6 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
                   },
                 },
               },
-              choosenBy: true,
             },
           },
         },
@@ -62,6 +62,34 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
             },
           },
           scores: true,
+        },
+      },
+      scoreRequests: {
+        include: {
+          requestedBy: {
+            select: { name: true },
+          },
+          lunch: {
+            select: {
+              id: true,
+              date: true,
+              groupLocation: {
+                select: {
+                  group: {
+                    select: {
+                      id: true,
+                      name: true,
+                    },
+                  },
+                  location: {
+                    select: {
+                      name: true,
+                    },
+                  },
+                },
+              },
+            },
+          },
         },
       },
     },

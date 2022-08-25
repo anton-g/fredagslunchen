@@ -149,8 +149,7 @@ describe("smoke tests", () => {
     cy.cleanupGroup({ name: testGroup.name })
   })
 
-  /*
-  it("should allow you to configure an invite link for a group", () => {
+  it.skip("should allow you to configure an invite link for a group", () => {
     const testGroup = {
       name: faker.lorem.words(2),
     }
@@ -180,7 +179,6 @@ describe("smoke tests", () => {
 
     cy.cleanupGroup({ name: testGroup.name })
   })
-  */
 
   // TODO test with new location
   it("should allow you to create and delete lunch and score", () => {

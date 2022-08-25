@@ -154,7 +154,15 @@ export function getAllGroups() {
           },
         },
       },
-      members: true,
+      members: {
+        include: {
+          user: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
     },
   })
 }
