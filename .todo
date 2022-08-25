@@ -1,22 +1,26 @@
 - Request score
-- Feedback
+- Invite link bug for logged in user
+- Help component on mobile
+- Add form constraints where applicable
 - Edit user
   - Name
   - Password
-  - Email
 - Group settings
   - Location (lng, lat)
   - Group admins
+  - Remove group member
+- Leave group
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
+- Better error boundaries
+- Feedback
+- Demo group
 - Write tests
   - New lunch from location
   - Invite user with email
   - Invite user with link
   - Creating anonymous user
   - Claiming anonymous user
-- Remove group member
-  - Require group admin
 - Delete group location
   - Require group admin?
 - Delete user

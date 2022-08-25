@@ -2,7 +2,7 @@ import type { User, Group, Prisma, Location, Email } from "@prisma/client"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
-import { formatNumber, getAverageNumber } from "~/utils"
+import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
 
 export type { Group } from "@prisma/client"
 
@@ -191,6 +191,25 @@ export async function addUserToGroupWithInviteToken({
   inviteToken: NonNullable<Group["inviteToken"]>
   userId: User["id"]
 }) {
+  const group = await prisma.group.findFirst({
+    where: {
+      inviteToken: inviteToken,
+      members: {
+        some: {
+          userId,
+        },
+      },
+    },
+    select: {
+      id: true,
+    },
+  })
+
+  if (group) {
+    // User is already in the group
+    return group
+  }
+
   return await prisma.group.update({
     where: {
       inviteToken: inviteToken,
@@ -222,7 +241,7 @@ export async function addUserEmailToGroup({
   try {
     const user = await prisma.user.findFirst({
       where: {
-        email: { email: email.toLowerCase().trim() },
+        email: { email: cleanEmail(email) },
       },
     })
 

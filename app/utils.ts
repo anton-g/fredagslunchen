@@ -1,3 +1,4 @@
+import type { Email } from "@prisma/client"
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
 
@@ -147,4 +148,8 @@ export function getDomainUrl(request: Request) {
   }
   const protocol = host.includes("localhost") ? "http" : "https"
   return `${protocol}://${host}`
+}
+
+export function cleanEmail(email: Email["email"]) {
+  return email.toLowerCase().trim()
 }

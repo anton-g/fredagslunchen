@@ -8,6 +8,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useCatch,
   useLoaderData,
   useLocation,
 } from "@remix-run/react"
@@ -145,5 +146,20 @@ export default function App() {
         {ENV.NODE_ENV === "development" ? <LiveReload /> : null}
       </body>
     </html>
+  )
+}
+
+export function ErrorBoundary() {
+  return (
+    <div>
+      <h1>Uh oh!</h1>
+      <p> Something went wrong!</p>
+      <p>
+        Try again later or{" "}
+        <a rel="nofollow" href="https://twitter.com/awnton">
+          let me know!
+        </a>
+      </p>
+    </div>
   )
 }
