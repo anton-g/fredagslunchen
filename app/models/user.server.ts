@@ -527,7 +527,7 @@ export async function verifyUserEmail({
     },
   })
 
-  return email.user[0].id
+  return email.userId
 }
 
 export async function checkIsAdmin(userId: User["id"]) {

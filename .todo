@@ -1,5 +1,6 @@
 - Investigate issue with map ENV
-- Fix Email not being deleted when User is deleted
+- Redirect when submitting requested score
+- Correct sort of lunches on profile page
 - Help component on mobile
 - Add form constraints where applicable
 - Edit user

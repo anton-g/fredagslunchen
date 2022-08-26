@@ -10,17 +10,17 @@ generator client {
 model Email {
   id                      Int       @id @default(autoincrement())
   email                   String    @unique
-  user                    User[]
+  user                    User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId                  String?   @unique
   verified                Boolean   @default(false)
   verificationToken       String?   @unique
   verificationRequestTime DateTime?
 }
 
 model User {
-  id      String @id @default(cuid())
-  email   Email? @relation(fields: [emailId], references: [id], onDelete: Cascade)
-  emailId Int?
-  name    String
+  id    String @id @default(cuid())
+  email Email?
+  name  String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

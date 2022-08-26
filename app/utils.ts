@@ -46,7 +46,7 @@ export function useMatchesData(
 }
 
 function isUser(user: any): user is User {
-  return user && typeof user === "object" && typeof user.emailId === "number"
+  return user && typeof user === "object" && typeof user.role === "string"
 }
 
 export function useOptionalUser(): User | undefined {
@@ -54,6 +54,7 @@ export function useOptionalUser(): User | undefined {
   if (!data || !isUser(data.user)) {
     return undefined
   }
+
   return data.user
 }
 
