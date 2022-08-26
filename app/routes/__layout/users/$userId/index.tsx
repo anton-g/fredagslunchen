@@ -51,6 +51,11 @@ export default function Index() {
   const { user, isYou } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
+  const sortedScores = user.scores.sort(
+    (a, b) =>
+      new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
+  )
+
   return (
     <Wrapper>
       <Section>
@@ -87,7 +92,7 @@ export default function Index() {
         </StatsGrid>
       </Section>
       <Spacer size={64} />
-      {user.scores.length > 0 && (
+      {sortedScores.length > 0 && (
         <Section>
           <Subtitle>Lunches</Subtitle>
           <Table>
@@ -102,7 +107,7 @@ export default function Index() {
               </tr>
             </Table.Head>
             <tbody>
-              {user.scores.map((score) => (
+              {sortedScores.map((score) => (
                 <tr key={score.id}>
                   <Table.Cell>
                     <Link
