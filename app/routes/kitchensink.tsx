@@ -22,6 +22,7 @@ import { Dialog } from "~/components/Dialog"
 import { getEnv } from "~/env.server"
 import styled from "styled-components"
 import { Help } from "~/components/Help"
+import { Popover } from "~/components/Popover"
 
 export const meta: MetaFunction = () => {
   return {
@@ -41,6 +42,14 @@ export default function Kitchensink() {
   return (
     <div style={{ padding: 24 }}>
       <Stack gap={24}>
+        <Component title="Popover">
+          <Popover>
+            <Popover.Trigger asChild>
+              <Button>Click me</Button>
+            </Popover.Trigger>
+            <Popover.Content>Hello</Popover.Content>
+          </Popover>
+        </Component>
         <Component title="Hints">
           <Help>
             <p>Here's some helpful info!</p>

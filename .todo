@@ -1,8 +1,6 @@
 - Group settings
-  - Location (lng, lat)
   - Group admins
   - Remove group member
-- Help component on mobile
 - Add form constraints where applicable
 - Investigate issue with map ENV
 - Edit user
@@ -38,3 +36,4 @@
   - Select color schemes
   - Select avatar
   - Discover?
+- Dialog -> Alert Dialog
