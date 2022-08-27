@@ -418,6 +418,7 @@ const NewScoreForm = ({
               max={10}
               step={0.25}
               type="number"
+              required
               ref={scoreRef}
               aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
               aria-errormessage={

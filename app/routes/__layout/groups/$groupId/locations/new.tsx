@@ -232,6 +232,7 @@ export default function NewLocationPage() {
               <Input
                 ref={addressRef}
                 name="address"
+                required
                 aria-invalid={actionData?.errors?.address ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.address ? "address-error" : undefined
@@ -250,6 +251,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={zipCodeRef}
                   name="zipCode"
+                  required
                   aria-invalid={actionData?.errors?.zipCode ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.zipCode ? "zip-code-error" : undefined
@@ -267,6 +269,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={cityRef}
                   name="city"
+                  required
                   aria-invalid={actionData?.errors?.city ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.city ? "city-error" : undefined
@@ -286,6 +289,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={latRef}
                   name="lat"
+                  required
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lat ? "lat-error" : undefined
@@ -303,6 +307,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
+                  required
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lon ? "lon-error" : undefined

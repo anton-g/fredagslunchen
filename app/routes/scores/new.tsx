@@ -34,7 +34,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  if (!score || isNaN(score)) {
+  if (score === null || score === undefined || isNaN(score)) {
     return json<ActionData>(
       { errors: { score: "Score is required" } },
       { status: 400 }

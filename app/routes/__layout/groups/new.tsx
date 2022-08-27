@@ -67,6 +67,7 @@ export default function NewGroupPage() {
               <Input
                 ref={nameRef}
                 name="name"
+                required
                 aria-invalid={actionData?.errors?.name ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.name ? "name-error" : undefined

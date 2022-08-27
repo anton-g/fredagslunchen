@@ -136,6 +136,7 @@ export default function NewLunchPage() {
                 defaultValue={new Date().toISOString().split("T")[0]}
                 name="date"
                 type="date"
+                required
                 aria-invalid={actionData?.errors?.date ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.date ? "date-error" : undefined
