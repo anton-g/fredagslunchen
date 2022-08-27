@@ -55,6 +55,9 @@ model Group {
 
   inviteToken String? @unique
 
+  lon Float?
+  lat Float?
+
   members        GroupMember[]
   groupLocations GroupLocation[]
 }

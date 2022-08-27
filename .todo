@@ -7,7 +7,11 @@
 - Investigate issue with map ENV
 - Edit user
   - Password
+- Help / FAQ
+  - Where can I find coordinates?
+  Google Maps, right click copy
 - Leave group
+- Parse address on paste
 - News (changelog) (MDX?)
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)

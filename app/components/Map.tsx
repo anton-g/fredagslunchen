@@ -20,10 +20,12 @@ type Location = {
 
 type MapProps = {
   locations: Location[]
+  lat?: number | null
+  lon?: number | null
 }
 
 // TODO make generic with popup as render prop child?
-export const Map = ({ locations }: MapProps) => {
+export const Map = ({ locations, lat, lon }: MapProps) => {
   const [cursor, setCursor] = useState<"auto" | "pointer">("auto")
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
@@ -54,9 +56,9 @@ export const Map = ({ locations }: MapProps) => {
     <MapPrimitive
       reuseMaps
       initialViewState={{
-        longitude: 18.055201,
-        latitude: 59.333761,
-        zoom: 11,
+        longitude: lon ?? 18.055201,
+        latitude: lat ?? 59.333761,
+        zoom: lon && lat ? 13 : 11,
       }}
       style={{ width: "100%", height: 400 }}
       mapStyle="mapbox://styles/mapbox/light-v10"

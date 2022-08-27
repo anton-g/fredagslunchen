@@ -243,6 +243,8 @@ export default function GroupDetailsPage() {
           <Spacer size={8} />
           <LazyCard>
             <Map
+              lat={details.group.lat}
+              lon={details.group.lon}
               locations={details.group.groupLocations
                 .filter((x) => x.lunches.length > 0)
                 .map((x) => ({
