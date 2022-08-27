@@ -1,10 +1,11 @@
-import type { ActionFunction } from "@remix-run/server-runtime"
+import { ActionFunction, redirect } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import {
   createScore,
   createScoreWithNewAnonymousUser,
 } from "~/models/score.server"
 import { requireUserId } from "~/session.server"
+import { safeRedirect } from "~/utils"
 
 type ActionData = {
   errors?: {
@@ -62,6 +63,13 @@ export const action: ActionFunction = async ({ request, params }) => {
       comment: comment ? comment.toString() : null,
       lunchId: parseInt(lunchId),
     })
+
+    const redirectToValue = formData.get("redirectTo")
+    if (redirectToValue) {
+      const redirectTo = safeRedirect(redirectToValue)
+
+      return redirect(redirectTo)
+    }
 
     return json({ ok: true })
   }

@@ -134,7 +134,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
       <CardDescription>
         {request.requestedBy.name} requested your score for the{" "}
         <Link
-          to={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}}`}
+          to={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
         >
           lunch at <strong>{request.lunch.groupLocation.location.name}</strong>
         </Link>{" "}
@@ -185,6 +185,11 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
           type="hidden"
           name="groupId"
           value={request.lunch.groupLocation.group.id}
+        />
+        <input
+          type="hidden"
+          name="redirectTo"
+          value={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
         />
         <Button style={{ marginLeft: "auto" }}>Save score</Button>
       </scoreFetcher.Form>

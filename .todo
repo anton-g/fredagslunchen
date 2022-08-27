@@ -1,8 +1,6 @@
-- Correct sort of lunches on profile page
 - Help component on mobile
 - Add form constraints where applicable
 - Investigate issue with map ENV
-- Redirect when submitting requested score
 - Edit user
   - Name
   - Password
