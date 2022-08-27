@@ -16,7 +16,7 @@
 - Better error boundaries
 - Feedback
 - Demo group
-- Imrpoved landing page
+- Improved landing page
 - Write tests
   - New lunch from location
   - Invite user with email
@@ -30,10 +30,10 @@
 - Database backups
   - Litestream?
   - Cron? https://litestream.io/alternatives/cron/
-- Discover page
+- Discover / Inspiration page
   - Top locations
+- Dialog -> Alert Dialog
 - Premium / Supporter?
   - Select color schemes
   - Select avatar
   - Discover?
-- Dialog -> Alert Dialog
