@@ -14,7 +14,7 @@ import invariant from "tiny-invariant"
 import { SeedAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
 import { StatsGrid } from "~/components/StatsGrid"
-import { Button } from "~/components/Button"
+import { Button, LinkButton } from "~/components/Button"
 import { Stack } from "~/components/Stack"
 import { sendEmailVerificationEmail } from "~/services/mail.server"
 
@@ -63,17 +63,18 @@ export default function Index() {
           <SeedAvatar seed={user.id} />
           <Title>{isYou ? "You" : user.name}</Title>
         </TitleRow>
-        {isYou && !user.email?.verified && (
-          <>
-            <Spacer size={24} />
+        <Spacer size={24} />
+        <Stack gap={16} axis="horizontal">
+          <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
+          {isYou && !user.email?.verified && (
             <Form method="post">
               <Stack gap={8} axis="horizontal">
                 <Button disabled={actionData?.ok}>Verify your email</Button>
                 {actionData?.ok && <span>Check your email (and spam)</span>}
               </Stack>
             </Form>
-          </>
-        )}
+          )}
+        </Stack>
         <Spacer size={24} />
         <StatsGrid>
           <Stat label="Number of lunches" value={user.stats.lunchCount} />

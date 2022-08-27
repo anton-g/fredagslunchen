@@ -541,6 +541,17 @@ export async function checkIsAdmin(userId: User["id"]) {
   return Boolean(user)
 }
 
+export async function updateUser(update: Partial<User>) {
+  return prisma.user.update({
+    where: {
+      id: update.id,
+    },
+    data: {
+      ...update,
+    },
+  })
+}
+
 // TODO stats generation duplicated in group.server.ts
 function generateUserStats(
   user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>

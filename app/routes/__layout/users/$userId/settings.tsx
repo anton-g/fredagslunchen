@@ -2,26 +2,31 @@ import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData } from "@remix-run/react"
 import * as React from "react"
+import styled from "styled-components"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
-import { getGroup, updateGroup } from "~/models/group.server"
+import { getUserById, updateUser } from "~/models/user.server"
 
 import { requireUserId } from "~/session.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
-  invariant(params.groupId, "groupId is required")
-  const group = await getGroup({
-    id: params.groupId,
-    userId,
-  })
+  invariant(params.userId, "userId is required")
 
-  if (!group) return new Response("Not found", { status: 404 })
+  if (userId !== params.userId) {
+    throw new Response("Not Found", { status: 404 })
+  }
+
+  const user = await getUserById(userId)
+
+  if (!user) {
+    throw new Response("Not Found", { status: 404 })
+  }
 
   return json({
-    group,
+    user,
   })
 }
 
@@ -32,9 +37,12 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request)
-  const groupId = params.groupId
-  invariant(groupId, "groupId not found")
+  const userId = await requireUserId(request)
+  invariant(params.userId, "userId not found")
+
+  if (userId !== params.userId) {
+    throw new Response("Bad Request", { status: 400 })
+  }
 
   const formData = await request.formData()
   const name = formData.get("name")
@@ -46,16 +54,16 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  const group = await updateGroup({
-    id: groupId,
+  const user = await updateUser({
+    id: userId,
     name,
   })
 
-  return redirect(`/groups/${group.id}`)
+  return redirect(`/users/${user.id}`)
 }
 
-export default function GroupSettingsPage() {
-  const { group } = useLoaderData<typeof loader>()
+export default function UserSettingsPage() {
+  const { user } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
   const nameRef = React.useRef<HTMLInputElement>(null)
 
@@ -67,6 +75,7 @@ export default function GroupSettingsPage() {
 
   return (
     <div>
+      <Title>Your settings</Title>
       <Form method="post">
         <div>
           <label htmlFor="name">Name</label>
@@ -78,7 +87,7 @@ export default function GroupSettingsPage() {
               name="name"
               type="name"
               autoComplete="name"
-              defaultValue={group.name}
+              defaultValue={user.name}
               aria-invalid={actionData?.errors?.name ? true : undefined}
               aria-describedby="name-error"
             />
@@ -93,3 +102,9 @@ export default function GroupSettingsPage() {
     </div>
   )
 }
+
+const Title = styled.h2`
+  font-size: 48px;
+  margin: 0;
+  margin-bottom: 24px;
+`
