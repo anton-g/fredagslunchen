@@ -1,13 +1,13 @@
-- Help component on mobile
-- Add form constraints where applicable
-- Investigate issue with map ENV
-- Edit user
-  - Name
-  - Password
 - Group settings
   - Location (lng, lat)
   - Group admins
   - Remove group member
+- Help component on mobile
+- Add form constraints where applicable
+- Investigate issue with map ENV
+- Edit user
+  - Password
+  - Name
 - Leave group
 - News (changelog) (MDX?)
 - Admin page
