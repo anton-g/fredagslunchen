@@ -359,6 +359,17 @@ export async function deleteGroup({
   })
 }
 
+export async function updateGroup(update: Partial<Group>) {
+  return prisma.group.update({
+    where: {
+      id: update.id,
+    },
+    data: {
+      ...update,
+    },
+  })
+}
+
 type StatsType = {
   averageScore: number
   bestLocation: {

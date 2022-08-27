@@ -145,18 +145,6 @@ export default function InvitePage() {
                   <Tooltip.Content>Remove invite link</Tooltip.Content>
                 </Tooltip>
               </fetcher.Form>
-              {/* <fetcher.Form method="post" action="/groups/api/invite-token">
-                <input type="hidden" name="groupId" value={groupId} />
-                <input type="hidden" name="userId" value={userId} />
-                <Tooltip>
-                  <Tooltip.Trigger asChild>
-                    <Button variant="round" aria-label="Refresh invite link">
-                      <UpdateIcon />
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>Refresh invite link</Tooltip.Content>
-                </Tooltip>
-              </fetcher.Form> */}
               <Tooltip>
                 <Tooltip.Trigger asChild>
                   <Button

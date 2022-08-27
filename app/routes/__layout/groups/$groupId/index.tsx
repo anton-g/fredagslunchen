@@ -22,7 +22,7 @@ import { useRef, useState } from "react"
 import { getEnv } from "~/env.server"
 import { Dialog } from "~/components/Dialog"
 import { Tooltip } from "~/components/Tooltip"
-import { Cross2Icon } from "@radix-ui/react-icons"
+import { Cross2Icon, GearIcon } from "@radix-ui/react-icons"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
@@ -266,7 +266,10 @@ export default function GroupDetailsPage() {
       {isAdmin && (
         <>
           <Spacer size={64} />
-          <AdminActions groupName={details.group.name} />
+          <AdminActions
+            groupName={details.group.name}
+            groupId={details.group.id}
+          />
         </>
       )}
     </div>
@@ -330,7 +333,13 @@ const MapCard = styled(Card)`
   min-height: 400px;
 `
 
-const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
+const AdminActions = ({
+  groupName,
+  groupId,
+}: {
+  groupName: Group["name"]
+  groupId: Group["id"]
+}) => {
   const [confirmNameValue, setConfirmNameValue] = useState("")
 
   return (
@@ -377,6 +386,18 @@ const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
           </Form>
         </Dialog.Content>
       </Dialog>
+      <Tooltip>
+        <Tooltip.Trigger asChild>
+          <LinkButton
+            to={`/groups/${groupId}/settings`}
+            variant="round"
+            aria-label="Edit settings"
+          >
+            <GearIcon />
+          </LinkButton>
+        </Tooltip.Trigger>
+        <Tooltip.Content>Edit settings</Tooltip.Content>
+      </Tooltip>
     </Wrapper>
   )
 }
