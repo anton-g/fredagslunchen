@@ -1,3 +1,4 @@
+import type { Group } from "@prisma/client"
 import { Link } from "@remix-run/react"
 import { useState } from "react"
 import MapPrimitive, { Layer, Popup, Source } from "react-map-gl"
@@ -22,10 +23,11 @@ type MapProps = {
   locations: Location[]
   lat?: number | null
   lon?: number | null
+  groupId?: Group["id"]
 }
 
 // TODO make generic with popup as render prop child?
-export const Map = ({ locations, lat, lon }: MapProps) => {
+export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
   const [cursor, setCursor] = useState<"auto" | "pointer">("auto")
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
@@ -104,7 +106,7 @@ export const Map = ({ locations, lat, lon }: MapProps) => {
           maxWidth={"450px"}
           offset={8}
         >
-          <LocationPopupContent location={selectedLocation} />
+          <LocationPopupContent location={selectedLocation} groupId={groupId} />
         </StyledPopup>
       )}
     </MapPrimitive>
@@ -135,10 +137,16 @@ const StyledPopup = styled(Popup)`
   }
 `
 
-const LocationPopupContent = ({ location }: { location: Location }) => {
+const LocationPopupContent = ({
+  location,
+  groupId,
+}: {
+  location: Location
+  groupId?: Group["id"]
+}) => {
   return (
     <div>
-      <Link to={`/locations/${location.id}`}>
+      <Link to={`/groups/${groupId}/locations/${location.id}`}>
         <LocationTitle>{location.name}</LocationTitle>
       </Link>
       {location.address}

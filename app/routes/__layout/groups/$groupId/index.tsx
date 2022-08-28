@@ -224,6 +224,7 @@ export default function GroupDetailsPage() {
           <Spacer size={8} />
           <LazyCard>
             <Map
+              groupId={details.group.id}
               lat={details.group.lat}
               lon={details.group.lon}
               locations={details.group.groupLocations
