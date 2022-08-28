@@ -9,7 +9,9 @@ type AvatarProps = {
   size?: AvatarSize
 }
 export const Avatar = ({ variant, size = "large" }: AvatarProps) => {
-  return <Wrapper size={size}>{faces[variant]}</Wrapper>
+  const Face = faces[variant - 1]
+
+  return <Wrapper size={size}>{Face}</Wrapper>
 }
 
 const sizes: Record<AvatarSize, number> = {
@@ -19,6 +21,10 @@ const sizes: Record<AvatarSize, number> = {
 }
 
 const Wrapper = styled(Card)<{ size: AvatarSize }>`
+  width: ${({ size }) => sizes[size]}px;
+  height: ${({ size }) => sizes[size]}px;
+  min-width: ${({ size }) => sizes[size]}px;
+  min-height: ${({ size }) => sizes[size]}px;
   max-width: ${({ size }) => sizes[size]}px;
   max-height: ${({ size }) => sizes[size]}px;
   padding: 0;
