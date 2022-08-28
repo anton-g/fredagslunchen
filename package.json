@@ -34,6 +34,7 @@
     "@radix-ui/react-dialog": "^1.0.0",
     "@radix-ui/react-hover-card": "^0.1.5",
     "@radix-ui/react-icons": "^1.1.1",
+    "@radix-ui/react-popover": "^1.0.0",
     "@radix-ui/react-select": "^0.1.1",
     "@radix-ui/react-switch": "^0.1.5",
     "@radix-ui/react-tooltip": "^1.0.0",

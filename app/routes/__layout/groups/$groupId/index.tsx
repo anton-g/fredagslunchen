@@ -1,29 +1,24 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
-import { redirect } from "@remix-run/node"
+import type { LoaderArgs } from "@remix-run/node"
 import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
-import { Form, useCatch, useLoaderData } from "@remix-run/react"
+import { useCatch, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
-import type { Group } from "~/models/group.server"
-import { deleteGroup } from "~/models/group.server"
 import { getGroupDetails } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Table } from "~/components/Table"
 import { Spacer } from "~/components/Spacer"
-import { Button, LinkButton } from "~/components/Button"
+import { LinkButton } from "~/components/Button"
 import { Stat } from "~/components/Stat"
 import { HoverCard } from "~/components/HoverCard"
 import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
-import { useRef, useState } from "react"
+import { useRef } from "react"
 import { getEnv } from "~/env.server"
-import { Dialog } from "~/components/Dialog"
 import { Tooltip } from "~/components/Tooltip"
-import { Cross2Icon } from "@radix-ui/react-icons"
-import { Input } from "~/components/Input"
+import { GearIcon } from "@radix-ui/react-icons"
 import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
 
@@ -41,20 +36,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   )
 
   return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin })
-}
-
-export const action: ActionFunction = async ({ request, params }) => {
-  if (request.method !== "DELETE") return null
-
-  const userId = await requireUserId(request)
-  invariant(params.groupId, "groupId not found")
-
-  await deleteGroup({
-    id: params.groupId,
-    requestedByUserId: userId,
-  })
-
-  return redirect("/groups")
 }
 
 export default function GroupDetailsPage() {
@@ -243,6 +224,9 @@ export default function GroupDetailsPage() {
           <Spacer size={8} />
           <LazyCard>
             <Map
+              groupId={details.group.id}
+              lat={details.group.lat}
+              lon={details.group.lon}
               locations={details.group.groupLocations
                 .filter((x) => x.lunches.length > 0)
                 .map((x) => ({
@@ -266,7 +250,20 @@ export default function GroupDetailsPage() {
       {isAdmin && (
         <>
           <Spacer size={64} />
-          <AdminActions groupName={details.group.name} />
+          <Wrapper axis="horizontal" gap={16}>
+            <Tooltip>
+              <Tooltip.Trigger asChild>
+                <LinkButton
+                  to={`/groups/${details.group.id}/settings`}
+                  variant="round"
+                  aria-label="Group settings"
+                >
+                  <GearIcon />
+                </LinkButton>
+              </Tooltip.Trigger>
+              <Tooltip.Content>Group settings</Tooltip.Content>
+            </Tooltip>
+          </Wrapper>
         </>
       )}
     </div>
@@ -330,64 +327,6 @@ const MapCard = styled(Card)`
   min-height: 400px;
 `
 
-const AdminActions = ({ groupName }: { groupName: Group["name"] }) => {
-  const [confirmNameValue, setConfirmNameValue] = useState("")
-
-  return (
-    <Wrapper axis="horizontal" gap={16}>
-      <Dialog>
-        <Tooltip>
-          <Tooltip.Trigger asChild>
-            <Dialog.Trigger asChild>
-              <Button variant="round" aria-label="Delete group">
-                <Cross2Icon />
-              </Button>
-            </Dialog.Trigger>
-          </Tooltip.Trigger>
-          <Tooltip.Content>Delete group</Tooltip.Content>
-        </Tooltip>
-        <Dialog.Content>
-          <Dialog.Close />
-          <Dialog.Title>
-            Are you sure you want to delete the group {groupName}?
-          </Dialog.Title>
-          <DialogDescription>
-            This will delete this group including all locations, lunches and
-            scores. This action is <strong>irreversible</strong> and{" "}
-            <strong>cannot be undone.</strong>
-          </DialogDescription>
-          <label htmlFor="name">
-            Please type <strong>{groupName}</strong> to confirm.
-          </label>
-          <Input
-            id="name"
-            required
-            name="name"
-            onChange={(e) => setConfirmNameValue(e.target.value)}
-          />
-          <Spacer size={16} />
-          <Form method="delete">
-            <Button
-              variant="large"
-              style={{ marginLeft: "auto" }}
-              disabled={confirmNameValue !== groupName}
-            >
-              I am sure
-            </Button>
-          </Form>
-        </Dialog.Content>
-      </Dialog>
-    </Wrapper>
-  )
-}
-
 const Wrapper = styled(Stack)`
   justify-content: center;
-`
-
-const DialogDescription = styled(Dialog.Description)`
-  > p {
-    margin: 0;
-    margin-bottom: 16px;
-  }
 `

@@ -1,19 +1,21 @@
-- Investigate issue with map ENV
-- Help component on mobile
-- Add form constraints where applicable
-- Edit user
-  - Name
-  - Password
 - Group settings
-  - Location (lng, lat)
   - Group admins
   - Remove group member
+- Investigate issue with map ENV
+- Edit user
+  - Password
+- Help / FAQ
+  - Where can I find coordinates?
+  Google Maps, right click copy
 - Leave group
+- Parse address on paste
+- News (changelog) (MDX?)
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
 - Better error boundaries
 - Feedback
 - Demo group
+- Improved landing page
 - Write tests
   - New lunch from location
   - Invite user with email
@@ -27,8 +29,9 @@
 - Database backups
   - Litestream?
   - Cron? https://litestream.io/alternatives/cron/
-- Discover page
+- Discover / Inspiration page
   - Top locations
+- Dialog -> Alert Dialog
 - Premium / Supporter?
   - Select color schemes
   - Select avatar

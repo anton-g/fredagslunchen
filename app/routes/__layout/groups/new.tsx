@@ -48,7 +48,7 @@ export default function NewGroupPage() {
       <h2>Create a new group</h2>
       <p>
         Create a new group to get started. When the group is created you can
-        invite other users to join you in your lunch adventures!
+        invite other users to join you on your lunch adventures!
       </p>
       <p>If you're looking to join a group, tell them to invite you instead!</p>
       <Form
@@ -67,6 +67,7 @@ export default function NewGroupPage() {
               <Input
                 ref={nameRef}
                 name="name"
+                required
                 aria-invalid={actionData?.errors?.name ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.name ? "name-error" : undefined

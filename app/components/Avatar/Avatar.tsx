@@ -1,5 +1,6 @@
 import styled from "styled-components"
-import { Card } from "./Card"
+import { Card } from "../Card"
+import { faces } from "./faces"
 
 type AvatarSize = "small" | "medium" | "large"
 
@@ -8,14 +9,7 @@ type AvatarProps = {
   size?: AvatarSize
 }
 export const Avatar = ({ variant, size = "large" }: AvatarProps) => {
-  return (
-    <Wrapper size={size}>
-      <img
-        src={`/images/faces/${variant}.svg`}
-        alt="black and white sketch of a face"
-      ></img>
-    </Wrapper>
-  )
+  return <Wrapper size={size}>{faces[variant]}</Wrapper>
 }
 
 const sizes: Record<AvatarSize, number> = {
@@ -29,10 +23,11 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   max-height: ${({ size }) => sizes[size]}px;
   padding: 0;
 
-  img {
+  svg {
     height: 100%;
     width: 100%;
-    background-color: white;
+    background-color: ${({ theme }) => theme.colors.secondary};
+    fill: ${({ theme }) => theme.colors.primary};
   }
 `
 

@@ -1,18 +1,18 @@
 import type { ReactNode } from "react"
 import styled from "styled-components"
 import { QuestionMarkCircledIcon } from "@radix-ui/react-icons"
-import { HoverCard } from "./HoverCard"
+import { Popover } from "./Popover"
 
 export function Help({ children }: { children: ReactNode }) {
   return (
-    <HoverCard>
-      <HoverCard.Trigger asChild>
+    <Popover>
+      <Popover.Trigger asChild>
         <Icon>
           <QuestionMarkCircledIcon />
         </Icon>
-      </HoverCard.Trigger>
+      </Popover.Trigger>
       <Content>{children}</Content>
-    </HoverCard>
+    </Popover>
   )
 }
 
@@ -28,7 +28,7 @@ const Icon = styled.div`
   }
 `
 
-const Content = styled(HoverCard.Content)`
+const Content = styled(Popover.Content)`
   max-width: 400px;
 
   p {

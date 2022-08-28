@@ -60,6 +60,7 @@ export default function DiscoverPage() {
           <Spacer size={24} />
           <Subtitle>Map</Subtitle>
           <MapCard>
+            {/* TODO: fix location link */}
             <Map locations={locations} />
           </MapCard>
         </>

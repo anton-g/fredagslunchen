@@ -1,8 +1,7 @@
-import { CopyIcon, Cross2Icon, UpdateIcon } from "@radix-ui/react-icons"
+import { CopyIcon, Cross2Icon } from "@radix-ui/react-icons"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import {
-  Form,
   useActionData,
   useCatch,
   useFetcher,
@@ -84,7 +83,7 @@ export default function InvitePage() {
 
   return (
     <>
-      <h3>Add existing user to group</h3>
+      {/* <h3>Add existing user to group</h3>
       <Form
         method="post"
         style={{
@@ -119,7 +118,7 @@ export default function InvitePage() {
             </Button>
           </div>
         </Stack>
-      </Form>
+      </Form> */}
       <h3 style={{ marginBottom: 0 }}>Invite with link</h3>
       {groupInviteToken ? (
         <>
@@ -143,18 +142,6 @@ export default function InvitePage() {
                     </Button>
                   </Tooltip.Trigger>
                   <Tooltip.Content>Remove invite link</Tooltip.Content>
-                </Tooltip>
-              </fetcher.Form>
-              <fetcher.Form method="post" action="/groups/api/invite-token">
-                <input type="hidden" name="groupId" value={groupId} />
-                <input type="hidden" name="userId" value={userId} />
-                <Tooltip>
-                  <Tooltip.Trigger asChild>
-                    <Button variant="round" aria-label="Refresh invite link">
-                      <UpdateIcon />
-                    </Button>
-                  </Tooltip.Trigger>
-                  <Tooltip.Content>Refresh invite link</Tooltip.Content>
                 </Tooltip>
               </fetcher.Form>
               <Tooltip>
