@@ -1,16 +1,19 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { Group } from "~/models/group.server"
+import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData } from "@remix-run/react"
-import * as React from "react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
+import { Dialog } from "~/components/Dialog"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
-import { getGroup, updateGroup } from "~/models/group.server"
+import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
 
 import { requireUserId } from "~/session.server"
+import { useEffect, useRef, useState } from "react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -36,10 +39,18 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request)
-  const groupId = params.groupId
-  invariant(groupId, "groupId not found")
+  const userId = await requireUserId(request)
+  invariant(params.groupId, "groupId not found")
 
+  switch (request.method) {
+    case "DELETE":
+      return deleteGroupAction(userId, params.groupId)
+    default:
+      return updateGroupAction(request, params.groupId)
+  }
+}
+
+const updateGroupAction = async (request: Request, groupId: Group["id"]) => {
   const formData = await request.formData()
   const name = formData.get("name")
   const latInput = formData.get("lat")
@@ -78,14 +89,23 @@ export const action: ActionFunction = async ({ request, params }) => {
   return redirect(`/groups/${group.id}`)
 }
 
+const deleteGroupAction = async (userId: User["id"], groupId: Group["id"]) => {
+  await deleteGroup({
+    id: groupId,
+    requestedByUserId: userId,
+  })
+
+  return redirect("/groups")
+}
+
 export default function GroupSettingsPage() {
   const { group } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
-  const nameRef = React.useRef<HTMLInputElement>(null)
-  const latRef = React.useRef<HTMLInputElement>(null)
-  const lonRef = React.useRef<HTMLInputElement>(null)
+  const nameRef = useRef<HTMLInputElement>(null)
+  const latRef = useRef<HTMLInputElement>(null)
+  const lonRef = useRef<HTMLInputElement>(null)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (actionData?.errors?.name) {
       nameRef.current?.focus()
     }
@@ -159,6 +179,8 @@ export default function GroupSettingsPage() {
         <Spacer size={16} />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
+      <Subtitle>Destructive actions</Subtitle>
+      <DeleteGroupAction groupName={group.name} />
     </div>
   )
 }
@@ -173,6 +195,55 @@ const Subtitle = styled.h3`
 
   + ${FieldDescription} {
     margin-top: -16px;
+    margin-bottom: 16px;
+  }
+`
+
+const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
+  const [confirmNameValue, setConfirmNameValue] = useState("")
+
+  return (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <Button>Delete group</Button>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Close />
+        <Dialog.Title>
+          Are you sure you want to delete the group {groupName}?
+        </Dialog.Title>
+        <DialogDescription>
+          This will delete this group including all locations, lunches and
+          scores. This action is <strong>irreversible</strong> and{" "}
+          <strong>cannot be undone.</strong>
+        </DialogDescription>
+        <label htmlFor="name">
+          Please type <strong>{groupName}</strong> to confirm.
+        </label>
+        <Input
+          id="name"
+          required
+          name="name"
+          onChange={(e) => setConfirmNameValue(e.target.value)}
+        />
+        <Spacer size={16} />
+        <Form method="delete">
+          <Button
+            variant="large"
+            style={{ marginLeft: "auto" }}
+            disabled={confirmNameValue !== groupName}
+          >
+            I am sure
+          </Button>
+        </Form>
+      </Dialog.Content>
+    </Dialog>
+  )
+}
+
+const DialogDescription = styled(Dialog.Description)`
+  > p {
+    margin: 0;
     margin-bottom: 16px;
   }
 `

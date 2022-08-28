@@ -1,4 +1,5 @@
-import { ActionFunction, redirect } from "@remix-run/server-runtime"
+import type { ActionFunction } from "@remix-run/server-runtime"
+import { redirect } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import {
   createScore,
