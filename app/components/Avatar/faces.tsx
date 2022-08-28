@@ -30,8 +30,6 @@ const face2 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Awe</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Awe"
       stroke="none"
@@ -56,8 +54,6 @@ const face3 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Blank</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Blank"
       stroke="none"
@@ -82,8 +78,6 @@ const face4 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Calm</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Calm"
       stroke="none"
@@ -108,8 +102,6 @@ const face5 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Cheeky</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Cheeky"
       stroke="none"
@@ -134,8 +126,6 @@ const face6 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Concerned Fear</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Concerned-Fear"
       stroke="none"
@@ -160,8 +150,6 @@ const face7 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Concerned</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Concerned"
       stroke="none"
@@ -186,8 +174,6 @@ const face8 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Contempt</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Contempt"
       stroke="none"
@@ -212,8 +198,6 @@ const face9 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Cute</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Cute"
       stroke="none"
@@ -238,8 +222,6 @@ const face10 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Cyclops</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Cyclops"
       stroke="none"
@@ -264,8 +246,6 @@ const face11 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Driven</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Driven"
       stroke="none"
@@ -290,8 +270,6 @@ const face12 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Eating Happy</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Eating-Happy"
       stroke="none"
@@ -316,8 +294,6 @@ const face13 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Explaining</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Explaining"
       stroke="none"
@@ -341,8 +317,6 @@ const face14 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Eyes Closed</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Eyes-Closed"
       stroke="none"
@@ -366,8 +340,6 @@ const face15 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Fear</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Fear"
       stroke="none"
@@ -391,8 +363,6 @@ const face16 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Hectic</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Hectic"
       stroke="none"
@@ -416,8 +386,6 @@ const face17 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Loving Grin 1</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Loving-Grin-1"
       stroke="none"
@@ -441,8 +409,6 @@ const face18 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Loving Grin 2</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Loving-Grin-2"
       stroke="none"
@@ -466,8 +432,6 @@ const face19 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Monster</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Monster"
       stroke="none"
@@ -491,8 +455,6 @@ const face20 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Old</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Old"
       stroke="none"
@@ -516,8 +478,6 @@ const face21 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Rage</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Rage"
       stroke="none"
@@ -541,8 +501,6 @@ const face22 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Serious</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Serious"
       stroke="none"
@@ -566,8 +524,6 @@ const face23 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Smile Big</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Smile-Big"
       stroke="none"
@@ -591,8 +547,6 @@ const face24 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Smile LOL</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Smile-LOL"
       stroke="none"
@@ -616,8 +570,6 @@ const face25 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Smile Teeth Gap</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Smile-Teeth-Gap"
       stroke="none"
@@ -641,8 +593,6 @@ const face26 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Smile</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Smile"
       stroke="none"
@@ -666,8 +616,6 @@ const face27 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Solemn</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Solemn"
       stroke="none"
@@ -691,8 +639,6 @@ const face28 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Suspicious</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Suspicious"
       stroke="none"
@@ -716,8 +662,6 @@ const face29 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Tired</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Tired"
       stroke="none"
@@ -741,8 +685,6 @@ const face30 = (
     version="1.1"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <title>face/Very Angry</title>
-    <desc>Created with Sketch.</desc>
     <g
       id="face/Very-Angry"
       stroke="none"

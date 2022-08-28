@@ -120,9 +120,9 @@ export default function Kitchensink() {
         </Component>
         <Component title="Avatar">
           <Stack gap={24} axis={"horizontal"}>
-            <Avatar variant={5} />
-            <Avatar variant={5} size="medium" />
-            <Avatar variant={5} size="small" />
+            <Avatar variant={1} />
+            <Avatar variant={2} size="medium" />
+            <Avatar variant={3} size="small" />
             <RandomAvatar />
             <SeedAvatar seed={"BassLabb"} />
             <SeedAvatar seed={"Tessan"} />
