@@ -16,6 +16,7 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
       email: {
         select: {
           verified: true,
+          email: true,
         },
       },
       groups: {

@@ -173,9 +173,10 @@ export default function Kitchensink() {
         </Component>
         <Component title="Input">
           <Stack gap={24} axis="horizontal">
-            <Input type="text" />
+            <Input type="text" defaultValue="Basic input" />
             <Input type="date" />
-            <Input type="number" />
+            <Input type="number" defaultValue="5" />
+            <Input disabled defaultValue="Disabled input" />
           </Stack>
         </Component>
         <Component title="Button">

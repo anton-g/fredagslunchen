@@ -10,7 +10,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import {
   changeUserPassword,
-  getUserById,
+  getFullUserById,
   updateUser,
 } from "~/models/user.server"
 
@@ -24,7 +24,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const user = await getUserById(userId)
+  const user = await getFullUserById({ id: userId, requestUserId: userId })
 
   if (!user) {
     throw new Response("Not Found", { status: 404 })
@@ -128,25 +128,46 @@ export default function UserSettingsPage() {
     <div>
       <Title>Your settings</Title>
       <Form method="post">
-        <div>
-          <label htmlFor="name">Name</label>
+        <Stack gap={16}>
           <div>
-            <Input
-              ref={nameRef}
-              id="name"
-              required
-              name="name"
-              type="name"
-              autoComplete="name"
-              defaultValue={user.name}
-              aria-invalid={actionData?.errors?.name ? true : undefined}
-              aria-describedby="name-error"
-            />
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
-            )}
+            <label htmlFor="name">Name</label>
+            <div>
+              <Input
+                ref={nameRef}
+                id="name"
+                required
+                name="name"
+                type="name"
+                autoComplete="name"
+                defaultValue={user.name}
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
+              />
+              {actionData?.errors?.name && (
+                <div id="name-error">{actionData.errors.name}</div>
+              )}
+            </div>
           </div>
-        </div>
+          <div>
+            <label htmlFor="email">Email</label>
+            <div>
+              <Input
+                // ref={emailRef}
+                // id="email"
+                required
+                // name="email"
+                type="email"
+                disabled
+                defaultValue={user.email?.email}
+                // aria-invalid={actionData?.errors?.name ? true : undefined}
+                // aria-describedby="name-error"
+              />
+              {/* {actionData?.errors?.name && (
+              <div id="name-error">{actionData.errors.name}</div>
+            )} */}
+            </div>
+          </div>
+        </Stack>
         <Spacer size={16} />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
