@@ -430,6 +430,51 @@ export async function createResetPasswordToken(email: Email["email"]) {
 }
 
 export async function changeUserPassword({
+  id,
+  oldPassword,
+  newPassword,
+}: {
+  id: User["id"]
+  oldPassword: string
+  newPassword: string
+}) {
+  const userWithPassword = await prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      password: true,
+    },
+  })
+
+  const isValid = await bcrypt.compare(
+    oldPassword,
+    userWithPassword.password?.hash || ""
+  )
+
+  if (!isValid) {
+    return {
+      error: "Invalid password",
+    }
+  }
+
+  const hashedPassword = await hashPassword(newPassword)
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      passwordResetTime: null,
+      passwordResetToken: null,
+      password: {
+        update: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  })
+}
+
+export async function changeUserPasswordWithToken({
   token,
   newPassword,
 }: {

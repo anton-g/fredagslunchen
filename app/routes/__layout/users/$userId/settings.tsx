@@ -7,7 +7,12 @@ import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
-import { getUserById, updateUser } from "~/models/user.server"
+import { Stack } from "~/components/Stack"
+import {
+  changeUserPassword,
+  getUserById,
+  updateUser,
+} from "~/models/user.server"
 
 import { requireUserId } from "~/session.server"
 
@@ -33,6 +38,8 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 type ActionData = {
   errors?: {
     name?: string
+    password?: string
+    newPassword?: string
   }
 }
 
@@ -45,6 +52,48 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const formData = await request.formData()
+  const password = formData.get("current-password")
+  if (password) {
+    // todo move to func
+    const newPassword = formData.get("new-password")
+
+    if (typeof password !== "string" || password.length === 0) {
+      return json<ActionData>(
+        { errors: { password: "Current password is required" } },
+        { status: 400 }
+      )
+    }
+
+    if (typeof newPassword !== "string" || newPassword.length === 0) {
+      return json<ActionData>(
+        { errors: { newPassword: "New password is required" } },
+        { status: 400 }
+      )
+    }
+
+    if (newPassword.length < 8) {
+      return json<ActionData>(
+        { errors: { newPassword: "Password is too short" } },
+        { status: 400 }
+      )
+    }
+
+    const userOrError = await changeUserPassword({
+      id: userId,
+      oldPassword: password,
+      newPassword,
+    })
+
+    if ("error" in userOrError) {
+      return json<ActionData>(
+        { errors: { password: userOrError.error } },
+        { status: 400 }
+      )
+    }
+
+    return redirect(`/users/${userOrError.id}`)
+  }
+
   const name = formData.get("name")
 
   if (typeof name !== "string" || name.length === 0) {
@@ -66,6 +115,8 @@ export default function UserSettingsPage() {
   const { user } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
   const nameRef = React.useRef<HTMLInputElement>(null)
+  const currentPasswordRef = React.useRef<HTMLInputElement>(null)
+  const newPasswordRef = React.useRef<HTMLInputElement>(null)
 
   React.useEffect(() => {
     if (actionData?.errors?.name) {
@@ -99,6 +150,51 @@ export default function UserSettingsPage() {
         <Spacer size={16} />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
+      <Form method="post">
+        <Subtitle>Change password</Subtitle>
+        <Stack gap={16}>
+          <div>
+            <label htmlFor="current-password">Current password</label>
+            <div>
+              <Input
+                id="current-password"
+                ref={currentPasswordRef}
+                name="current-password"
+                type="password"
+                aria-invalid={actionData?.errors?.password ? true : undefined}
+                aria-describedby="current-password-error"
+              />
+              {actionData?.errors?.password && (
+                <div id="current-password-error">
+                  {actionData.errors.password}
+                </div>
+              )}
+            </div>
+          </div>
+          <div>
+            <label htmlFor="new-password">New password</label>
+            <div>
+              <Input
+                id="new-password"
+                ref={newPasswordRef}
+                name="new-password"
+                minLength={8}
+                type="password"
+                aria-invalid={
+                  actionData?.errors?.newPassword ? true : undefined
+                }
+                aria-describedby="new-password-error"
+              />
+              {actionData?.errors?.newPassword && (
+                <div id="new-password-error">
+                  {actionData.errors.newPassword}
+                </div>
+              )}
+            </div>
+          </div>
+          <Button style={{ marginLeft: "auto" }}>Change password</Button>
+        </Stack>
+      </Form>
     </div>
   )
 }
@@ -107,4 +203,9 @@ const Title = styled.h2`
   font-size: 48px;
   margin: 0;
   margin-bottom: 24px;
+`
+
+const Subtitle = styled.h3`
+  font-size: 24px;
+  margin: 16px 0;
 `
