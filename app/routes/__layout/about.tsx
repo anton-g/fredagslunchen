@@ -1,4 +1,5 @@
 import type { MetaFunction } from "@remix-run/node"
+import { Link } from "@remix-run/react"
 import styled from "styled-components"
 
 export const meta: MetaFunction = () => {
@@ -13,8 +14,8 @@ export default function AboutPage() {
       <Title>About</Title>
       <p>
         Fredagslunchen.club is still in early development so you might find
-        bugs, missing features or other inconsistencies but all the "main"
-        features should work!
+        bugs, missing features or other inconsistencies. If you are interested
+        you can find <Link to="/changelog">the changelog here</Link>.
       </p>
       <p>
         If you have any feedback, bug reports or just want to say hi you can{" "}

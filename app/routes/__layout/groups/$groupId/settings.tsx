@@ -114,6 +114,7 @@ export default function GroupSettingsPage() {
   return (
     <div>
       <Form method="post">
+        <Subtitle>Details</Subtitle>
         <div>
           <label htmlFor="name">Name</label>
           <div>
