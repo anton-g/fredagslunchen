@@ -1,6 +1,9 @@
 import type { ActionFunction } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
-import { deleteGroupMember } from "~/models/group.server"
+import {
+  deleteGroupMember,
+  updateGroupMembership as updateGroupMember,
+} from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 
 type ActionData = {
@@ -18,32 +21,43 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (typeof userId !== "string" || userId.length === 0) {
     return json<ActionData>(
-      { errors: { error: "Something went wrong 3" } },
+      { errors: { error: "Something went wrong" } },
       { status: 400 }
     )
   }
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>(
-      { errors: { error: "Something went wrong 4" } },
+      { errors: { error: "Something went wrong" } },
       { status: 400 }
     )
   }
 
   if (request.method === "DELETE") {
-    const result = await deleteGroupMember({
+    await deleteGroupMember({
       groupId,
       userId,
       requestedByUserId: currentUserId,
     })
-    console.log(result)
+    return json({ ok: true })
   }
-  // else {
-  //   await createGroupInviteToken({
-  //     userId,
-  //     groupId,
-  //   })
-  // }
+
+  const role = formData.get("role")
+  if (typeof role !== "string" || !["ADMIN", "MEMBER"].includes(role)) {
+    return json<ActionData>(
+      { errors: { error: "Something went wrong" } },
+      { status: 400 }
+    )
+  }
+
+  await updateGroupMember({
+    userId,
+    groupId,
+    requestedByUserId: currentUserId,
+    update: {
+      role,
+    },
+  })
 
   return json({ ok: true })
 }

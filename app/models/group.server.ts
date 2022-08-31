@@ -1,4 +1,11 @@
-import type { User, Group, Prisma, Location, Email } from "@prisma/client"
+import type {
+  User,
+  Group,
+  Prisma,
+  Location,
+  Email,
+  GroupMember,
+} from "@prisma/client"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
@@ -389,7 +396,7 @@ export async function deleteGroupMember({
   })
 
   if (!group) {
-    return { error: "Something went wrong 1" }
+    return { error: "Something went wrong" }
   }
 
   const requestedByAdmin = group.members.some(
@@ -398,7 +405,7 @@ export async function deleteGroupMember({
   const requestedBySameUser = userId === requestedByUserId
 
   if (!requestedByAdmin && !requestedBySameUser) {
-    return { error: "Something went wrong 2" }
+    return { error: "Something went wrong" }
   }
 
   const groupMember = await prisma.groupMember.delete({
@@ -469,6 +476,50 @@ export async function deleteGroupMember({
   }
 
   return groupMember
+}
+
+export async function updateGroupMembership({
+  groupId,
+  userId,
+  requestedByUserId,
+  update,
+}: {
+  groupId: Group["id"]
+  userId: User["id"]
+  requestedByUserId: User["id"]
+  update: Partial<GroupMember>
+}) {
+  const group = await prisma.group.findUnique({
+    where: {
+      id: groupId,
+    },
+    include: {
+      members: true,
+    },
+  })
+
+  if (!group) {
+    return { error: "Something went wrong" }
+  }
+
+  const requestedByAdmin = group.members.some(
+    (x) => x.userId === requestedByUserId && x.role === "ADMIN"
+  )
+  if (!requestedByAdmin) {
+    return { error: "Something went wrong" }
+  }
+
+  return await prisma.groupMember.update({
+    where: {
+      userId_groupId: {
+        groupId,
+        userId,
+      },
+    },
+    data: {
+      ...update,
+    },
+  })
 }
 
 type StatsType = {

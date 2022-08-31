@@ -36,6 +36,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   return json({
     group,
+    userId,
   })
 }
 
@@ -108,7 +109,7 @@ const deleteGroupAction = async (userId: User["id"], groupId: Group["id"]) => {
 }
 
 export default function GroupSettingsPage() {
-  const { group } = useLoaderData<typeof loader>()
+  const { group, userId } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
   const nameRef = useRef<HTMLInputElement>(null)
   const latRef = useRef<HTMLInputElement>(null)
@@ -205,12 +206,12 @@ export default function GroupSettingsPage() {
                 <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
               </Table.Cell>
               <Table.Cell>
-                {/* {group.members.length > 1 && (
+                {member.userId !== userId && (
                   <ChangeMemberRoleAction member={member} />
-                )} */}
+                )}
               </Table.Cell>
               <Table.Cell>
-                {group.members.length > 1 && (
+                {member.userId !== userId && (
                   <RemoveMemberAction member={member} />
                 )}
               </Table.Cell>
@@ -325,10 +326,18 @@ type ChangeMemberRoleActionProps = {
   member: RecursivelyConvertDatesToStrings<GroupMember & { user: User }>
 }
 const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
+  const [open, setOpen] = useState(false)
+  const fetcher = useFetcher()
+
+  useEffect(() => {
+    if (fetcher.data?.ok) setOpen(false)
+  }, [fetcher.data])
+
   if (member.user.role === "ANONYMOUS") return null
 
+  // TODO rewrite the inline logic here
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
         <TextButton>
           {member.role === "ADMIN" ? "Make user" : "Make admin"}
@@ -352,11 +361,18 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
           )}
         </DialogDescription>
         <Spacer size={8} />
-        {/* <Form method="delete"> */}
-        <Button variant="large" style={{ marginLeft: "auto" }}>
-          I am sure
-        </Button>
-        {/* </Form> */}
+        <fetcher.Form action="/groups/api/member" method="post">
+          <input name="userId" value={member.userId} type="hidden" />
+          <input name="groupId" value={member.groupId} type="hidden" />
+          <input
+            name="role"
+            value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"}
+            type="hidden"
+          />
+          <Button variant="large" style={{ marginLeft: "auto" }}>
+            I am sure
+          </Button>
+        </fetcher.Form>
       </Dialog.Content>
     </Dialog>
   )
