@@ -2,10 +2,16 @@ import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import type { Group } from "~/models/group.server"
 import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import {
+  Form,
+  Link,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, TextButton } from "~/components/Button"
 import { Dialog } from "~/components/Dialog"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
@@ -14,6 +20,9 @@ import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
 
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
+import { Table } from "~/components/Table"
+import type { GroupMember } from "@prisma/client"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -23,7 +32,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     userId,
   })
 
-  if (!group) return new Response("Not found", { status: 404 })
+  if (!group) throw new Response("Not found", { status: 404 })
 
   return json({
     group,
@@ -147,7 +156,7 @@ export default function GroupSettingsPage() {
               <Input
                 ref={latRef}
                 name="lat"
-                defaultValue={group.lat}
+                defaultValue={group.lat ?? ""}
                 aria-invalid={actionData?.errors?.lat ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.lat ? "lat-error" : undefined
@@ -165,7 +174,7 @@ export default function GroupSettingsPage() {
               <Input
                 ref={lonRef}
                 name="lon"
-                defaultValue={group.lon}
+                defaultValue={group.lon ?? ""}
                 aria-invalid={actionData?.errors?.lon ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.lon ? "lon-error" : undefined
@@ -180,6 +189,36 @@ export default function GroupSettingsPage() {
         <Spacer size={16} />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
+      <Subtitle>Members</Subtitle>
+      <Table>
+        <Table.Head>
+          <tr>
+            <Table.Heading wide>Name</Table.Heading>
+            <Table.Heading></Table.Heading>
+            <Table.Heading></Table.Heading>
+          </tr>
+        </Table.Head>
+        <tbody>
+          {group.members.map((member) => (
+            <tr key={member.userId}>
+              <Table.Cell wide>
+                <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
+              </Table.Cell>
+              <Table.Cell>
+                {/* {group.members.length > 1 && (
+                  <ChangeMemberRoleAction member={member} />
+                )} */}
+              </Table.Cell>
+              <Table.Cell>
+                {group.members.length > 1 && (
+                  <RemoveMemberAction member={member} />
+                )}
+              </Table.Cell>
+            </tr>
+          ))}
+        </tbody>
+      </Table>
+      <Spacer size={24} />
       <Subtitle>Destructive actions</Subtitle>
       <DeleteGroupAction groupName={group.name} />
     </div>
@@ -248,3 +287,77 @@ const DialogDescription = styled(Dialog.Description)`
     margin-bottom: 16px;
   }
 `
+
+type RemoveMemberActionProps = {
+  member: RecursivelyConvertDatesToStrings<GroupMember & { user: User }>
+}
+const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
+  const fetcher = useFetcher()
+
+  return (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <TextButton>Remove</TextButton>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Close />
+        <Dialog.Title>
+          Are you sure you want to remove {member.user.name} from the group?
+        </Dialog.Title>
+        <DialogDescription>
+          This will delete all their scores and comments. This action is{" "}
+          <strong>irreversible</strong> and <strong>cannot be undone.</strong>
+        </DialogDescription>
+        <Spacer size={16} />
+        <fetcher.Form action="/groups/api/member" method="delete">
+          <input name="userId" value={member.userId} type="hidden" />
+          <input name="groupId" value={member.groupId} type="hidden" />
+          <Button variant="large" style={{ marginLeft: "auto" }}>
+            I am sure
+          </Button>
+        </fetcher.Form>
+      </Dialog.Content>
+    </Dialog>
+  )
+}
+
+type ChangeMemberRoleActionProps = {
+  member: RecursivelyConvertDatesToStrings<GroupMember & { user: User }>
+}
+const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
+  if (member.user.role === "ANONYMOUS") return null
+
+  return (
+    <Dialog>
+      <Dialog.Trigger asChild>
+        <TextButton>
+          {member.role === "ADMIN" ? "Make user" : "Make admin"}
+        </TextButton>
+      </Dialog.Trigger>
+      <Dialog.Content>
+        <Dialog.Close />
+        <Dialog.Title>
+          Are you sure you want to make {member.user.name}{" "}
+          {member.role === "ADMIN" ? "a user" : "an admin"}?
+        </Dialog.Title>
+        <DialogDescription>
+          {member.role === "ADMIN" ? (
+            <>
+              This will <strong>remove</strong> their access to group settings.
+            </>
+          ) : (
+            <>
+              This will <strong>give them access</strong> to group settings.
+            </>
+          )}
+        </DialogDescription>
+        <Spacer size={8} />
+        {/* <Form method="delete"> */}
+        <Button variant="large" style={{ marginLeft: "auto" }}>
+          I am sure
+        </Button>
+        {/* </Form> */}
+      </Dialog.Content>
+    </Dialog>
+  )
+}

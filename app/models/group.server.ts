@@ -370,6 +370,107 @@ export async function updateGroup(update: Partial<Group>) {
   })
 }
 
+export async function deleteGroupMember({
+  groupId,
+  userId,
+  requestedByUserId,
+}: {
+  groupId: Group["id"]
+  userId: User["id"]
+  requestedByUserId: User["id"]
+}) {
+  const group = await prisma.group.findUnique({
+    where: {
+      id: groupId,
+    },
+    include: {
+      members: true,
+    },
+  })
+
+  if (!group) {
+    return { error: "Something went wrong 1" }
+  }
+
+  const requestedByAdmin = group.members.some(
+    (x) => x.userId === requestedByUserId && x.role === "ADMIN"
+  )
+  const requestedBySameUser = userId === requestedByUserId
+
+  if (!requestedByAdmin && !requestedBySameUser) {
+    return { error: "Something went wrong 2" }
+  }
+
+  const groupMember = await prisma.groupMember.delete({
+    where: {
+      userId_groupId: {
+        groupId,
+        userId,
+      },
+    },
+    include: {
+      user: {
+        select: {
+          role: true,
+        },
+      },
+    },
+  })
+
+  await prisma.score.deleteMany({
+    where: {
+      lunch: {
+        groupLocationGroupId: groupId,
+      },
+      userId,
+    },
+  })
+
+  await prisma.scoreRequest.deleteMany({
+    where: {
+      lunch: {
+        groupLocationGroupId: groupId,
+      },
+      OR: [
+        {
+          requestedByUserId: userId,
+        },
+        {
+          userId,
+        },
+      ],
+    },
+  })
+
+  await prisma.groupLocation.updateMany({
+    where: {
+      discoveredById: userId,
+    },
+    data: {
+      discoveredById: null,
+    },
+  })
+
+  await prisma.lunch.updateMany({
+    where: {
+      choosenByUserId: userId,
+    },
+    data: {
+      choosenByUserId: null,
+    },
+  })
+
+  if (groupMember.user.role === "ANONYMOUS") {
+    await prisma.user.delete({
+      where: {
+        id: userId,
+      },
+    })
+  }
+
+  return groupMember
+}
+
 type StatsType = {
   averageScore: number
   bestLocation: {

@@ -23,16 +23,18 @@ const Root = styled.table`
 
 const Head = styled.thead``
 
-const Heading = styled.th<{ numeric?: boolean }>`
+const Heading = styled.th<{ numeric?: boolean; wide?: boolean }>`
   text-align: ${({ numeric }) => (numeric ? "right" : "left")};
   padding: 4px 12px;
   white-space: nowrap;
+  width: ${({ wide }) => (wide ? "100%" : "auto")}; ;
 `
 
-const Cell = styled.td<{ numeric?: boolean }>`
+const Cell = styled.td<{ numeric?: boolean; wide?: boolean }>`
   text-align: ${({ numeric }) => (numeric ? "right" : "left")};
   padding: 4px 12px;
   white-space: nowrap;
+  width: ${({ wide }) => (wide ? "100%" : "auto")};
 
   a {
     text-decoration: underline;

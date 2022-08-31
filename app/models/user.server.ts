@@ -257,10 +257,6 @@ export async function createAnonymousUser(name: string, groupId: Group["id"]) {
   return user
 }
 
-export async function deleteUserByEmail(email: Email["email"]) {
-  return prisma.user.delete({ where: {} })
-}
-
 export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
   const fromUser = await prisma.user.findUnique({
     where: {

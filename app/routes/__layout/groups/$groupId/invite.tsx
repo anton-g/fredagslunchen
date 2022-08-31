@@ -26,7 +26,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     userId,
   })
 
-  if (!group) return new Response("Not found", { status: 404 })
+  if (!group) throw new Response("Not found", { status: 404 })
 
   const { origin } = new URL(request.url)
 

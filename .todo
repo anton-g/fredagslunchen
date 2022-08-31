@@ -1,13 +1,11 @@
 - Group settings
   - Group admins
-  - Remove group member
 - Investigate issue with map ENV
 - Help / FAQ
   - Where can I find coordinates?
   Google Maps, right click copy
 - Leave group
 - Parse address on paste
-- News (changelog) (MDX?)
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
 - Better error boundaries
