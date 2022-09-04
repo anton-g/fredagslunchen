@@ -1,5 +1,18 @@
 # Changelog
 
+## 2022-09-04
+
+### New features
+
+- **Manage group users**
+
+  - You can now remove group members.
+  - You can now change roles for group members.
+
+- **Change password**
+
+  - You can now change your password in your settings.
+
 ## 2022-08-28
 
 ### New features
