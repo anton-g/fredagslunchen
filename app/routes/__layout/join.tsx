@@ -191,6 +191,7 @@ export default function Join() {
                 ref={passwordRef}
                 name="password"
                 type="password"
+                minLength={8}
                 autoComplete="new-password"
                 aria-invalid={actionData?.errors?.password ? true : undefined}
                 aria-describedby="password-error"

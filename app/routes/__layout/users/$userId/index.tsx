@@ -131,9 +131,13 @@ export default function Index() {
                     </Link>
                   </Table.Cell>
                   <Table.Cell>
-                    <Link to={`/users/${score.lunch.choosenBy.id}`}>
-                      {score.lunch.choosenBy.name}
-                    </Link>
+                    {score.lunch.choosenBy ? (
+                      <Link to={`/users/${score.lunch.choosenBy.id}`}>
+                        {score.lunch.choosenBy.name}
+                      </Link>
+                    ) : (
+                      "-"
+                    )}
                   </Table.Cell>
                   <Table.Cell>{score.comment}</Table.Cell>
                 </tr>

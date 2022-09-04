@@ -94,4 +94,20 @@ const NavLink = styled(RemixNavLink)`
   }
 `
 
-export { Button, LinkButton, NavLink }
+const TextButton = styled.button`
+  color: ${({ theme }) => theme.colors.primary};
+  background-color: transparent;
+  border: 0;
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+  font-size: 16px;
+  padding: 2px 6px;
+  height: fit-content;
+  text-decoration: underline;
+  cursor: pointer;
+`
+
+export { Button, LinkButton, NavLink, TextButton }

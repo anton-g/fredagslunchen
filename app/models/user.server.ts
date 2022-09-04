@@ -16,6 +16,7 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
       email: {
         select: {
           verified: true,
+          email: true,
         },
       },
       groups: {
@@ -256,10 +257,6 @@ export async function createAnonymousUser(name: string, groupId: Group["id"]) {
   return user
 }
 
-export async function deleteUserByEmail(email: Email["email"]) {
-  return prisma.user.delete({ where: {} })
-}
-
 export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
   const fromUser = await prisma.user.findUnique({
     where: {
@@ -430,6 +427,51 @@ export async function createResetPasswordToken(email: Email["email"]) {
 }
 
 export async function changeUserPassword({
+  id,
+  oldPassword,
+  newPassword,
+}: {
+  id: User["id"]
+  oldPassword: string
+  newPassword: string
+}) {
+  const userWithPassword = await prisma.user.findUniqueOrThrow({
+    where: { id },
+    include: {
+      password: true,
+    },
+  })
+
+  const isValid = await bcrypt.compare(
+    oldPassword,
+    userWithPassword.password?.hash || ""
+  )
+
+  if (!isValid) {
+    return {
+      error: "Invalid password",
+    }
+  }
+
+  const hashedPassword = await hashPassword(newPassword)
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      passwordResetTime: null,
+      passwordResetToken: null,
+      password: {
+        update: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  })
+}
+
+export async function changeUserPasswordWithToken({
   token,
   newPassword,
 }: {

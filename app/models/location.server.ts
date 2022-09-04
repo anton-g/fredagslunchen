@@ -33,7 +33,7 @@ export function getGroupLocation({
 
 type CreateGroupLocationInput = Omit<Location, "id"> & {
   groupId: Group["id"]
-  discoveredById: GroupLocation["discoveredById"]
+  discoveredById: NonNullable<GroupLocation["discoveredById"]>
   locationId?: Location["id"]
 }
 

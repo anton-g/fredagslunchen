@@ -85,8 +85,8 @@ model GroupLocation {
 
   lunches Lunch[]
 
-  discoveredBy   User   @relation(fields: [discoveredById], references: [id])
-  discoveredById String
+  discoveredBy   User?   @relation(fields: [discoveredById], references: [id])
+  discoveredById String?
 
   @@id([locationId, groupId])
 }
@@ -114,8 +114,8 @@ model Lunch {
   groupLocationLocationId Int
   groupLocationGroupId    String
 
-  choosenBy       User   @relation(fields: [choosenByUserId], references: [id])
-  choosenByUserId String @map("userId")
+  choosenBy       User?   @relation(fields: [choosenByUserId], references: [id])
+  choosenByUserId String? @map("userId")
 
   scoreRequests ScoreRequest[]
 }

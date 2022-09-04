@@ -7,7 +7,7 @@ import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useSearchParams } from "@remix-run/react"
 import * as React from "react"
 import { getUserId } from "~/session.server"
-import { changeUserPassword as resetUserPassword } from "~/models/user.server"
+import { changeUserPasswordWithToken as resetUserPassword } from "~/models/user.server"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
@@ -116,6 +116,7 @@ export default function ResetPasswordPage() {
                     autoFocus={true}
                     name="password"
                     type="password"
+                    minLength={8}
                     autoComplete="password"
                     aria-invalid={
                       actionData?.errors?.password ? true : undefined
@@ -134,7 +135,7 @@ export default function ResetPasswordPage() {
                     ref={confirmPasswordRef}
                     id="confirm-password"
                     required
-                    autoFocus={true}
+                    minLength={8}
                     name="confirm-password"
                     type="password"
                     aria-invalid={

@@ -108,8 +108,12 @@ export default function LunchDetailsPage() {
         <Stat label="Lowest score" value={lowestScore || "-"} />
         <Stat
           label="Choosen by"
-          value={groupLunch.choosenBy.name}
-          to={`/users/${groupLunch.choosenByUserId}`}
+          value={groupLunch.choosenBy?.name || "-"}
+          to={
+            groupLunch.choosenByUserId
+              ? `/users/${groupLunch.choosenByUserId}`
+              : undefined
+          }
         />
       </StatsGrid>
       <Spacer size={24} />

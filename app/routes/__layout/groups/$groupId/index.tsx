@@ -206,9 +206,13 @@ export default function GroupDetailsPage() {
                 </Link>
               </Table.Cell>
               <Table.Cell>
-                <Link to={`/users/${lunch.choosenBy.id}`}>
-                  {lunch.choosenBy.name}
-                </Link>
+                {lunch.choosenBy ? (
+                  <Link to={`/users/${lunch.choosenBy.id}`}>
+                    {lunch.choosenBy.name}
+                  </Link>
+                ) : (
+                  "-"
+                )}
               </Table.Cell>
               <Table.Cell numeric>
                 {formatNumber(getAverageNumber(lunch.scores, "score"))}
