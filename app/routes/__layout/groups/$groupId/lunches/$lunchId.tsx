@@ -262,7 +262,7 @@ const ScoreDeleteAction = ({
         <Dialog.Title>Are you sure you want to delete this score?</Dialog.Title>
         <Dialog.Description>{description}</Dialog.Description>
         <fetcher.Form method="post" action="/scores/delete">
-          <Button variant="large">I am sure</Button>
+          <Button size="large">I am sure</Button>
           <input type="hidden" name="scoreId" value={scoreId} />
         </fetcher.Form>
       </Dialog.Content>
@@ -515,7 +515,7 @@ const AdminActions = () => {
             <strong>irreversible</strong>.
           </DialogDescription>
           <Form method="delete">
-            <Button variant="large" style={{ marginLeft: "auto" }}>
+            <Button size="large" style={{ marginLeft: "auto" }}>
               I am sure
             </Button>
           </Form>

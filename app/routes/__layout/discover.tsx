@@ -61,7 +61,7 @@ export default function DiscoverPage() {
           <Subtitle>Map</Subtitle>
           <MapCard>
             {/* TODO: fix location link */}
-            <Map locations={locations} />
+            <Map locations={locations.filter((x) => x.lunchCount)} />
           </MapCard>
         </>
       )}

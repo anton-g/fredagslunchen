@@ -192,7 +192,15 @@ export default function Kitchensink() {
               <CubeIcon />
             </Button>
             <LinkButton to="/kitchensink">As link</LinkButton>
-            <Button variant="large">Large</Button>
+            <Button size="large">Large</Button>
+            <Button size="huge">Huge</Button>
+            <Button variant="inverted">Inverted</Button>
+            <Button variant="inverted" size="large">
+              Inverted large
+            </Button>
+            <Button variant="inverted" size="huge">
+              Inverted huge
+            </Button>
           </Stack>
         </Component>
         <Component title="Stack">

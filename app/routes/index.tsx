@@ -13,6 +13,8 @@ import { Stack } from "~/components/Stack"
 import { useEffect, useRef } from "react"
 import { Input } from "~/components/Input"
 import { TextArea } from "~/components/TextArea"
+import { Landing } from "~/views/landing"
+import { Layout } from "~/views/layout"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof getFullUserById>>>
 type ScoreRequest = RecursivelyConvertDatesToStrings<
@@ -28,64 +30,58 @@ export const loader = async ({ request }: LoaderArgs) => {
 
   return json({
     user,
+    isAdmin: user?.role === "ADMIN",
   })
 }
 
 export default function Index() {
-  const { user } = useLoaderData<typeof loader>()
+  const { user, isAdmin } = useLoaderData<typeof loader>()
 
   if (!user) {
-    return (
-      <Wrapper>
-        <Title style={{ textAlign: "center" }}>Welcome.</Title>
-        <p>
-          No more discussions about where to eat. Just get together with your
-          friends or colleagues, discover new restaurants, have a lovely time,
-          rate your lunch, soak in the statistics. And then do it all again.
-        </p>
-        <Spacer size={8} />
-        <p style={{ fontWeight: "bold" }}>Enjoy Fredagslunchen.</p>
-      </Wrapper>
-    )
+    return <Landing />
   }
 
   if (user.groups.length === 0) {
     return (
-      <Wrapper>
-        <Title style={{ textAlign: "center" }}>Welcome {user.name}!</Title>
-        <p>
-          <Link to="/groups/new">Create a new group</Link> to get started! You
-          can create a group for whatever constellation of people you want. How
-          about your team at work, that group of friends you always meet with
-          over a bowl of ramen, or maybe a group just for you?
-        </p>
-        <Spacer size={24} />
-        <LinkButton
-          to="/groups/new"
-          variant="large"
-          style={{ margin: "0 auto" }}
-        >
-          Create your first group
-        </LinkButton>
-      </Wrapper>
+      <Layout isAdmin={isAdmin}>
+        <Wrapper>
+          <Title style={{ textAlign: "center" }}>Welcome {user.name}!</Title>
+          <p>
+            <Link to="/groups/new">Create a new group</Link> to get started! You
+            can create a group for whatever constellation of people you want.
+            How about your team at work, that group of friends you always meet
+            with over a bowl of ramen, or maybe a group just for you?
+          </p>
+          <Spacer size={24} />
+          <LinkButton
+            to="/groups/new"
+            size="large"
+            style={{ margin: "0 auto" }}
+          >
+            Create your first group
+          </LinkButton>
+        </Wrapper>
+      </Layout>
     )
   }
 
   return (
-    <Wrapper>
-      <Title>Hello {user.name}!</Title>
-      <Spacer size={16} />
-      {user.scoreRequests.length > 0 && (
-        <>
-          <Subtitle>Score requests</Subtitle>
-          <Stack gap={32}>
-            {user.scoreRequests.map((request) => (
-              <ScoreRequestCard request={request} key={request.id} />
-            ))}
-          </Stack>
-        </>
-      )}
-    </Wrapper>
+    <Layout isAdmin={isAdmin}>
+      <Wrapper>
+        <Title>Hello {user.name}!</Title>
+        <Spacer size={16} />
+        {user.scoreRequests.length > 0 && (
+          <>
+            <Subtitle>Score requests</Subtitle>
+            <Stack gap={32}>
+              {user.scoreRequests.map((request) => (
+                <ScoreRequestCard request={request} key={request.id} />
+              ))}
+            </Stack>
+          </>
+        )}
+      </Wrapper>
+    </Layout>
   )
 }
 

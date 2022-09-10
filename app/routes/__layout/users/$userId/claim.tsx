@@ -66,7 +66,7 @@ export default function Index() {
         </p>
       </Description>
       <Form method="post">
-        <Button variant="large" style={{ marginLeft: "auto" }}>
+        <Button size="large" style={{ marginLeft: "auto" }}>
           I'm really, really sure
         </Button>
       </Form>

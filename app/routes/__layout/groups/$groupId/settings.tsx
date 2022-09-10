@@ -270,7 +270,7 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
         <Spacer size={16} />
         <Form method="delete">
           <Button
-            variant="large"
+            size="large"
             style={{ marginLeft: "auto" }}
             disabled={confirmNameValue !== groupName}
           >
@@ -313,7 +313,7 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
         <fetcher.Form action="/groups/api/member" method="delete">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
-          <Button variant="large" style={{ marginLeft: "auto" }}>
+          <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
         </fetcher.Form>
@@ -369,7 +369,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
             value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"}
             type="hidden"
           />
-          <Button variant="large" style={{ marginLeft: "auto" }}>
+          <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
         </fetcher.Form>
