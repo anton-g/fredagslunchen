@@ -27,15 +27,15 @@
 
 ### Bug fixes
 
-- Redirect to lunch when submitting requested score
+- Redirect to lunch when submitting requested rating
 - Fix issue where help tooltips didn't show on mobile
 
 ## 2022-08-25
 
 ### New features
 
-- **Score requests**
-  - You can now request a score from another member in your group. They will get a notification on their start page.
+- **Rating requests**
+  - You can now request a rating from another member in your group. They will get a notification on their start page.
 
 ## 2022-08-23
 

@@ -155,20 +155,20 @@ const LocationPopupContent = ({
         <Stat size="small" label="Lunches" value={location.lunchCount} />
         <Stat
           size="small"
-          label="Average score"
+          label="Average rating"
           value={location.averageScore}
         />
         {location.highestScore && (
           <Stat
             size="small"
-            label="Highest score"
+            label="Highest rating"
             value={location.highestScore}
           />
         )}
         {location.lowestScore && (
           <Stat
             size="small"
-            label="Lowest score"
+            label="Lowest rating"
             value={location.lowestScore}
           />
         )}

@@ -316,7 +316,7 @@ const TableExample = () => {
         <tr>
           <Table.Heading>Date</Table.Heading>
           <Table.Heading>Location</Table.Heading>
-          <Table.Heading numeric>Score</Table.Heading>
+          <Table.Heading numeric>Rating</Table.Heading>
           <Table.Heading>Comment</Table.Heading>
         </tr>
       </Table.Head>

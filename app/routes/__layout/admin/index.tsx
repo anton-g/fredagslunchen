@@ -25,7 +25,7 @@ export default function AdminPage() {
         <Stat label="Users" value={stats.userCount} />
         <Stat label="Groups" value={stats.groupCount} />
         <Stat label="Lunches" value={stats.lunchCount} />
-        <Stat label="Scores" value={stats.scoreCount} />
+        <Stat label="Ratings" value={stats.scoreCount} />
         <Stat label="Group locations" value={stats.groupLocationCount} />
         <Stat label="Locations" value={stats.locationCount} />
       </StatsGrid>

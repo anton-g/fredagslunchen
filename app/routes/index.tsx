@@ -72,7 +72,7 @@ export default function Index() {
         <Spacer size={16} />
         {user.scoreRequests.length > 0 && (
           <>
-            <Subtitle>Score requests</Subtitle>
+            <Subtitle>Rating requests</Subtitle>
             <Stack gap={32}>
               {user.scoreRequests.map((request) => (
                 <ScoreRequestCard request={request} key={request.id} />
@@ -128,7 +128,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
   return (
     <Card key={request.id}>
       <CardDescription>
-        {request.requestedBy.name} requested your score for the{" "}
+        {request.requestedBy.name} requested your rating for the{" "}
         <Link
           to={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
         >
@@ -150,7 +150,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
         }}
       >
         <label>
-          <span>Score</span>
+          <span>Rating</span>
           <Input
             defaultValue={0}
             name="score"
@@ -187,7 +187,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
           name="redirectTo"
           value={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
         />
-        <Button style={{ marginLeft: "auto" }}>Save score</Button>
+        <Button style={{ marginLeft: "auto" }}>Save rating</Button>
       </scoreFetcher.Form>
     </Card>
   )

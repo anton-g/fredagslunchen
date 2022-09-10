@@ -58,7 +58,7 @@ export default function GroupDetailsPage() {
   return (
     <div>
       <StatsGrid>
-        <Stat label="Average score" value={details.stats.averageScore} />
+        <Stat label="Average rating" value={details.stats.averageScore} />
         <Stat
           label="Best location"
           value={`${details.stats.bestLocation.name || "-"}`}
@@ -126,7 +126,7 @@ export default function GroupDetailsPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Avg score</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
             <Table.Heading>Favorite lunch</Table.Heading>
             <Table.Heading>Worst lunch</Table.Heading>
           </tr>
@@ -187,7 +187,7 @@ export default function GroupDetailsPage() {
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Location</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg score</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>

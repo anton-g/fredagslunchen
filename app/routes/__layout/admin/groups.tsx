@@ -28,7 +28,7 @@ export default function AdminGroupsPage() {
             <Table.Heading>Members</Table.Heading>
             <Table.Heading>Locations</Table.Heading>
             <Table.Heading>Lunches</Table.Heading>
-            <Table.Heading>Scores</Table.Heading>
+            <Table.Heading>Ratings</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
