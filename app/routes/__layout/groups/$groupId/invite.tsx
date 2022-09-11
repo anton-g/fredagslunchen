@@ -83,7 +83,7 @@ export default function InvitePage() {
 
   return (
     <>
-      {/* <h3>Add existing user to group</h3>
+      {/* <h3>Add existing user to club</h3>
       <Form
         method="post"
         style={{
@@ -123,7 +123,7 @@ export default function InvitePage() {
       {groupInviteToken ? (
         <>
           <InviteDescription>
-            Anyone with the link can join your group.
+            Anyone with the link can join your club.
           </InviteDescription>
           <Stack gap={16}>
             <Input
@@ -165,7 +165,7 @@ export default function InvitePage() {
       ) : (
         <fetcher.Form method="post" action="/groups/api/invite-token">
           <InviteDescription>
-            Create a link that anyone can use to join your group.
+            Create a link that anyone can use to join your club.
           </InviteDescription>
           <input type="hidden" name="groupId" value={groupId} />
           <input type="hidden" name="userId" value={userId} />
@@ -185,7 +185,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Club not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)

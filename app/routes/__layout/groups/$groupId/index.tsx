@@ -35,11 +35,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     (m) => m.userId === userId && m.role === "ADMIN"
   )
 
-  return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin })
+  const isMember = details.group.members.some((x) => x.userId === userId)
+  const canEdit = isAdmin || isMember
+
+  return json({
+    details,
+    isMapsEnabled: getEnv().ENABLE_MAPS,
+    isAdmin,
+    canEdit,
+  })
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin } = useLoaderData<typeof loader>()
+  const { details, isMapsEnabled, isAdmin, canEdit } =
+    useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members
     .slice()
@@ -58,7 +67,7 @@ export default function GroupDetailsPage() {
   return (
     <div>
       <StatsGrid>
-        <Stat label="Average score" value={details.stats.averageScore} />
+        <Stat label="Average rating" value={details.stats.averageScore} />
         <Stat
           label="Best location"
           value={`${details.stats.bestLocation.name || "-"}`}
@@ -114,11 +123,13 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
-        <ActionBar>
-          <LinkButton to={`/groups/${details.group.id}/invite`}>
-            Invite user
-          </LinkButton>
-        </ActionBar>
+        {canEdit && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/invite`}>
+              Invite user
+            </LinkButton>
+          </ActionBar>
+        )}
       </SectionHeader>
       <Spacer size={8} />
       <Table>
@@ -126,7 +137,7 @@ export default function GroupDetailsPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Avg score</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
             <Table.Heading>Favorite lunch</Table.Heading>
             <Table.Heading>Worst lunch</Table.Heading>
           </tr>
@@ -171,14 +182,16 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
-        <ActionBar>
-          <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-            New lunch
-          </LinkButton>
-          <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-            New location
-          </LinkButton>
-        </ActionBar>
+        {canEdit && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
+              New lunch
+            </LinkButton>
+            <LinkButton to={`/groups/${details.group.id}/locations/new`}>
+              New location
+            </LinkButton>
+          </ActionBar>
+        )}
       </SectionHeader>
       <Spacer size={8} />
       <Table>
@@ -187,7 +200,7 @@ export default function GroupDetailsPage() {
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Location</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg score</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -260,12 +273,12 @@ export default function GroupDetailsPage() {
                 <LinkButton
                   to={`/groups/${details.group.id}/settings`}
                   variant="round"
-                  aria-label="Group settings"
+                  aria-label="Club settings"
                 >
                   <GearIcon />
                 </LinkButton>
               </Tooltip.Trigger>
-              <Tooltip.Content>Group settings</Tooltip.Content>
+              <Tooltip.Content>Club settings</Tooltip.Content>
             </Tooltip>
           </Wrapper>
         </>
@@ -284,7 +297,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Club not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)

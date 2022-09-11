@@ -40,7 +40,7 @@ export default function LocationDetailsPage() {
           <tr>
             <Table.Heading>Date</Table.Heading>
             <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg score</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -93,7 +93,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Location not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)

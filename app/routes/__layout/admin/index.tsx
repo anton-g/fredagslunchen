@@ -23,10 +23,10 @@ export default function AdminPage() {
       <Title>Stats</Title>
       <StatsGrid>
         <Stat label="Users" value={stats.userCount} />
-        <Stat label="Groups" value={stats.groupCount} />
+        <Stat label="Clubs" value={stats.groupCount} />
         <Stat label="Lunches" value={stats.lunchCount} />
-        <Stat label="Scores" value={stats.scoreCount} />
-        <Stat label="Group locations" value={stats.groupLocationCount} />
+        <Stat label="Ratings" value={stats.scoreCount} />
+        <Stat label="Club locations" value={stats.groupLocationCount} />
         <Stat label="Locations" value={stats.locationCount} />
       </StatsGrid>
     </>

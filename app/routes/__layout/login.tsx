@@ -143,11 +143,11 @@ export default function LoginPage() {
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
             <Checkbox id="remember" name="remember" />
             <label htmlFor="remember">Remember me</label>
-            <ForgotPasswordLink to="/forgot-password">
-              Forgot your password?
-            </ForgotPasswordLink>
+            <SubmitButton type="submit">Log in</SubmitButton>
           </div>
-          <SubmitButton type="submit">Log in</SubmitButton>
+          <ForgotPasswordLink to="/forgot-password">
+            Forgot your password?
+          </ForgotPasswordLink>
         </Stack>
       </Form>
     </>

@@ -192,7 +192,15 @@ export default function Kitchensink() {
               <CubeIcon />
             </Button>
             <LinkButton to="/kitchensink">As link</LinkButton>
-            <Button variant="large">Large</Button>
+            <Button size="large">Large</Button>
+            <Button size="huge">Huge</Button>
+            <Button variant="inverted">Inverted</Button>
+            <Button variant="inverted" size="large">
+              Inverted large
+            </Button>
+            <Button variant="inverted" size="huge">
+              Inverted huge
+            </Button>
           </Stack>
         </Component>
         <Component title="Stack">
@@ -308,7 +316,7 @@ const TableExample = () => {
         <tr>
           <Table.Heading>Date</Table.Heading>
           <Table.Heading>Location</Table.Heading>
-          <Table.Heading numeric>Score</Table.Heading>
+          <Table.Heading numeric>Rating</Table.Heading>
           <Table.Heading>Comment</Table.Heading>
         </tr>
       </Table.Head>

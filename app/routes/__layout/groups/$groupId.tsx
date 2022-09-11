@@ -7,6 +7,7 @@ import { getGroupDetails } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
+import { checkIsAdmin } from "~/models/user.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -17,7 +18,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  if (!details.group.members.some((x) => x.userId === userId)) {
+  const isGlobalAdmin = await checkIsAdmin(userId)
+
+  const isMember = details.group.members.some((x) => x.userId === userId)
+  if (!isMember && !isGlobalAdmin) {
     throw new Response("Unauthorized", { status: 401 })
   }
 
@@ -50,7 +54,7 @@ export function CatchBoundary() {
   if (caught.status === 404) {
     return (
       <div>
-        <h2>Group not found</h2>
+        <h2>Club not found</h2>
       </div>
     )
   }
@@ -60,7 +64,7 @@ export function CatchBoundary() {
       <div>
         <h2>Access denied</h2>
         If someone sent you this link, create an account and ask them to add you
-        to their group.
+        to their club.
       </div>
     )
   }

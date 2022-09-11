@@ -25,8 +25,8 @@ export default function GroupsPage() {
       <div>
         {data.groups.length === 0 ? (
           <>
-            <GroupTitle>No groups yet</GroupTitle>
-            <p>Create a new group or ask for an invite to see them here!</p>
+            <GroupTitle>No clubs yet</GroupTitle>
+            <p>Create a new club or ask for an invite to see them here!</p>
           </>
         ) : (
           <GroupList>
@@ -69,7 +69,7 @@ export default function GroupsPage() {
         )}
       </div>
       <Spacer size={48} />
-      <NewGroupLink to="new">+ New group</NewGroupLink>
+      <NewGroupLink to="new">+ New club</NewGroupLink>
     </main>
   )
 }

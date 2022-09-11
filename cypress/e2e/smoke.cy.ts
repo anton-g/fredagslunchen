@@ -96,10 +96,10 @@ describe("smoke tests", () => {
     cy.login()
     cy.visit("/")
 
-    cy.findByRole("link", { name: /groups/i }).click()
-    cy.findByText("No groups yet")
+    cy.findByRole("link", { name: /clubs/i }).click()
+    cy.findByText("No club yet")
 
-    cy.findByRole("link", { name: /new group/i }).click()
+    cy.findByRole("link", { name: /new club/i }).click()
 
     cy.findByRole("textbox", { name: /name/i }).type(testGroup.name)
     cy.findByRole("button", { name: /save/i }).click()
@@ -127,7 +127,7 @@ describe("smoke tests", () => {
     })
     cy.visit("/")
 
-    cy.findByRole("link", { name: /groups/i }).click()
+    cy.findByRole("link", { name: /clubs/i }).click()
     cy.findByRole("link", {
       name: new RegExp(`${testGroup.name}`, "i"),
     }).click()
@@ -158,7 +158,7 @@ describe("smoke tests", () => {
     })
     cy.visit("/")
 
-    cy.findByRole("link", { name: /groups/i }).click()
+    cy.findByRole("link", { name: /clubs/i }).click()
     cy.findByRole("link", {
       name: new RegExp(`${testGroup.name}`, "i"),
     }).click()
@@ -189,7 +189,7 @@ describe("smoke tests", () => {
       cy.createGroup({ name: testGroup.name, userId: user.userId })
     })
     cy.visit(`/`)
-    cy.findByRole("link", { name: /groups/i }).click()
+    cy.findByRole("link", { name: /clubs/i }).click()
     cy.findByRole("link", {
       name: new RegExp(`${testGroup.name}`, "i"),
     }).click()

@@ -145,9 +145,9 @@ export default function GroupSettingsPage() {
           </div>
         </div>
         <Spacer size={16} />
-        <Subtitle>Group location</Subtitle>
+        <Subtitle>Club location</Subtitle>
         <FieldDescription>
-          Your groups "home base". Setting this will update the center of the
+          Your clubs "home base". Setting this will update the center of the
           map.
         </FieldDescription>
         <Stack axis="horizontal" gap={16}>
@@ -246,15 +246,15 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
   return (
     <Dialog>
       <Dialog.Trigger asChild>
-        <Button>Delete group</Button>
+        <Button>Delete club</Button>
       </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Close />
         <Dialog.Title>
-          Are you sure you want to delete the group {groupName}?
+          Are you sure you want to delete the club {groupName}?
         </Dialog.Title>
         <DialogDescription>
-          This will delete this group including all locations, lunches and
+          This will delete this club including all locations, lunches and
           scores. This action is <strong>irreversible</strong> and{" "}
           <strong>cannot be undone.</strong>
         </DialogDescription>
@@ -270,7 +270,7 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
         <Spacer size={16} />
         <Form method="delete">
           <Button
-            variant="large"
+            size="large"
             style={{ marginLeft: "auto" }}
             disabled={confirmNameValue !== groupName}
           >
@@ -303,7 +303,7 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
       <Dialog.Content>
         <Dialog.Close />
         <Dialog.Title>
-          Are you sure you want to remove {member.user.name} from the group?
+          Are you sure you want to remove {member.user.name} from the club?
         </Dialog.Title>
         <DialogDescription>
           This will delete all their scores and comments. This action is{" "}
@@ -313,7 +313,7 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
         <fetcher.Form action="/groups/api/member" method="delete">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
-          <Button variant="large" style={{ marginLeft: "auto" }}>
+          <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
         </fetcher.Form>
@@ -352,11 +352,11 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
         <DialogDescription>
           {member.role === "ADMIN" ? (
             <>
-              This will <strong>remove</strong> their access to group settings.
+              This will <strong>remove</strong> their access to club settings.
             </>
           ) : (
             <>
-              This will <strong>give them access</strong> to group settings.
+              This will <strong>give them access</strong> to club settings.
             </>
           )}
         </DialogDescription>
@@ -369,7 +369,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
             value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"}
             type="hidden"
           />
-          <Button variant="large" style={{ marginLeft: "auto" }}>
+          <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
         </fetcher.Form>

@@ -45,12 +45,12 @@ export default function NewGroupPage() {
 
   return (
     <>
-      <h2>Create a new group</h2>
+      <h2>Create a new club</h2>
       <p>
-        Create a new group to get started. When the group is created you can
+        Create a new club to get started. When the club is created you can
         invite other users to join you on your lunch adventures!
       </p>
-      <p>If you're looking to join a group, tell them to invite you instead!</p>
+      <p>If you're looking to join a club, tell them to invite you instead!</p>
       <Form
         method="post"
         style={{
@@ -81,7 +81,7 @@ export default function NewGroupPage() {
 
           <div>
             <Button style={{ marginLeft: "auto" }} type="submit">
-              Create group
+              Create club
             </Button>
           </div>
         </Stack>

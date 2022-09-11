@@ -79,7 +79,7 @@ export default function Index() {
         <StatsGrid>
           <Stat label="Number of lunches" value={user.stats.lunchCount} />
           <Stat
-            label="Average score"
+            label="Average rating"
             value={formatNumber(user.stats.averageScore)}
           />
           <Stat
@@ -88,8 +88,8 @@ export default function Index() {
               user.stats.bestChoosenLunch?.groupLocation.location.name || "-"
             }
           />
-          <Stat label="Lowest score" value={user.stats.lowestScore} />
-          <Stat label="Highest score" value={user.stats.highestScore} />
+          <Stat label="Lowest rating" value={user.stats.lowestScore} />
+          <Stat label="Highest rating" value={user.stats.highestScore} />
         </StatsGrid>
       </Section>
       <Spacer size={64} />
@@ -101,8 +101,8 @@ export default function Index() {
               <tr>
                 <Table.Heading>Date</Table.Heading>
                 <Table.Heading>Location</Table.Heading>
-                <Table.Heading numeric>Score</Table.Heading>
-                <Table.Heading>Group</Table.Heading>
+                <Table.Heading numeric>Rating</Table.Heading>
+                <Table.Heading>Club</Table.Heading>
                 <Table.Heading>Choosen by</Table.Heading>
                 <Table.Heading>Comment</Table.Heading>
               </tr>

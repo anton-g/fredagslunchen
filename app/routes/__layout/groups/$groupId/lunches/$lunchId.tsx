@@ -103,9 +103,9 @@ export default function LunchDetailsPage() {
       </Title>
       <Spacer size={24} />
       <StatsGrid>
-        <Stat label="Average score" value={averageScore} />
-        <Stat label="Highest score" value={highestScore || "-"} />
-        <Stat label="Lowest score" value={lowestScore || "-"} />
+        <Stat label="Average rating" value={averageScore} />
+        <Stat label="Highest rating" value={highestScore || "-"} />
+        <Stat label="Lowest rating" value={lowestScore || "-"} />
         <Stat
           label="Choosen by"
           value={groupLunch.choosenBy?.name || "-"}
@@ -119,13 +119,13 @@ export default function LunchDetailsPage() {
       <Spacer size={24} />
       {(scores.length > 0 || groupLunch.scoreRequests.length > 0) && (
         <>
-          <Subtitle>Scores</Subtitle>
+          <Subtitle>Ratings</Subtitle>
           <Spacer size={16} />
           <Table>
             <Table.Head>
               <tr>
                 <Table.Heading>By</Table.Heading>
-                <Table.Heading numeric>Score</Table.Heading>
+                <Table.Heading numeric>Rating</Table.Heading>
                 <Table.Heading>Comment</Table.Heading>
                 <Table.Heading></Table.Heading>
               </tr>
@@ -149,7 +149,7 @@ export default function LunchDetailsPage() {
                         description={
                           <>
                             {score.user.name} gave{" "}
-                            {groupLunch.groupLocation.location.name} a score of{" "}
+                            {groupLunch.groupLocation.location.name} a rating of{" "}
                             {score.score}.<br />
                             This action is <strong>irreversible.</strong>
                           </>
@@ -182,7 +182,7 @@ export default function LunchDetailsPage() {
       <Spacer size={24} />
       {usersWithoutScoresOrRequests.length > 0 && (
         <>
-          <Subtitle>New score</Subtitle>
+          <Subtitle>New rating</Subtitle>
           <Spacer size={8} />
           <NewScoreForm
             users={usersWithoutScoresOrRequests}
@@ -213,7 +213,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Lunch not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)
@@ -250,19 +250,21 @@ const ScoreDeleteAction = ({
       <Tooltip>
         <Tooltip.Trigger asChild>
           <Dialog.Trigger asChild>
-            <DeleteButton aria-label="Delete score">
+            <DeleteButton aria-label="Delete rating">
               <Cross2Icon></Cross2Icon>
             </DeleteButton>
           </Dialog.Trigger>
         </Tooltip.Trigger>
-        <Tooltip.Content>Delete score</Tooltip.Content>
+        <Tooltip.Content>Delete rating</Tooltip.Content>
       </Tooltip>
       <Dialog.Content>
         <Dialog.Close />
-        <Dialog.Title>Are you sure you want to delete this score?</Dialog.Title>
+        <Dialog.Title>
+          Are you sure you want to delete this rating?
+        </Dialog.Title>
         <Dialog.Description>{description}</Dialog.Description>
         <fetcher.Form method="post" action="/scores/delete">
-          <Button variant="large">I am sure</Button>
+          <Button size="large">I am sure</Button>
           <input type="hidden" name="scoreId" value={scoreId} />
         </fetcher.Form>
       </Dialog.Content>
@@ -280,7 +282,7 @@ const ScoreRequestDeleteAction = ({
   return (
     <fetcher.Form method="post" action="/scores/request/delete">
       <input type="hidden" name="requestId" value={requestId} />
-      <DeleteButton aria-label="Delete request for score">
+      <DeleteButton aria-label="Delete request for rating">
         <Cross2Icon></Cross2Icon>
       </DeleteButton>
     </fetcher.Form>
@@ -414,7 +416,7 @@ const NewScoreForm = ({
             )}
           </Stack>
           <label>
-            <span>Score</span>
+            <span>Rating</span>
             <Input
               defaultValue={0}
               name="score"
@@ -448,11 +450,11 @@ const NewScoreForm = ({
       >
         <Stack axis="horizontal" gap={8} style={{ marginRight: "auto" }}>
           <Button form="request-form" onClick={handleRequestScore}>
-            Request score
+            Request rating
           </Button>
           <Help>
-            By sending a score request the user will get a notification that
-            they should submit their score. This will ignore any score and
+            By sending a rating request the user will get a notification that
+            they should submit their rating. This will ignore any rating and
             comment set above.
           </Help>
         </Stack>
@@ -464,7 +466,7 @@ const NewScoreForm = ({
                 <p>
                   Anonymous users are users without an account. Use these for
                   people that haven't yet created their account or the
-                  occational guest that you don't really want in your group.
+                  occational guest that you don't really want in your club.
                 </p>
                 <p>
                   You can transfer the anonymous users data to their account
@@ -474,7 +476,7 @@ const NewScoreForm = ({
             </>
           )}
         </div>
-        <Button>Save score</Button>
+        <Button>Save rating</Button>
       </Stack>
       <input type="hidden" name="groupId" value={groupId} />
     </scoreFetcher.Form>
@@ -515,7 +517,7 @@ const AdminActions = () => {
             <strong>irreversible</strong>.
           </DialogDescription>
           <Form method="delete">
-            <Button variant="large" style={{ marginLeft: "auto" }}>
+            <Button size="large" style={{ marginLeft: "auto" }}>
               I am sure
             </Button>
           </Form>

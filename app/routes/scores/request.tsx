@@ -27,7 +27,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   if (currentUserId === userId) {
     return json<ActionData>(
       {
-        errors: { userId: "Can't request score from yourself" },
+        errors: { userId: "Can't request rating from yourself" },
       },
       { status: 400 }
     )

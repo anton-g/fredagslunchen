@@ -36,7 +36,7 @@ export default function DiscoverPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading>Address</Table.Heading>
-            <Table.Heading numeric>Score</Table.Heading>
+            <Table.Heading numeric>Rating</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -61,7 +61,7 @@ export default function DiscoverPage() {
           <Subtitle>Map</Subtitle>
           <MapCard>
             {/* TODO: fix location link */}
-            <Map locations={locations} />
+            <Map locations={locations.filter((x) => x.lunchCount)} />
           </MapCard>
         </>
       )}

@@ -1,12 +1,42 @@
 import { Link as RemixLink, NavLink as RemixNavLink } from "@remix-run/react"
 import styled, { css } from "styled-components"
+import type { CustomColors } from "~/styles/styled"
 
-type ButtonVariant = "normal" | "round" | "large"
+type ButtonVariant = "normal" | "round" | "inverted"
+type ButtonSize = "normal" | "large" | "huge"
 
-const styles = css<{ variant?: ButtonVariant }>`
-  color: ${({ theme }) => theme.colors.primary};
-  background-color: ${({ theme }) => theme.colors.secondary};
-  border: 2px solid ${({ theme }) => theme.colors.primary};
+const buttonColors: Record<ButtonVariant, keyof CustomColors> = {
+  inverted: "secondary",
+  normal: "primary",
+  round: "primary",
+}
+
+const buttonBackgroundColors: Record<ButtonVariant, keyof CustomColors> = {
+  inverted: "primary",
+  normal: "secondary",
+  round: "secondary",
+}
+
+const buttonFontSizes: Record<ButtonSize, string> = {
+  normal: "16px",
+  large: "18px",
+  huge: "22px",
+}
+
+const buttonPaddings: Record<ButtonSize, string> = {
+  normal: "2px 6px",
+  large: "4px 8px",
+  huge: "6px 22px",
+}
+
+const styles = css<{ variant?: ButtonVariant; size?: ButtonSize }>`
+  color: ${({ theme, variant }) =>
+    theme.colors[buttonColors[variant || "normal"]]};
+  background-color: ${({ theme, variant }) =>
+    theme.colors[buttonBackgroundColors[variant || "normal"]]};
+  border: ${({ variant }) => (variant === "inverted" ? "1px" : "2px")} solid
+    ${({ theme, variant }) =>
+      variant === "inverted" ? theme.colors.secondary : theme.colors.primary};
   border-radius: ${({ variant }) => (variant === "round" ? "50%" : "4px")};
   position: relative;
   transform: translate(0.15rem, -0.15em);
@@ -15,9 +45,9 @@ const styles = css<{ variant?: ButtonVariant }>`
   display: flex;
   align-items: center;
   width: fit-content;
-  font-size: ${({ variant }) => (variant === "large" ? "18px" : "16px")};
+  font-size: ${({ size }) => buttonFontSizes[size || "normal"]};
   transition: transform 75ms ease-in-out;
-  padding: ${({ variant }) => (variant === "large" ? "4px 8px" : "2px 6px")};
+  padding: ${({ size }) => buttonPaddings[size || "normal"]};
   height: fit-content;
 
   ${({ variant }) =>
@@ -66,7 +96,7 @@ const styles = css<{ variant?: ButtonVariant }>`
   }
 `
 
-const Button = styled.button<{ variant?: ButtonVariant }>`
+const Button = styled.button<{ variant?: ButtonVariant; size?: ButtonSize }>`
   ${styles}
 `
 
@@ -74,7 +104,10 @@ Button.defaultProps = {
   variant: "normal",
 }
 
-const LinkButton = styled(RemixLink)<{ variant?: ButtonVariant }>`
+const LinkButton = styled(RemixLink)<{
+  variant?: ButtonVariant
+  size?: ButtonSize
+}>`
   ${styles}
 `
 

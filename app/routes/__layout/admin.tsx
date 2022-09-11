@@ -26,7 +26,7 @@ export default function AdminPage() {
       </Title>
       <Stack axis="horizontal" gap={16}>
         <NavLink to="/admin/users">users</NavLink>
-        <NavLink to="/admin/groups">groups</NavLink>
+        <NavLink to="/admin/groups">clubs</NavLink>
         <NavLink to="/admin/locations">locations</NavLink>
       </Stack>
       <Spacer size={16} />
