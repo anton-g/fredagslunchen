@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { useLoaderData } from "@remix-run/react"
+import { Link, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
 import { HoverCard } from "~/components/HoverCard"
 import { Table } from "~/components/Table"
@@ -34,7 +34,9 @@ export default function AdminGroupsPage() {
         <tbody>
           {groups.map((group) => (
             <tr key={group.id}>
-              <Table.Cell title={group.id}>{group.name}</Table.Cell>
+              <Table.Cell title={group.id}>
+                <Link to={`/groups/${group.id}`}>{group.name}</Link>
+              </Table.Cell>
               <Table.Cell numeric>
                 <HoverCard>
                   <HoverCard.Trigger>{group.members.length}</HoverCard.Trigger>

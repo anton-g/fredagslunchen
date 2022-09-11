@@ -35,11 +35,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     (m) => m.userId === userId && m.role === "ADMIN"
   )
 
-  return json({ details, isMapsEnabled: getEnv().ENABLE_MAPS, isAdmin })
+  const isMember = details.group.members.some((x) => x.userId === userId)
+  const canEdit = isAdmin || isMember
+
+  return json({
+    details,
+    isMapsEnabled: getEnv().ENABLE_MAPS,
+    isAdmin,
+    canEdit,
+  })
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin } = useLoaderData<typeof loader>()
+  const { details, isMapsEnabled, isAdmin, canEdit } =
+    useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members
     .slice()
@@ -114,11 +123,13 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
-        <ActionBar>
-          <LinkButton to={`/groups/${details.group.id}/invite`}>
-            Invite user
-          </LinkButton>
-        </ActionBar>
+        {canEdit && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/invite`}>
+              Invite user
+            </LinkButton>
+          </ActionBar>
+        )}
       </SectionHeader>
       <Spacer size={8} />
       <Table>
@@ -171,14 +182,16 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
-        <ActionBar>
-          <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-            New lunch
-          </LinkButton>
-          <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-            New location
-          </LinkButton>
-        </ActionBar>
+        {canEdit && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
+              New lunch
+            </LinkButton>
+            <LinkButton to={`/groups/${details.group.id}/locations/new`}>
+              New location
+            </LinkButton>
+          </ActionBar>
+        )}
       </SectionHeader>
       <Spacer size={8} />
       <Table>

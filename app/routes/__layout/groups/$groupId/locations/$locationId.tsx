@@ -93,7 +93,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Club not found</div>
+    return <div>Location not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)

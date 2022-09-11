@@ -7,6 +7,7 @@ import { getGroupDetails } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
+import { checkIsAdmin } from "~/models/user.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -17,7 +18,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  if (!details.group.members.some((x) => x.userId === userId)) {
+  const isGlobalAdmin = await checkIsAdmin(userId)
+
+  const isMember = details.group.members.some((x) => x.userId === userId)
+  if (!isMember && !isGlobalAdmin) {
     throw new Response("Unauthorized", { status: 401 })
   }
 
