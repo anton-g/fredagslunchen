@@ -1,5 +1,16 @@
 # Changelog
 
+## 2022-09-11
+
+- **Improved landing page**
+
+  - Updated the landing page to be a bit clearer and more inviting.
+
+- **Clearer naming**
+
+  - Renamed "Score" to "Rating"
+  - Renamed "Group" to "Club"
+
 ## 2022-09-04
 
 ### New features
