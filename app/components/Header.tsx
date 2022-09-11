@@ -15,7 +15,7 @@ export const Header = ({ isAdmin }: { isAdmin: boolean }) => {
         {user ? (
           <>
             <NavLink to={`/users/${user.id}`}>you</NavLink>
-            <NavLink to={"/groups"}>groups</NavLink>
+            <NavLink to={"/groups"}>clubs</NavLink>
             {isAdmin && <NavLink to={"/admin"}>admin</NavLink>}
             {/* <NavLink to={"/discover"}>discover</NavLink> */}
             <StyledForm action="/logout" method="post">

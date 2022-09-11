@@ -260,12 +260,12 @@ export default function GroupDetailsPage() {
                 <LinkButton
                   to={`/groups/${details.group.id}/settings`}
                   variant="round"
-                  aria-label="Group settings"
+                  aria-label="Club settings"
                 >
                   <GearIcon />
                 </LinkButton>
               </Tooltip.Trigger>
-              <Tooltip.Content>Group settings</Tooltip.Content>
+              <Tooltip.Content>Club settings</Tooltip.Content>
             </Tooltip>
           </Wrapper>
         </>
@@ -284,7 +284,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Club not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)

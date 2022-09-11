@@ -80,7 +80,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>(
-      { errors: { groupId: "Group is required" } },
+      { errors: { groupId: "Club is required" } },
       { status: 400 }
     )
   }

@@ -30,7 +30,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>(
-      { errors: { user: "Group is required" } },
+      { errors: { user: "Club is required" } },
       { status: 400 }
     )
   }

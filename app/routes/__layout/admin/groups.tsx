@@ -20,7 +20,7 @@ export default function AdminGroupsPage() {
 
   return (
     <div>
-      <Title>Groups</Title>
+      <Title>Clubs</Title>
       <Table>
         <Table.Head>
           <tr>

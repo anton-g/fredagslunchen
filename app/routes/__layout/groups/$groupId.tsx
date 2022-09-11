@@ -50,7 +50,7 @@ export function CatchBoundary() {
   if (caught.status === 404) {
     return (
       <div>
-        <h2>Group not found</h2>
+        <h2>Club not found</h2>
       </div>
     )
   }
@@ -60,7 +60,7 @@ export function CatchBoundary() {
       <div>
         <h2>Access denied</h2>
         If someone sent you this link, create an account and ask them to add you
-        to their group.
+        to their club.
       </div>
     )
   }

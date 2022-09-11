@@ -27,7 +27,7 @@ export default function AdminUsersPage() {
           <tr>
             <Table.Heading>Name</Table.Heading>
             <Table.Heading>Email</Table.Heading>
-            <Table.Heading numeric>Groups</Table.Heading>
+            <Table.Heading numeric>Clubs</Table.Heading>
             <Table.Heading numeric>Ratings</Table.Heading>
           </tr>
         </Table.Head>

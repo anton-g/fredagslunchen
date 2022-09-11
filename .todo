@@ -1,8 +1,6 @@
 - Group settings
   - Group admins
-- Rename
-  - Score -> Rating
-  - Group -> Club
+- Check 404s
 - Investigate issue with map ENV
 - Help / FAQ
   - Where can I find coordinates?

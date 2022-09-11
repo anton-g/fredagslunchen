@@ -30,7 +30,7 @@ export default function AdminLocationsPage() {
             <Table.Heading>Address</Table.Heading>
             <Table.Heading>Zip</Table.Heading>
             <Table.Heading>City</Table.Heading>
-            <Table.Heading>Groups</Table.Heading>
+            <Table.Heading>Clubs</Table.Heading>
             <Table.Heading>Lunches</Table.Heading>
             <Table.Heading></Table.Heading>
           </tr>

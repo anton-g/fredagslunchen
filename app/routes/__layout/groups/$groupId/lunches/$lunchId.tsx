@@ -213,7 +213,7 @@ export function CatchBoundary() {
   const caught = useCatch()
 
   if (caught.status === 404) {
-    return <div>Group not found</div>
+    return <div>Lunch not found</div>
   }
 
   throw new Error(`Unexpected caught response with status: ${caught.status}`)
@@ -466,7 +466,7 @@ const NewScoreForm = ({
                 <p>
                   Anonymous users are users without an account. Use these for
                   people that haven't yet created their account or the
-                  occational guest that you don't really want in your group.
+                  occational guest that you don't really want in your club.
                 </p>
                 <p>
                   You can transfer the anonymous users data to their account

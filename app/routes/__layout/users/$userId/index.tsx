@@ -102,7 +102,7 @@ export default function Index() {
                 <Table.Heading>Date</Table.Heading>
                 <Table.Heading>Location</Table.Heading>
                 <Table.Heading numeric>Rating</Table.Heading>
-                <Table.Heading>Group</Table.Heading>
+                <Table.Heading>Club</Table.Heading>
                 <Table.Heading>Choosen by</Table.Heading>
                 <Table.Heading>Comment</Table.Heading>
               </tr>
