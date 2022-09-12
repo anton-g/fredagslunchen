@@ -70,6 +70,10 @@ export const links: LinksFunction = () => {
       rel: "stylesheet",
       href: "https://api.tiles.mapbox.com/mapbox-gl-js/v2.9.2/mapbox-gl.css",
     },
+    {
+      rel: "apple-touch-icon",
+      href: "logo.png",
+    },
   ]
 }
 

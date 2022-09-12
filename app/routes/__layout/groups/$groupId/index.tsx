@@ -161,7 +161,7 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
-      <Subtitle>Suggestions</Subtitle>
+      <Subtitle>Recommendations</Subtitle>
       <Spacer size={8} />
       <StatsGrid>
         <HoverCard>
