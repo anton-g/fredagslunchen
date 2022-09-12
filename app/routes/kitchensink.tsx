@@ -321,14 +321,18 @@ const TableExample = () => {
         </tr>
       </Table.Head>
       <tbody>
-        <tr>
+        <Table.ClickableRow onClick={() => alert("click")}>
           <Table.Cell>Last Friday</Table.Cell>
-          <Table.Cell>
-            <Link to="/kitchensink">Franzén</Link>
-          </Table.Cell>
+          <Table.Cell>Franzén</Table.Cell>
           <Table.Cell numeric>3</Table.Cell>
-          <Table.Cell>Very bad</Table.Cell>
-        </tr>
+          <Table.Cell>This row is clickable</Table.Cell>
+        </Table.ClickableRow>
+        <Table.LinkRow to="/">
+          <Table.Cell>Last monday</Table.Cell>
+          <Table.Cell>Franzén</Table.Cell>
+          <Table.Cell numeric>3</Table.Cell>
+          <Table.Cell>This row is a link</Table.Cell>
+        </Table.LinkRow>
         <tr>
           <Table.Cell>2022-04-02</Table.Cell>
           <Table.Cell>

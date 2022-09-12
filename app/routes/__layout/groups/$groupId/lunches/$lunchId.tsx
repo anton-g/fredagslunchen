@@ -126,7 +126,7 @@ export default function LunchDetailsPage() {
               <tr>
                 <Table.Heading>By</Table.Heading>
                 <Table.Heading numeric>Rating</Table.Heading>
-                <Table.Heading>Comment</Table.Heading>
+                <Table.Heading wide>Comment</Table.Heading>
                 <Table.Heading></Table.Heading>
               </tr>
             </Table.Head>
@@ -137,7 +137,7 @@ export default function LunchDetailsPage() {
                     <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell title={score.comment ?? undefined}>
+                  <Table.Cell title={score.comment ?? undefined} wide>
                     {shorten(score.comment)}
                   </Table.Cell>
                   <Table.Cell
@@ -227,7 +227,7 @@ const Title = styled.h2`
     text-transform: uppercase;
   }
 
-  a:hover {
+  a {
     text-decoration: underline;
   }
 `
