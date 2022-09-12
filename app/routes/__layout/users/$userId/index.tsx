@@ -109,7 +109,10 @@ export default function Index() {
             </Table.Head>
             <tbody>
               {sortedScores.map((score) => (
-                <tr key={score.id}>
+                <Table.LinkRow
+                  to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
+                  key={score.id}
+                >
                   <Table.Cell>
                     <Link
                       to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
@@ -118,29 +121,17 @@ export default function Index() {
                     </Link>
                   </Table.Cell>
                   <Table.Cell>
-                    <Link
-                      to={`/groups/${score.lunch.groupLocation.groupId}/locations/${score.lunch.groupLocation.locationId}`}
-                    >
-                      {score.lunch.groupLocation.location.name}
-                    </Link>
+                    {score.lunch.groupLocation.location.name}
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
                   <Table.Cell>
-                    <Link to={`/groups/${score.lunch.groupLocationGroupId}`}>
-                      {score.lunch.groupLocation.group.name}
-                    </Link>
+                    {score.lunch.groupLocation.group.name}
                   </Table.Cell>
                   <Table.Cell>
-                    {score.lunch.choosenBy ? (
-                      <Link to={`/users/${score.lunch.choosenBy.id}`}>
-                        {score.lunch.choosenBy.name}
-                      </Link>
-                    ) : (
-                      "-"
-                    )}
+                    {score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}
                   </Table.Cell>
                   <Table.Cell>{score.comment}</Table.Cell>
-                </tr>
+                </Table.LinkRow>
               ))}
             </tbody>
           </Table>

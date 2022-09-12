@@ -207,32 +207,23 @@ export default function GroupDetailsPage() {
         </Table.Head>
         <tbody>
           {allLunches.map((lunch) => (
-            <tr key={lunch.id}>
+            <Table.LinkRow
+              to={`/groups/${details.group.id}/lunches/${lunch.id}`}
+              key={lunch.id}
+            >
               <Table.Cell>
                 <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
                   {formatTimeAgo(new Date(lunch.date))}
                 </Link>
               </Table.Cell>
+              <Table.Cell>{lunch.loc.location.name}</Table.Cell>
               <Table.Cell>
-                <Link
-                  to={`/groups/${details.group.id}/locations/${lunch.loc.locationId}`}
-                >
-                  {lunch.loc.location.name}
-                </Link>
-              </Table.Cell>
-              <Table.Cell>
-                {lunch.choosenBy ? (
-                  <Link to={`/users/${lunch.choosenBy.id}`}>
-                    {lunch.choosenBy.name}
-                  </Link>
-                ) : (
-                  "-"
-                )}
+                {lunch.choosenBy ? lunch.choosenBy.name : "-"}
               </Table.Cell>
               <Table.Cell numeric>
                 {formatNumber(getAverageNumber(lunch.scores, "score"))}
               </Table.Cell>
-            </tr>
+            </Table.LinkRow>
           ))}
         </tbody>
       </Table>

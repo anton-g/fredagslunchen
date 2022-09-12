@@ -49,10 +49,7 @@ const StatLink = styled(Link)<{ size: StatSize }>`
   font-weight: bold;
   font-size: ${({ size }) => (size === "normal" ? 24 : 18)}px;
   width: fit-content;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  text-decoration: underline;
 `
 
 const Value = styled.span<{ size: StatSize }>`

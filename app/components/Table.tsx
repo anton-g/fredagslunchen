@@ -1,3 +1,4 @@
+import { useNavigate } from "@remix-run/react"
 import type { ReactNode } from "react"
 import styled from "styled-components"
 import { Card } from "./Card"
@@ -19,6 +20,7 @@ const Wrapper = styled(Card)`
 
 const Root = styled.table`
   width: 100%;
+  border-spacing: 0;
 `
 
 const Head = styled.thead``
@@ -41,8 +43,58 @@ const Cell = styled.td<{ numeric?: boolean; wide?: boolean }>`
   }
 `
 
+/**
+ * Remember to always include a real clickable element in the row for a11y when using this component.
+ */
+const ClickableRow = ({
+  children,
+  onClick,
+}: {
+  children: ReactNode
+  onClick: React.MouseEventHandler<HTMLTableRowElement>
+}) => {
+  return <Row onClick={onClick}>{children}</Row>
+}
+
+const Row = styled.tr`
+  td:first-child {
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+    overflow: hidden;
+  }
+
+  td:last-child {
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
+
+  &:hover {
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.secondary};
+    cursor: pointer;
+  }
+`
+
+const LinkRow = ({ children, to }: { to: string; children: ReactNode }) => {
+  const navigate = useNavigate()
+
+  const handleClick = () => {
+    navigate(to)
+  }
+
+  return <ClickableRow onClick={handleClick}>{children}</ClickableRow>
+}
+
 Table.Head = Head
 Table.Heading = Heading
 Table.Cell = Cell
+/**
+ * Remember to always include a real clickable element in the row for a11y when using this component.
+ */
+Table.ClickableRow = ClickableRow
+/**
+ * Remember to always include a real clickable element in the row for a11y when using this component.
+ */
+Table.LinkRow = LinkRow
 
 export { Table }
