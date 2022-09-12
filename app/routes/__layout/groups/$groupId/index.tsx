@@ -50,13 +50,15 @@ export default function GroupDetailsPage() {
   const { details, isMapsEnabled, isAdmin, canEdit } =
     useLoaderData<typeof loader>()
 
-  const orderedPickers = details.group.members
-    .slice()
-    .sort(
-      (a, b) =>
-        b.stats.lunchCount / b.stats.choiceCount -
-        a.stats.lunchCount / a.stats.choiceCount
+  const orderedPickers = details.group.members.slice().sort((a, b) => {
+    if (a.stats.lunchCount === 0) return 1
+    if (b.stats.lunchCount === 0) return -1
+
+    return (
+      a.stats.lunchCount / a.stats.choiceCount -
+      b.stats.lunchCount / b.stats.choiceCount
     )
+  })
   const suggestedPicker = orderedPickers[0]
   const alternativePickers = orderedPickers.slice(1)
 
