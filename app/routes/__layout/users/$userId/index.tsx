@@ -65,7 +65,7 @@ export default function Index() {
         </TitleRow>
         <Spacer size={24} />
         <Stack gap={16} axis="horizontal">
-          <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
+          {isYou && <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>}
           {isYou && !user.email?.verified && (
             <Form method="post">
               <Stack gap={8} axis="horizontal">
