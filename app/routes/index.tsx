@@ -49,7 +49,7 @@ export default function Index() {
           <p>
             <Link to="/groups/new">Create a new club</Link> to get started! You
             can create a club for whatever constellation of people you want. How
-            about your team at work, that club of friends you always meet with
+            about your team at work, that group of friends you always meet with
             over a bowl of ramen, or maybe a club just for you?
           </p>
           <Spacer size={24} />

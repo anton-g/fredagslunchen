@@ -1,5 +1,13 @@
 # Changelog
 
+## 2022-09-12
+
+- **Improved recommended picker algorithm**
+
+  - The member recommended to pick the next location should now be more fair for everyone.
+
+- **Add icon for when you save the app to your home screen**
+
 ## 2022-09-11
 
 - **Improved landing page**
