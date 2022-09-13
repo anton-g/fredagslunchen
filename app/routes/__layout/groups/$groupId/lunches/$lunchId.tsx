@@ -15,7 +15,7 @@ import invariant from "tiny-invariant"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
 import { Cross2Icon } from "@radix-ui/react-icons"
-import { requireUserId } from "~/session.server"
+import { getUserId, requireUserId } from "~/session.server"
 import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
 import { Stat } from "~/components/Stat"
@@ -31,7 +31,7 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
   invariant(params.lunchId, "lunchId not found")
 
@@ -39,14 +39,16 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     id: parseInt(params.lunchId),
   })
 
-  const isAdmin = groupLunch?.groupLocation.group.members.some(
-    (m) => m.userId === userId && m.role === "ADMIN"
+  const currentMember = groupLunch?.groupLocation.group.members.find(
+    (m) => m.userId === userId
   )
+  const isAdmin = currentMember?.role === "ADMIN"
+  const isMember = Boolean(currentMember)
 
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLunch, isAdmin, userId })
+  return json({ groupLunch, isAdmin, isMember, userId })
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -65,7 +67,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin, userId } = useLoaderData<typeof loader>()
+  const { groupLunch, isAdmin, userId, isMember } =
+    useLoaderData<typeof loader>()
 
   const scores = groupLunch.scores
 
@@ -138,7 +141,7 @@ export default function LunchDetailsPage() {
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
                   <Table.Cell title={score.comment ?? undefined} wide>
-                    {shorten(score.comment)}
+                    {shorten(score.comment, { length: 45 })}
                   </Table.Cell>
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
@@ -171,7 +174,9 @@ export default function LunchDetailsPage() {
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    <ScoreRequestDeleteAction requestId={request.id} />
+                    {isMember && (
+                      <ScoreRequestDeleteAction requestId={request.id} />
+                    )}
                   </Table.Cell>
                 </ScoreRow>
               ))}
@@ -180,7 +185,7 @@ export default function LunchDetailsPage() {
         </>
       )}
       <Spacer size={24} />
-      {usersWithoutScoresOrRequests.length > 0 && (
+      {usersWithoutScoresOrRequests.length > 0 && isMember && (
         <>
           <Subtitle>New rating</Subtitle>
           <Spacer size={8} />

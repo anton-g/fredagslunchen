@@ -102,7 +102,7 @@ export async function getFullUserById({
   requestUserId,
 }: {
   id: User["id"]
-  requestUserId: User["id"]
+  requestUserId?: User["id"]
 }) {
   const user = await fetchUserDetails({ id })
 
@@ -114,7 +114,8 @@ export async function getFullUserById({
     ...user,
     scores: user.scores.filter((score) =>
       score.lunch.groupLocation.group.members.some(
-        (x) => x.userId === requestUserId
+        (x) =>
+          x.userId === requestUserId || score.lunch.groupLocation.group.public
       )
     ),
   }

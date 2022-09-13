@@ -11,7 +11,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const currentUserId = await requireUserId(request)
+  const currentUserId = await requireUserId(request, "/")
 
   const formData = await request.formData()
   const userId = formData.get("userId")

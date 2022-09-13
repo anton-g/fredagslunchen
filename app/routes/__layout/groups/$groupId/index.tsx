@@ -4,7 +4,7 @@ import { json } from "@remix-run/node"
 import { useCatch, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { getGroupDetails } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Table } from "~/components/Table"
@@ -23,10 +23,10 @@ import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  let userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
 
-  const details = await getGroupDetails({ userId, id: params.groupId })
+  const details = await getGroupDetails({ id: params.groupId })
   if (!details) {
     throw new Response("Not Found", { status: 404 })
   }

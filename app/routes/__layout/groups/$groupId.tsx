@@ -4,32 +4,38 @@ import { useCatch, useLoaderData, Outlet, Link } from "@remix-run/react"
 import invariant from "tiny-invariant"
 
 import { getGroupDetails } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { getUserId, requireUserId } from "~/session.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { checkIsAdmin } from "~/models/user.server"
+import { LinkButton } from "~/components/Button"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  let userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
 
-  const details = await getGroupDetails({ userId, id: params.groupId })
+  const details = await getGroupDetails({ id: params.groupId })
   if (!details) {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const isGlobalAdmin = await checkIsAdmin(userId)
+  const isPublicGroup = details.group.public
+  if (!isPublicGroup) {
+    userId = await requireUserId(request)
+  }
 
+  const isGlobalAdmin = userId ? await checkIsAdmin(userId) : false
   const isMember = details.group.members.some((x) => x.userId === userId)
-  if (!isMember && !isGlobalAdmin) {
+
+  if (!isMember && !isGlobalAdmin && !isPublicGroup) {
     throw new Response("Unauthorized", { status: 401 })
   }
 
-  return json({ details })
+  return json({ details, isMember, isPublicGroup })
 }
 
 export default function GroupDetailsPage() {
-  const { details } = useLoaderData<typeof loader>()
+  const { details, isMember, isPublicGroup } = useLoaderData<typeof loader>()
 
   return (
     <div>
@@ -38,6 +44,19 @@ export default function GroupDetailsPage() {
       </Title>
       <Spacer size={8} />
       <Outlet />
+      {!isMember && isPublicGroup && (
+        <>
+          <Spacer size={56} />
+          <LinkButton
+            to="/join"
+            size="huge"
+            variant="inverted"
+            style={{ margin: "0 auto" }}
+          >
+            Join Fredagslunchen
+          </LinkButton>
+        </>
+      )}
     </div>
   )
 }

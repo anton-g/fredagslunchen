@@ -18,7 +18,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request)
+  await requireUserId(request, "/")
 
   const formData = await request.formData()
   const scoreString = formData.get("score")

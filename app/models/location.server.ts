@@ -27,6 +27,15 @@ export function getGroupLocation({
         include: { scores: true, choosenBy: true },
       },
       location: true,
+      group: {
+        include: {
+          members: {
+            select: {
+              userId: true,
+            },
+          },
+        },
+      },
     },
   })
 }

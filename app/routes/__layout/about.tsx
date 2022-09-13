@@ -36,9 +36,3 @@ const Title = styled.h2`
   margin: 0;
   margin-bottom: 24px;
 `
-
-const Subtitle = styled.h3`
-  font-size: 36px;
-  margin: 0;
-  margin-bottom: 16px;
-`
