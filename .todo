@@ -12,6 +12,8 @@
 - Delete user
 - Dialog -> Alert Dialog
 - Social login
+- Add transitions and loading state when necessary
+- Add optimistic UI when possible
 
 # Later
 - Admin page

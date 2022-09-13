@@ -1,5 +1,11 @@
 # Changelog
 
+## 2022-09-13
+
+- **Demo club**
+
+  - You can now find a demo of what a club looks like on the start page.
+
 ## 2022-09-12
 
 - **Improved recommended picker algorithm**
