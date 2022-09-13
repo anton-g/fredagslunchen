@@ -37,7 +37,7 @@ describe("formatTimeAgo", () => {
     const date = new Date(2000, 1, 10, 12)
     vi.setSystemTime(date)
 
-    expect(formatTimeAgo(sub(new Date(), { hours: 2 }))).toBe("today")
+    expect(formatTimeAgo(sub(new Date(), { hours: 2 }))).toBe("2 hours ago")
     expect(formatTimeAgo(sub(new Date(), { days: 1 }))).toBe("yesterday")
     expect(formatTimeAgo(sub(new Date(), { days: 4 }))).toBe("4 days ago")
     expect(formatTimeAgo(sub(new Date(), { weeks: 1 }))).toBe("last week")
