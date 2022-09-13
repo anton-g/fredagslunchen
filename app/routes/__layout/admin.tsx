@@ -28,6 +28,7 @@ export default function AdminPage() {
         <NavLink to="/admin/users">users</NavLink>
         <NavLink to="/admin/groups">clubs</NavLink>
         <NavLink to="/admin/locations">locations</NavLink>
+        <NavLink to="/admin/tools">tools</NavLink>
       </Stack>
       <Spacer size={16} />
       <Outlet />

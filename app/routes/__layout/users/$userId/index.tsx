@@ -1,5 +1,5 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
-import { formatNumber, formatTimeAgo } from "~/utils"
+import { formatNumber, formatTimeAgo, shorten } from "~/utils"
 import { useLoaderData, Link, Form, useActionData } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
@@ -9,7 +9,7 @@ import {
   createEmailVerificationToken,
   getFullUserById,
 } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
 import { SeedAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
@@ -19,7 +19,7 @@ import { Stack } from "~/components/Stack"
 import { sendEmailVerificationEmail } from "~/services/mail.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  const userId = await getUserId(request)
   invariant(params.userId, "userId not found")
 
   const user = await getFullUserById({
@@ -65,7 +65,9 @@ export default function Index() {
         </TitleRow>
         <Spacer size={24} />
         <Stack gap={16} axis="horizontal">
-          {isYou && <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>}
+          {isYou && (
+            <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
+          )}
           {isYou && !user.email?.verified && (
             <Form method="post">
               <Stack gap={8} axis="horizontal">
@@ -130,7 +132,9 @@ export default function Index() {
                   <Table.Cell>
                     {score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}
                   </Table.Cell>
-                  <Table.Cell>{score.comment}</Table.Cell>
+                  <Table.Cell>
+                    {shorten(score.comment, { length: 30 })}
+                  </Table.Cell>
                 </Table.LinkRow>
               ))}
             </tbody>

@@ -3,7 +3,7 @@ import { json } from "@remix-run/node"
 import { useCatch, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
 
-import { requireUserId } from "~/session.server"
+import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import { getGroupLocation } from "~/models/location.server"
 import { Table } from "~/components/Table"
@@ -13,7 +13,7 @@ import { Spacer } from "~/components/Spacer"
 import { formatNumber } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request)
+  const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
   invariant(params.locationId, "locationId not found")
 
@@ -25,15 +25,21 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!groupLocation) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLocation })
+
+  const currentMember = groupLocation.group.members.find(
+    (m) => m.userId === userId
+  )
+  const isMember = Boolean(currentMember)
+
+  return json({ groupLocation, isMember })
 }
 
 export default function LocationDetailsPage() {
-  const { groupLocation } = useLoaderData<typeof loader>()
+  const { groupLocation, isMember } = useLoaderData<typeof loader>()
 
   return (
     <div>
-      <Title>{groupLocation.location.name}</Title>
+      <Title>at {groupLocation.location.name}</Title>
       <h3>Lunches</h3>
       <Table>
         <Table.Head>
@@ -45,7 +51,10 @@ export default function LocationDetailsPage() {
         </Table.Head>
         <tbody>
           {groupLocation.lunches.map((lunch) => (
-            <tr key={lunch.id}>
+            <Table.LinkRow
+              to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
+              key={lunch.id}
+            >
               <Table.Cell>
                 <Link
                   to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
@@ -54,13 +63,7 @@ export default function LocationDetailsPage() {
                 </Link>
               </Table.Cell>
               <Table.Cell>
-                {lunch.choosenBy ? (
-                  <Link to={`/users/${lunch.choosenBy.id}`}>
-                    {lunch.choosenBy.name}
-                  </Link>
-                ) : (
-                  "-"
-                )}
+                {lunch.choosenBy ? lunch.choosenBy.name : "-"}
               </Table.Cell>
               <Table.Cell numeric>
                 {formatNumber(
@@ -68,17 +71,21 @@ export default function LocationDetailsPage() {
                     lunch.scores.length
                 )}
               </Table.Cell>
-            </tr>
+            </Table.LinkRow>
           ))}
         </tbody>
       </Table>
-      <Spacer size={16} />
-      <LinkButton
-        to={`/groups/${groupLocation.groupId}/lunches/new?loc=${groupLocation.locationId}`}
-        style={{ marginLeft: "auto" }}
-      >
-        New lunch
-      </LinkButton>
+      {isMember && (
+        <>
+          <Spacer size={16} />
+          <LinkButton
+            to={`/groups/${groupLocation.groupId}/lunches/new?loc=${groupLocation.locationId}`}
+            style={{ marginLeft: "auto" }}
+          >
+            New lunch
+          </LinkButton>
+        </>
+      )}
     </div>
   )
 }

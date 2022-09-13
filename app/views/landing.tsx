@@ -1,3 +1,4 @@
+import { Link } from "@remix-run/react"
 import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Header } from "~/components/Header"
@@ -21,6 +22,8 @@ export function Landing() {
         <LinkButton to="/join" size="huge" variant="inverted">
           Join the club
         </LinkButton>
+        <Spacer size={16} />
+        <Link to="/groups/demo">Show me an example</Link>
       </Content>
       <Footer>
         <img src={footerDoodle} alt="Three hand drawn people vibing" />

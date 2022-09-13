@@ -42,9 +42,7 @@ export function getGroup({
   })
 }
 
-type GetGroupDetailsInput = Pick<Group, "id"> & {
-  userId: User["id"]
-}
+type GetGroupDetailsInput = Pick<Group, "id">
 
 async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
   return await prisma.group.findUnique({
@@ -99,9 +97,8 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
   })
 }
 
-export async function getGroupDetails({ id, userId }: GetGroupDetailsInput) {
-  const group = await fetchGroupDetails({ id, userId })
-
+export async function getGroupDetails({ id }: GetGroupDetailsInput) {
+  const group = await fetchGroupDetails({ id })
   if (!group) return null
 
   const stats = generateGroupStats(group)

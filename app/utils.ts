@@ -91,7 +91,7 @@ const DIVISIONS: { amount: number; name: Intl.RelativeTimeFormatUnit }[] = [
   { amount: Number.POSITIVE_INFINITY, name: "years" },
 ]
 
-export function formatTimeAgo(date: Date) {
+export function formatTimeAgo2(date: Date) {
   let duration = (date.valueOf() - new Date().valueOf()) / 1000 / 60 / 60 / 24
 
   for (let i = 0; i <= DIVISIONS.length; i++) {
@@ -100,6 +100,63 @@ export function formatTimeAgo(date: Date) {
       return formatter.format(Math.ceil(duration), division.name)
     }
     duration /= division.amount
+    console.log({ n: division.name, d: Math.abs(duration) })
+  }
+}
+
+export function formatTimeAgo3(timestamp: Date) {
+  const diff = (new Date().getTime() - timestamp.getTime()) / 1000
+  const minutes = Math.floor(diff / 60)
+  const hours = Math.floor(minutes / 60)
+  const days = Math.floor(hours / 24)
+  const months = Math.floor(days / 30)
+  const years = Math.floor(months / 12)
+
+  if (years > 0) {
+    return formatter.format(0 - years, "year")
+  } else if (months > 0) {
+    return formatter.format(0 - months, "month")
+  } else if (days > 0) {
+    return formatter.format(0 - days, "day")
+  } else if (hours > 0) {
+    return formatter.format(0 - hours, "hour")
+  } else if (minutes > 0) {
+    return formatter.format(0 - minutes, "minute")
+  } else {
+    return formatter.format(0 - diff, "second")
+  }
+}
+
+export function formatTimeAgo(date: Date) {
+  const SECOND = 1000
+  const MINUTE = 60 * SECOND
+  const HOUR = 60 * MINUTE
+  const DAY = 24 * HOUR
+  const WEEK = 7 * DAY
+  const MONTH = 30 * DAY
+  const YEAR = 365 * DAY
+  const intervals: {
+    ge: number
+    divisor: number
+    unit: Intl.RelativeTimeFormatUnit
+  }[] = [
+    { ge: YEAR, divisor: YEAR, unit: "year" },
+    { ge: MONTH, divisor: MONTH, unit: "month" },
+    { ge: WEEK, divisor: WEEK, unit: "week" },
+    { ge: DAY, divisor: DAY, unit: "day" },
+    { ge: HOUR, divisor: DAY, unit: "day" },
+    { ge: MINUTE, divisor: DAY, unit: "day" },
+    { ge: 30 * SECOND, divisor: DAY, unit: "day" },
+  ]
+  const now = Date.now()
+  const diff = now - date.getTime()
+  const diffAbs = Math.abs(diff)
+  for (const interval of intervals) {
+    if (diffAbs >= interval.ge) {
+      const x = Math.round(Math.abs(diff) / interval.divisor)
+      const isFuture = diff < 0
+      return formatter.format(isFuture ? x : -x, interval.unit)
+    }
   }
 }
 
