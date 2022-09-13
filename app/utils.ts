@@ -144,9 +144,9 @@ export function formatTimeAgo(date: Date) {
     { ge: MONTH, divisor: MONTH, unit: "month" },
     { ge: WEEK, divisor: WEEK, unit: "week" },
     { ge: DAY, divisor: DAY, unit: "day" },
-    { ge: HOUR, divisor: HOUR, unit: "hour" },
-    { ge: MINUTE, divisor: MINUTE, unit: "minute" },
-    { ge: 30 * SECOND, divisor: SECOND, unit: "seconds" },
+    { ge: HOUR, divisor: DAY, unit: "day" },
+    { ge: MINUTE, divisor: DAY, unit: "day" },
+    { ge: 30 * SECOND, divisor: DAY, unit: "day" },
   ]
   const now = Date.now()
   const diff = now - date.getTime()
