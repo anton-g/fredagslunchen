@@ -1,6 +1,11 @@
 import { createGlobalStyle } from "styled-components"
 
 export default createGlobalStyle`
+  :root {
+    --color-primary: ${({ theme }) => theme.colors.primary};
+    --color-secondary: ${({ theme }) => theme.colors.secondary};
+  }
+
   html {
     margin: 0;
     min-height: 100%;

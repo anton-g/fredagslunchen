@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Header } from "~/components/Header"
 import { Spacer } from "~/components/Spacer"
-import footerDoodle from "./footerDoodle.svg"
+import { ThreePeopleVibing } from "~/illustrations/ThreePeopleVibing"
 
 export function Landing() {
   return (
@@ -28,7 +28,7 @@ export function Landing() {
         </Link>
       </Content>
       <Footer>
-        <img src={footerDoodle} alt="Three hand drawn people vibing" />
+        <ThreePeopleVibing />
       </Footer>
     </Wrapper>
   )
@@ -72,8 +72,7 @@ const Footer = styled.div`
   max-width: 1000px;
   width: 95vw;
 
-  img {
+  svg {
     width: 100%;
-    vertical-align: middle;
   }
 `
