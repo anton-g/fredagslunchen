@@ -23,7 +23,9 @@ export function Landing() {
           Join the club
         </LinkButton>
         <Spacer size={16} />
-        <Link to="/groups/demo">Show me an example</Link>
+        <Link to="/groups/demo" style={{ textDecoration: "underline" }}>
+          Show me an example
+        </Link>
       </Content>
       <Footer>
         <img src={footerDoodle} alt="Three hand drawn people vibing" />
