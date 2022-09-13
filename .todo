@@ -1,5 +1,4 @@
 # Next
-- Fix comment width
 - Help / FAQ
   - Where can I find coordinates?
   Google Maps, right click copy
@@ -14,6 +13,7 @@
 - Social login
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
+- Social cards
 
 # Later
 - Admin page
