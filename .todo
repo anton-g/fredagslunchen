@@ -36,3 +36,5 @@
   - Creating anonymous user
   - Claiming anonymous user
 - Improved landing page
+- Show map image before loading interactive map
+- Fix issues when JS is disabled
