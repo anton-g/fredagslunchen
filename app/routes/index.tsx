@@ -15,6 +15,7 @@ import { Input } from "~/components/Input"
 import { TextArea } from "~/components/TextArea"
 import { Landing } from "~/views/landing"
 import { Layout } from "~/views/layout"
+import { IceCream } from "~/illustrations/IceCream"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof getFullUserById>>>
 type ScoreRequest = RecursivelyConvertDatesToStrings<
@@ -70,15 +71,19 @@ export default function Index() {
       <Wrapper>
         <Title>Hello {user.name}!</Title>
         <Spacer size={16} />
-        {user.scoreRequests.length > 0 && (
-          <>
-            <Subtitle>Rating requests</Subtitle>
-            <Stack gap={32}>
-              {user.scoreRequests.map((request) => (
-                <ScoreRequestCard request={request} key={request.id} />
-              ))}
-            </Stack>
-          </>
+        <Subtitle>Rating requests</Subtitle>
+        {user.scoreRequests.length > 0 ? (
+          <Stack gap={32}>
+            {user.scoreRequests.map((request) => (
+              <ScoreRequestCard request={request} key={request.id} />
+            ))}
+          </Stack>
+        ) : (
+          <Stack gap={64}>
+            You've got no waiting requests. When someone requests a rating from
+            you it will show up here.
+            <IceCream />
+          </Stack>
         )}
       </Wrapper>
     </Layout>
