@@ -16,6 +16,17 @@ export default function PrivacyPage() {
         privacy we provide this privacy policy notice explaining the way your
         personal information is collected and used.
       </p>
+      <Subtitle>Cookies</Subtitle>
+      <p>
+        Where necessary, this website uses cookies to store information about a
+        visitor’s preferences and history in order to better serve the user
+        and/or present the user with customized content.
+      </p>
+      <Subtitle>Advertisement and Other Third Parties</Subtitle>
+      <p>
+        We do not use any cookies to track users or visitors for any purpose
+        related to advertisements or for any third party.
+      </p>
       <Subtitle>Collection of Routine Information</Subtitle>
       <p>
         We want to process as little personal information as possible when you
@@ -32,17 +43,6 @@ export default function PrivacyPage() {
         the GDPR is "Article 6(1)(f); where our legitimate interests are to
         improve our website and business continually." As per the explanation,
         no personal data is stored over time.
-      </p>
-      <Subtitle>Cookies</Subtitle>
-      <p>
-        Where necessary, this website uses cookies to store information about a
-        visitor’s preferences and history in order to better serve the user
-        and/or present the user with customized content.
-      </p>
-      <Subtitle>Advertisement and Other Third Parties</Subtitle>
-      <p>
-        We do not use any cookies to track users or visitors for any purpose
-        related to advertisements or for any third party.
       </p>
       <Subtitle>Security</Subtitle>
       <p>

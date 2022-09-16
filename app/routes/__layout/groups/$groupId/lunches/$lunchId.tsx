@@ -154,7 +154,7 @@ export default function LunchDetailsPage() {
                             {score.user.name} gave{" "}
                             {groupLunch.groupLocation.location.name} a rating of{" "}
                             {score.score}.<br />
-                            This action is <strong>irreversible.</strong>
+                            This action is <strong>cannot be undone.</strong>
                           </>
                         }
                       />
@@ -518,8 +518,8 @@ const AdminActions = () => {
             Are you sure you want to delete this lunch?
           </Dialog.Title>
           <DialogDescription>
-            This will delete this lunch including all scores. This action is{" "}
-            <strong>irreversible</strong>.
+            This will delete this lunch including all scores. This action{" "}
+            <strong>cannot be undone</strong>!
           </DialogDescription>
           <Form method="delete">
             <Button size="large" style={{ marginLeft: "auto" }}>

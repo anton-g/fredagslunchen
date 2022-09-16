@@ -11,6 +11,7 @@ type ActionData = {
     score?: string
     user?: string
     lunchId?: string
+    groupId?: string
   }
 }
 
@@ -30,7 +31,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>(
-      { errors: { user: "Club is required" } },
+      { errors: { groupId: "Club is required" } },
       { status: 400 }
     )
   }

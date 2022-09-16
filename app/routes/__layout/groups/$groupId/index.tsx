@@ -1,15 +1,16 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
-import { useCatch, useLoaderData } from "@remix-run/react"
+import { useCatch, useFetcher, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
+import type { Group } from "~/models/group.server"
 import { getGroupDetails } from "~/models/group.server"
 import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Table } from "~/components/Table"
 import { Spacer } from "~/components/Spacer"
-import { LinkButton } from "~/components/Button"
+import { Button, LinkButton } from "~/components/Button"
 import { Stat } from "~/components/Stat"
 import { HoverCard } from "~/components/HoverCard"
 import { Map } from "~/components/Map"
@@ -18,9 +19,10 @@ import { useOnScreen } from "~/hooks/useOnScreen"
 import { useRef } from "react"
 import { getEnv } from "~/env.server"
 import { Tooltip } from "~/components/Tooltip"
-import { GearIcon } from "@radix-ui/react-icons"
+import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
 import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
+import { Dialog } from "~/components/Dialog"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -257,25 +259,12 @@ export default function GroupDetailsPage() {
           </LazyCard>
         </>
       )}
-      {isAdmin && (
-        <>
-          <Spacer size={64} />
-          <Wrapper axis="horizontal" gap={16}>
-            <Tooltip>
-              <Tooltip.Trigger asChild>
-                <LinkButton
-                  to={`/groups/${details.group.id}/settings`}
-                  variant="round"
-                  aria-label="Club settings"
-                >
-                  <GearIcon />
-                </LinkButton>
-              </Tooltip.Trigger>
-              <Tooltip.Content>Club settings</Tooltip.Content>
-            </Tooltip>
-          </Wrapper>
-        </>
-      )}
+      <Spacer size={64} />
+      <GroupActionBar
+        groupId={details.group.id}
+        groupName={details.group.name}
+        isAdmin={isAdmin}
+      />
     </div>
   )
 }
@@ -336,6 +325,69 @@ const MapCard = styled(Card)`
   padding: 0;
   min-height: 400px;
 `
+
+type GroupActionBarProps = {
+  isAdmin: boolean
+  groupId: Group["id"]
+  groupName: Group["name"]
+}
+
+const GroupActionBar = ({
+  isAdmin,
+  groupId,
+  groupName,
+}: GroupActionBarProps) => {
+  const fetcher = useFetcher()
+
+  return (
+    <Wrapper axis="horizontal" gap={16}>
+      {isAdmin && (
+        <Tooltip>
+          <Tooltip.Trigger asChild>
+            <LinkButton
+              to={`/groups/${groupId}/settings`}
+              variant="round"
+              aria-label="Club settings"
+            >
+              <GearIcon />
+            </LinkButton>
+          </Tooltip.Trigger>
+          <Tooltip.Content>Club settings</Tooltip.Content>
+        </Tooltip>
+      )}
+      {!isAdmin && (
+        <Dialog>
+          <Tooltip>
+            <Dialog.Trigger asChild>
+              <Tooltip.Trigger asChild>
+                <Button variant="round" aria-label="Leave club">
+                  <ExitIcon />
+                </Button>
+              </Tooltip.Trigger>
+            </Dialog.Trigger>
+            <Tooltip.Content>Leave club</Tooltip.Content>
+          </Tooltip>
+          <Dialog.Content>
+            <Dialog.Close />
+            <Dialog.Title>
+              Are you sure you want to leave the club {groupName}?
+            </Dialog.Title>
+            <Spacer size={16} />
+            This will delete all your scores and comments. This action{" "}
+            <strong>cannot be undone.</strong>
+            <Spacer size={16} />
+            <fetcher.Form method="post" action="/groups/api/leave">
+              <input type="hidden" name="groupId" value={groupId} />
+              <Button size="large" style={{ marginLeft: "auto" }}>
+                I am sure
+              </Button>
+            </fetcher.Form>
+          </Dialog.Content>
+        </Dialog>
+      )}
+    </Wrapper>
+  )
+}
 
 const Wrapper = styled(Stack)`
   justify-content: center;

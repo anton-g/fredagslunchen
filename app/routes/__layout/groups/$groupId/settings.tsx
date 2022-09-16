@@ -255,8 +255,7 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
         </Dialog.Title>
         <DialogDescription>
           This will delete this club including all locations, lunches and
-          scores. This action is <strong>irreversible</strong> and{" "}
-          <strong>cannot be undone.</strong>
+          scores. This action <strong>cannot be undone.</strong>
         </DialogDescription>
         <label htmlFor="name">
           Please type <strong>{groupName}</strong> to confirm.
@@ -306,8 +305,8 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
           Are you sure you want to remove {member.user.name} from the club?
         </Dialog.Title>
         <DialogDescription>
-          This will delete all their scores and comments. This action is{" "}
-          <strong>irreversible</strong> and <strong>cannot be undone.</strong>
+          This will delete all their scores and comments. This action{" "}
+          <strong>cannot be undone</strong>!
         </DialogDescription>
         <Spacer size={16} />
         <fetcher.Form action="/groups/api/member" method="delete">
