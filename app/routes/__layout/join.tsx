@@ -139,8 +139,8 @@ export default function Join() {
   }, [actionData])
 
   return (
-    <div>
-      <h2>Sign up</h2>
+    <Wrapper>
+      <h2>Join the club</h2>
       {/* Workaround to include search to action: https://github.com/remix-run/remix/issues/3133 */}
       <Form method="post" action={`${location.pathname}${location.search}`}>
         <Stack gap={16}>
@@ -209,9 +209,14 @@ export default function Join() {
           </div>
         </Stack>
       </Form>
-    </div>
+    </Wrapper>
   )
 }
+
+const Wrapper = styled.div`
+  max-width: 430px;
+  margin: 0 auto;
+`
 
 const SubmitButton = styled(Button)`
   margin-left: auto;

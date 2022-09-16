@@ -96,7 +96,7 @@ export default function LoginPage() {
   }, [actionData])
 
   return (
-    <>
+    <Wrapper>
       <h2>Login</h2>
       <Form method="post">
         <Stack gap={16}>
@@ -150,9 +150,14 @@ export default function LoginPage() {
           </ForgotPasswordLink>
         </Stack>
       </Form>
-    </>
+    </Wrapper>
   )
 }
+
+const Wrapper = styled.div`
+  max-width: 430px;
+  margin: 0 auto;
+`
 
 const SubmitButton = styled(Button)`
   margin-left: auto;
