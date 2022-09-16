@@ -85,6 +85,11 @@ export const meta: MetaFunction = () => ({
   charset: "utf-8",
   title: "Fredagslunchen",
   viewport: "width=device-width,initial-scale=1",
+  "twitter:title": "Fredagslunchen",
+  "twitter:card": "summary_large_image",
+  "twitter:description": "Never worry about where to eat again.",
+  "og:title": "Fredagslunchen",
+  "og:description": "Never worry about where to eat again.",
   "og:image":
     "https://res.cloudinary.com/anton-g/image/upload/c_fill,w_1280,h_699/l_text:Roboto_140_bold:Fredagslunchen/template_ns4drh.png",
 })

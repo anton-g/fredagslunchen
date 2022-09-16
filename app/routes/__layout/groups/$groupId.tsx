@@ -12,6 +12,8 @@ import { LinkButton } from "~/components/Button"
 
 export const meta: MetaFunction = ({ data }) => {
   return {
+    "twitter:title": `${data.details.group.name} on Fredagslunchen`,
+    "og:title": `${data.details.group.name} on Fredagslunchen`,
     "og:image": `https://res.cloudinary.com/anton-g/image/upload/w_1280,h_699/c_fit,l_text:Roboto_150_bold:${data.details.group.name},w_1100/fl_layer_apply,g_north_west,y_90,x_75/c_fit,l_text:Roboto_90_bold:${data.details.stats.averageScore},w_1100/fl_layer_apply,g_south_east,y_95,x_150/c_fit,l_text:Roboto_35_bold:avg,w_1100/fl_layer_apply,g_south_east,y_95,x_90/c_fit,l_text:Roboto_28_bold:fredagslunchen.club,w_1100/fl_layer_apply,g_south_west,y_60,x_65/template_ns4drh.png`,
   }
 }
