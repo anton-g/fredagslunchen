@@ -62,7 +62,7 @@ export default function Index() {
         </p>
         {/* TODO: show overlapping data here */}
         <p>
-          This action is <strong>irreversible</strong>.
+          This action <strong>cannot be undone</strong>!
         </p>
       </Description>
       <Form method="post">

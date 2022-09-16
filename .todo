@@ -1,26 +1,26 @@
 # Next
-- Social cards
 - Help / FAQ
   - Where can I find coordinates?
   Google Maps, right click copy
-- Leave group
 - Investigate issue with map ENV
 - Better error boundaries
 - Feedback
-- Delete group location
-  - Require group admin?
+- Delete club location
+  - Require club admin?
 - Delete user
 - Dialog -> Alert Dialog
-- Social login
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
+- Social login
+- Improve map design
 
 # Later
+- Restructure api routes
 - Admin page
   - Merge locations (ie Sandhäxan and Sandhaxan)
 - Role based -> Permissions based access
 - Investigate how to reduce db calls when on a deeply nested route
-- Export group data
+- Export club data
 - Premium / Supporter?
   - Select color schemes
   - Select avatar
