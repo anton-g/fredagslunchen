@@ -1,12 +1,29 @@
 # Changelog
 
+## 2022-09-16
+
+### New features
+
+- **Leave club**
+
+  - You can now leave a club without requiring an admin to remove you.
+
+### Bug fixes
+
+- Fix jank when navigating between pages with/without scrollbar
+- Fix accessibility issue with Help tooltips
+
 ## 2022-09-13
+
+### New features
 
 - **Demo club**
 
   - You can now find a demo of what a club looks like on the start page.
 
 ## 2022-09-12
+
+### New features
 
 - **Improved recommended picker algorithm**
 
@@ -15,6 +32,8 @@
 - **Add icon for when you save the app to your home screen**
 
 ## 2022-09-11
+
+### New features
 
 - **Improved landing page**
 

@@ -16,11 +16,15 @@ export function Help({ children }: { children: ReactNode }) {
   )
 }
 
-const Icon = styled.div`
+const Icon = styled.button`
+  padding: 0;
+  margin: 0;
+  background: none;
+  border: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  cursor: help;
+  cursor: pointer;
 
   svg {
     width: 20px;
@@ -29,7 +33,8 @@ const Icon = styled.div`
 `
 
 const Content = styled(Popover.Content)`
-  max-width: 400px;
+  max-width: min(400px, 90vw);
+  margin: 0 8px;
 
   p {
     margin: 0;

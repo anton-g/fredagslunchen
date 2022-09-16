@@ -8,7 +8,6 @@
 - Delete club location
   - Require club admin?
 - Delete user
-- Dialog -> Alert Dialog
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
 - Social login
