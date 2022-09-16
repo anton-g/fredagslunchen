@@ -14,7 +14,7 @@ import {
 import invariant from "tiny-invariant"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
-import { Cross2Icon } from "@radix-ui/react-icons"
+import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons"
 import { getUserId, requireUserId } from "~/session.server"
 import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
@@ -506,7 +506,7 @@ const AdminActions = () => {
           <Tooltip.Trigger asChild>
             <Dialog.Trigger asChild>
               <Button variant="round" aria-label="Delete lunch">
-                <Cross2Icon />
+                <TrashIcon />
               </Button>
             </Dialog.Trigger>
           </Tooltip.Trigger>
