@@ -44,12 +44,13 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     details,
     isMapsEnabled: getEnv().ENABLE_MAPS,
     isAdmin,
+    isMember,
     canEdit,
   })
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin, canEdit } =
+  const { details, isMapsEnabled, isAdmin, isMember, canEdit } =
     useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members.slice().sort((a, b) => {
@@ -264,6 +265,7 @@ export default function GroupDetailsPage() {
         groupId={details.group.id}
         groupName={details.group.name}
         isAdmin={isAdmin}
+        isMember={isMember}
       />
     </div>
   )
@@ -328,12 +330,14 @@ const MapCard = styled(Card)`
 
 type GroupActionBarProps = {
   isAdmin: boolean
+  isMember: boolean
   groupId: Group["id"]
   groupName: Group["name"]
 }
 
 const GroupActionBar = ({
   isAdmin,
+  isMember,
   groupId,
   groupName,
 }: GroupActionBarProps) => {
@@ -355,7 +359,7 @@ const GroupActionBar = ({
           <Tooltip.Content>Club settings</Tooltip.Content>
         </Tooltip>
       )}
-      {!isAdmin && (
+      {!isAdmin && isMember && (
         <Dialog>
           <Tooltip>
             <Dialog.Trigger asChild>
