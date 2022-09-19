@@ -58,8 +58,8 @@ export default function GroupDetailsPage() {
     if (b.stats.lunchCount === 0) return -1
 
     return (
-      a.stats.lunchCount / a.stats.choiceCount -
-      b.stats.lunchCount / b.stats.choiceCount
+      a.stats.choiceCount / a.stats.lunchCount -
+      b.stats.choiceCount / b.stats.lunchCount
     )
   })
   const suggestedPicker = orderedPickers[0]

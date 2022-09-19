@@ -12,6 +12,10 @@
 - Add optimistic UI when possible
 - Social login
 - Improve map design
+- Check that all child routes are protected
+  - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
+- Refactor to not use delete methods
+  - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 
 # Later
 - Restructure api routes
