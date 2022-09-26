@@ -23,6 +23,7 @@ import { getEnv } from "~/env.server"
 import styled from "styled-components"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
+import { RadioGroup } from "~/components/RadioGroup"
 
 export const meta: MetaFunction = () => {
   return {
@@ -159,6 +160,24 @@ export default function Kitchensink() {
               </Card>
             </Card>
           </Stack>
+        </Component>
+        <Component title="RadioGroup">
+          <RadioGroup defaultValue="default">
+            <Stack gap={16} axis="vertical">
+              <Stack gap={8} axis="horizontal">
+                <RadioGroup.Item value="default" id="r1" />
+                <label htmlFor="r1">Default</label>
+              </Stack>
+              <Stack gap={8} axis="horizontal">
+                <RadioGroup.Item value="second" id="r2" />
+                <label htmlFor="r2">Second</label>
+              </Stack>
+              <Stack gap={8} axis="horizontal">
+                <RadioGroup.Item value="third" id="r3" />
+                <label htmlFor="r3">Third</label>
+              </Stack>
+            </Stack>
+          </RadioGroup>
         </Component>
         <Component title="Checkbox">
           <Stack gap={24} axis="horizontal">
