@@ -164,6 +164,8 @@ export default function Kitchensink() {
           <Stack gap={24} axis="horizontal">
             <Checkbox />
             <Checkbox defaultChecked />
+            <Checkbox variant="large" />
+            <Checkbox variant="large" defaultChecked />
           </Stack>
         </Component>
         <Component title="TextArea">
