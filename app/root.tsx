@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react"
 import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node"
 import mapboxgl from "mapbox-gl"
 import { json } from "@remix-run/node"
@@ -12,13 +13,16 @@ import {
   useLocation,
 } from "@remix-run/react"
 import GlobalStyle from "./styles/global"
-
 import { getUser } from "./session.server"
 import { ThemeProvider } from "styled-components"
-import { theme } from "./styles/theme"
 import { getEnv } from "./env.server"
-import { useEffect, useRef } from "react"
 import { getDomainUrl, removeTrailingSlash } from "./utils"
+import type { Theme } from "./styles/theme"
+import {
+  availableThemes,
+  InternalThemeProvider,
+  useThemeContext,
+} from "./styles/theme"
 
 declare global {
   interface Window {
@@ -95,12 +99,14 @@ export const meta: MetaFunction = () => ({
 })
 
 export const loader = async ({ request }: LoaderArgs) => {
+  const user = await getUser(request)
   return json({
-    user: await getUser(request),
+    user,
     ENV: getEnv(),
     requestInfo: {
       origin: getDomainUrl(request),
     },
+    theme: (user?.theme || "light") as Theme,
   })
 }
 
@@ -121,10 +127,9 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <ThemeProvider theme={theme}>
-          <Outlet />
-          <GlobalStyle />
-        </ThemeProvider>
+        <InternalThemeProvider defaultTheme={data.theme}>
+          <Content />
+        </InternalThemeProvider>
         <ScrollRestoration />
         {ENV.NODE_ENV === "development" ? null : (
           <script
@@ -156,6 +161,17 @@ export default function App() {
         {ENV.NODE_ENV === "development" ? <LiveReload /> : null}
       </body>
     </html>
+  )
+}
+
+const Content = () => {
+  const { theme } = useThemeContext()
+
+  return (
+    <ThemeProvider theme={availableThemes[theme]}>
+      <Outlet />
+      <GlobalStyle />
+    </ThemeProvider>
   )
 }
 

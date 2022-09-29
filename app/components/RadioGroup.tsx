@@ -20,7 +20,7 @@ const RadioItem = (props: ComponentProps<typeof StyledRadioItem>) => {
 
 const StyledRadioItem = styled(RadioGroupPrimitive.Item)`
   all: unset;
-  background-color: white;
+  background-color: ${({ theme }) => theme.colors.secondary};
   width: 22px;
   height: 22px;
   border: 2px solid ${({ theme }) => theme.colors.primary};

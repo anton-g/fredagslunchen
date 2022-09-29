@@ -3,6 +3,7 @@ import { Link } from "@remix-run/react"
 import { useState } from "react"
 import MapPrimitive, { Layer, Popup, Source } from "react-map-gl"
 import styled from "styled-components"
+import { themeToMapStyle, useThemeContext } from "~/styles/theme"
 import { formatNumber } from "~/utils"
 import { Spacer } from "./Spacer"
 import { Stat } from "./Stat"
@@ -28,6 +29,7 @@ type MapProps = {
 
 // TODO make generic with popup as render prop child?
 export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
+  const { theme } = useThemeContext()
   const [cursor, setCursor] = useState<"auto" | "pointer">("auto")
   const [selectedLocation, setSelectedLocation] = useState<Location | null>(
     null
@@ -63,7 +65,7 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
         zoom: lon && lat ? 14 : 11,
       }}
       style={{ width: "100%", height: 400 }}
-      mapStyle="mapbox://styles/mapbox/light-v10"
+      mapStyle={themeToMapStyle[theme]}
       interactiveLayerIds={["places"]}
       onClick={(e) => {
         if (!e.features?.length) return
