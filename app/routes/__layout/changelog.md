@@ -1,5 +1,11 @@
 # Changelog
 
+## 2022-09-29
+
+- **Dark theme**
+
+  - You can now switch to dark theme in your settings.
+
 ## 2022-09-16
 
 ### New features
