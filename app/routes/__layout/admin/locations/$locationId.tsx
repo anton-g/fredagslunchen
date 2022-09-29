@@ -225,7 +225,7 @@ export default function AdminLocationDetailsPage() {
                 <Input
                   ref={latRef}
                   name="lat"
-                  defaultValue={location.lat}
+                  defaultValue={location.lat || ""}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lat ? "lat-error" : undefined
@@ -243,7 +243,7 @@ export default function AdminLocationDetailsPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
-                  defaultValue={location.lon}
+                  defaultValue={location.lon || ""}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lon ? "lon-error" : undefined
