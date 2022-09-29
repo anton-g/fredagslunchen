@@ -90,16 +90,16 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  if (typeof lat !== "string" || lat.length === 0) {
+  if (lat && (typeof lat !== "string" || lat.length === 0)) {
     return json<ActionData>(
-      { errors: { lat: "Latitude is required" } },
+      { errors: { lat: "Invalid format" } },
       { status: 400 }
     )
   }
 
-  if (typeof lon !== "string" || lon.length === 0) {
+  if (lon && (typeof lon !== "string" || lon.length === 0)) {
     return json<ActionData>(
-      { errors: { lon: "Longitude is required" } },
+      { errors: { lon: "Invalid format" } },
       { status: 400 }
     )
   }
@@ -185,8 +185,8 @@ export default function NewLocationPage() {
     addressRef.current!.value = selectedLocation.address
     zipCodeRef.current!.value = selectedLocation.zipCode
     cityRef.current!.value = selectedLocation.city
-    latRef.current!.value = selectedLocation.lat
-    lonRef.current!.value = selectedLocation.lon
+    latRef.current!.value = selectedLocation.lat || ""
+    lonRef.current!.value = selectedLocation.lon || ""
   }
 
   return (
@@ -289,7 +289,6 @@ export default function NewLocationPage() {
                 <Input
                   ref={latRef}
                   name="lat"
-                  required
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lat ? "lat-error" : undefined
@@ -307,7 +306,6 @@ export default function NewLocationPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
-                  required
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lon ? "lon-error" : undefined

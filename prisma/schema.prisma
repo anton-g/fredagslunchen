@@ -97,8 +97,8 @@ model GroupLocation {
 model Location {
   id      Int     @id @default(autoincrement())
   name    String
-  lon     String
-  lat     String
+  lon     String?
+  lat     String?
   address String
   city    String
   zipCode String
