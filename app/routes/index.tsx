@@ -82,7 +82,7 @@ export default function Index() {
           <Stack gap={64}>
             You've got no waiting requests. When someone requests a rating from
             you it will show up here.
-            <IceCream />
+            <Illustration />
           </Stack>
         )}
       </Wrapper>
@@ -116,6 +116,10 @@ const Subtitle = styled.h3`
   font-size: 24px;
   margin: 0;
   margin-bottom: 16px;
+`
+
+const Illustration = styled(IceCream)`
+  max-width: 100%;
 `
 
 const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {

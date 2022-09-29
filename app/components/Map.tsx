@@ -10,8 +10,8 @@ import { Stat } from "./Stat"
 
 type Location = {
   id: number
-  lon: string
-  lat: string
+  lon: string | null
+  lat: string | null
   name: string
   address: string
   lunchCount: number
@@ -41,7 +41,7 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
       type: "Feature" as const,
       geometry: {
         type: "Point" as const,
-        coordinates: [parseFloat(loc.lon), parseFloat(loc.lat)],
+        coordinates: [parseFloat(loc.lon!), parseFloat(loc.lat!)],
       },
       properties: {
         ...loc,
@@ -101,8 +101,8 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
       </Source>
       {selectedLocation && (
         <StyledPopup
-          latitude={parseFloat(selectedLocation.lat)}
-          longitude={parseFloat(selectedLocation.lon)}
+          latitude={parseFloat(selectedLocation.lat!)}
+          longitude={parseFloat(selectedLocation.lon!)}
           onClose={() => setSelectedLocation(null)}
           closeButton={false}
           maxWidth={"450px"}

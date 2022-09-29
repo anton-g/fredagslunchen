@@ -5,8 +5,10 @@
 - Investigate issue with map ENV
 - Better error boundaries
 - Feedback
-- Delete club location
-  - Require club admin?
+- Club locations
+  - View all
+  - Update
+  - Delete (require club admin?)
 - Delete user
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
@@ -30,6 +32,8 @@
   - Select color schemes
   - Select avatar
   - Discover?
+- Nominatim for geocoding
+  - Should be able to host docker container on fly for like $4
 - Discover / Inspiration page
   - Top locations
 - Database backups

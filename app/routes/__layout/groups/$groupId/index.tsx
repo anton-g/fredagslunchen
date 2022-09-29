@@ -241,7 +241,10 @@ export default function GroupDetailsPage() {
               lat={details.group.lat}
               lon={details.group.lon}
               locations={details.group.groupLocations
-                .filter((x) => x.lunches.length > 0)
+                .filter(
+                  (x) =>
+                    x.lunches.length > 0 && x.location.lat && x.location.lon
+                )
                 .map((x) => ({
                   address: x.location.address,
                   averageScore: getAverageNumber(
