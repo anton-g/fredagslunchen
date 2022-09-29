@@ -1,11 +1,18 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData } from "@remix-run/react"
+import {
+  Form,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+} from "@remix-run/react"
 import * as React from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
+import { Card } from "~/components/Card"
 import { Input } from "~/components/Input"
+import { RadioGroup } from "~/components/RadioGroup"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import {
@@ -15,6 +22,7 @@ import {
 } from "~/models/user.server"
 
 import { requireUserId } from "~/session.server"
+import { availableThemes, useThemeContext } from "~/styles/theme"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -40,6 +48,7 @@ type ActionData = {
     name?: string
     password?: string
     newPassword?: string
+    theme?: string
   }
 }
 
@@ -52,6 +61,24 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const formData = await request.formData()
+
+  const theme = formData.get("theme")
+  if (theme) {
+    if (typeof theme !== "string" || theme.length === 0) {
+      return json<ActionData>(
+        { errors: { theme: "Invalid theme" } },
+        { status: 400 }
+      )
+    }
+
+    await updateUser({
+      id: userId,
+      theme,
+    })
+
+    return json({ ok: true })
+  }
+
   const password = formData.get("current-password")
   if (password) {
     // todo move to func
@@ -216,6 +243,7 @@ export default function UserSettingsPage() {
           <Button style={{ marginLeft: "auto" }}>Change password</Button>
         </Stack>
       </Form>
+      <ThemePicker />
     </div>
   )
 }
@@ -230,3 +258,99 @@ const Subtitle = styled.h3`
   font-size: 24px;
   margin: 16px 0;
 `
+
+const ColorStack = styled(Stack)`
+  align-items: center;
+
+  > *:first-child {
+    margin-bottom: -16px;
+  }
+
+  > *:nth-child(2) {
+    margin-left: -16px;
+    margin-top: -16px;
+  }
+`
+
+const ColorTitle = styled.h2`
+  margin-left: auto;
+`
+
+const RadioItemCard = ({
+  children,
+  ...props
+}: React.ComponentProps<typeof RadioGroup.Item>) => {
+  return (
+    <Wrapper>
+      <Content>{children}</Content>
+      <Spacer size={24} />
+      <RadioGroup.Item {...props} />
+    </Wrapper>
+  )
+}
+
+const Wrapper = styled.label`
+  ${({ theme }) =>
+    css`
+      background-color: ${theme.colors.secondary};
+      color: ${theme.colors.primary};
+      border: 2px solid ${theme.colors.primary};
+      box-shadow: -5px 5px 0px 0px ${theme.colors.primary};
+    `}
+
+  border-radius: 8px;
+  padding: 16px 24px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+`
+
+const Content = styled.div`
+  flex-grow: 1;
+`
+
+const Color = styled(Card)<{ color: string }>`
+  padding: 0;
+  background-color: ${({ color }) => color};
+  width: 40px;
+  height: 40px;
+  box-shadow: none;
+`
+
+const ThemePicker = () => {
+  const { theme, setTheme } = useThemeContext()
+  const fetcher = useFetcher()
+
+  const themes = Object.entries(availableThemes).map(([key, val]) => ({
+    key,
+    name: val.name,
+    primary: val.colors.primary,
+    secondary: val.colors.secondary,
+  }))
+
+  return (
+    <fetcher.Form
+      method="post"
+      onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
+    >
+      <Subtitle>Theme</Subtitle>
+      <RadioGroup
+        defaultValue={theme}
+        onValueChange={(theme: any) => setTheme(theme)}
+        name="theme"
+      >
+        <Stack gap={16}>
+          {themes.map((t) => (
+            <RadioItemCard value={t.key} id={t.key} key={t.key}>
+              <ColorStack gap={0} axis="horizontal">
+                <Color color={t.secondary} />
+                <Color color={t.primary} />
+                <ColorTitle>{t.name}</ColorTitle>
+              </ColorStack>
+            </RadioItemCard>
+          ))}
+        </Stack>
+      </RadioGroup>
+    </fetcher.Form>
+  )
+}

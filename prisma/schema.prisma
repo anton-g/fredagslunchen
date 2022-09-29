@@ -31,6 +31,8 @@ model User {
   passwordResetToken String?
   passwordResetTime  DateTime?
 
+  theme String @default("light")
+
   groups              GroupMember[]
   scores              Score[]
   choosenLunches      Lunch[]

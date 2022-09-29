@@ -84,49 +84,6 @@ const formatter = new Intl.RelativeTimeFormat("en-us", {
   numeric: "auto",
 })
 
-const DIVISIONS: { amount: number; name: Intl.RelativeTimeFormatUnit }[] = [
-  { amount: 7, name: "days" },
-  { amount: 4.34524, name: "weeks" },
-  { amount: 12, name: "months" },
-  { amount: Number.POSITIVE_INFINITY, name: "years" },
-]
-
-export function formatTimeAgo2(date: Date) {
-  let duration = (date.valueOf() - new Date().valueOf()) / 1000 / 60 / 60 / 24
-
-  for (let i = 0; i <= DIVISIONS.length; i++) {
-    const division = DIVISIONS[i]
-    if (Math.abs(duration) < division.amount) {
-      return formatter.format(Math.ceil(duration), division.name)
-    }
-    duration /= division.amount
-    console.log({ n: division.name, d: Math.abs(duration) })
-  }
-}
-
-export function formatTimeAgo3(timestamp: Date) {
-  const diff = (new Date().getTime() - timestamp.getTime()) / 1000
-  const minutes = Math.floor(diff / 60)
-  const hours = Math.floor(minutes / 60)
-  const days = Math.floor(hours / 24)
-  const months = Math.floor(days / 30)
-  const years = Math.floor(months / 12)
-
-  if (years > 0) {
-    return formatter.format(0 - years, "year")
-  } else if (months > 0) {
-    return formatter.format(0 - months, "month")
-  } else if (days > 0) {
-    return formatter.format(0 - days, "day")
-  } else if (hours > 0) {
-    return formatter.format(0 - hours, "hour")
-  } else if (minutes > 0) {
-    return formatter.format(0 - minutes, "minute")
-  } else {
-    return formatter.format(0 - diff, "second")
-  }
-}
-
 export function formatTimeAgo(date: Date) {
   const SECOND = 1000
   const MINUTE = 60 * SECOND
