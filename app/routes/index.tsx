@@ -16,6 +16,7 @@ import { TextArea } from "~/components/TextArea"
 import { Landing } from "~/views/landing"
 import { Layout } from "~/views/layout"
 import { IceCream } from "~/illustrations/IceCream"
+import { useThemeContext } from "~/styles/theme"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof getFullUserById>>>
 type ScoreRequest = RecursivelyConvertDatesToStrings<
@@ -37,6 +38,13 @@ export const loader = async ({ request }: LoaderArgs) => {
 
 export default function Index() {
   const { user, isAdmin } = useLoaderData<typeof loader>()
+  const { setTheme } = useThemeContext()
+
+  useEffect(() => {
+    if (user) {
+      setTheme(user.theme)
+    }
+  }, [setTheme, user])
 
   if (!user) {
     return <Landing />

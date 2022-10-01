@@ -3,6 +3,7 @@ import invariant from "tiny-invariant"
 
 import type { User } from "~/models/user.server"
 import { getUserById } from "~/models/user.server"
+import type { Theme } from "./styles/theme"
 
 invariant(process.env.SESSION_SECRET, "SESSION_SECRET must be set")
 
@@ -37,7 +38,7 @@ export async function getUser(request: Request) {
   if (userId === undefined) return null
 
   const user = await getUserById(userId)
-  if (user) return user
+  if (user) return { ...user, theme: user.theme as Theme }
 
   throw await logout(request)
 }

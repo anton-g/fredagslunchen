@@ -5,6 +5,7 @@ import sub from "date-fns/sub"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
+import type { Theme } from "~/styles/theme"
 import { cleanEmail, getAverageNumber } from "~/utils"
 
 export type { User } from "@prisma/client"
@@ -122,6 +123,7 @@ export async function getFullUserById({
 
   return {
     ...filteredUser,
+    theme: filteredUser.theme as Theme,
     stats,
   }
 }

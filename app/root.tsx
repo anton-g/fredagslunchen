@@ -106,7 +106,7 @@ export const loader = async ({ request }: LoaderArgs) => {
     requestInfo: {
       origin: getDomainUrl(request),
     },
-    theme: (user?.theme || "light") as Theme,
+    theme: user?.theme || "light",
   })
 }
 
