@@ -1,6 +1,5 @@
 # Next
 - Themes
-  - Set theme on login
   - Improve dark theme map
 - More stats
   - Best average picker
@@ -26,7 +25,6 @@
 - Refactor to not use delete methods
   - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 - Test the cypress workaround in updated Indie Stack
-- Show stat for most successful picker
 
 # Later
 - Restructure api routes

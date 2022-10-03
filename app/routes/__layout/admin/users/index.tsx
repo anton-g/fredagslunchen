@@ -33,12 +33,12 @@ export default function AdminUsersPage() {
         </Table.Head>
         <tbody>
           {users.map((user) => (
-            <tr key={user.id}>
+            <Table.LinkRow key={user.id} to={`/admin/users/${user.id}`}>
               <Table.Cell>{user.name}</Table.Cell>
               <Table.Cell>{user.email?.email}</Table.Cell>
               <Table.Cell numeric>{user.groups.length}</Table.Cell>
               <Table.Cell numeric>{user.scores.length}</Table.Cell>
-            </tr>
+            </Table.LinkRow>
           ))}
         </tbody>
       </Table>

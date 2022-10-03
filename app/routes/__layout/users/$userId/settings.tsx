@@ -17,6 +17,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import {
   changeUserPassword,
+  checkIsAdmin,
   getFullUserById,
   updateUser,
 } from "~/models/user.server"
@@ -28,7 +29,9 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
   invariant(params.userId, "userId is required")
 
-  if (userId !== params.userId) {
+  const isAdmin = checkIsAdmin(userId)
+
+  if (userId !== params.userId && !isAdmin) {
     throw new Response("Not Found", { status: 404 })
   }
 
