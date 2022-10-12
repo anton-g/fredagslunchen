@@ -395,9 +395,9 @@ const PremiumOverlay = () => {
       <Backdrop />
       <h3>Support Fredagslunchen</h3>
       <Spacer size={8} />
-      <p>Get access to themes, avatars and more!</p>
+      <p>Get access to more themes, avatars and more!</p>
       <Spacer size={16} />
-      <LinkButton to="/support" size="large">
+      <LinkButton to="/supporter" size="large">
         Become a supporter
       </LinkButton>
     </PremiumWrapper>
@@ -406,7 +406,7 @@ const PremiumOverlay = () => {
 
 const PremiumWrapper = styled.div`
   position: absolute;
-  inset: -8px;
+  inset: -8px -8px -16px -8px;
   font-weight: bold;
   z-index: 1;
   display: flex;
@@ -417,7 +417,7 @@ const PremiumWrapper = styled.div`
   > h3 {
     margin: 0;
     font-size: 36px;
-    padding: 0 8px;
+    padding: 4px 8px;
     background-color: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.secondary};
   }
