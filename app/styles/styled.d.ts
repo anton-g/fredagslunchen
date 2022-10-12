@@ -10,6 +10,7 @@ type CustomColors = {
 declare module "styled-components" {
   export interface DefaultTheme {
     name: string
+    premium: boolean
     colors: CustomColors
   }
 }
