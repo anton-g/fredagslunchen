@@ -11,7 +11,7 @@ import { nanoid } from "nanoid"
 import { prisma } from "~/db.server"
 import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
 
-export type { Group } from "@prisma/client"
+export type { Group, GroupMember } from "@prisma/client"
 
 export function getGroup({
   id,

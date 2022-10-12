@@ -1,9 +1,13 @@
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import type { Lunch } from "~/models/lunch.server"
+import type { Score, ScoreRequest } from "~/models/score.server"
+import type { User } from "~/models/user.server"
+import type { Group } from "~/models/group.server"
 import type { MouseEventHandler, ReactNode } from "react"
+import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
-import type { Group, Lunch, Score, ScoreRequest, User } from "@prisma/client"
 import { json, redirect } from "@remix-run/node"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import {
   Form,
   Link,
@@ -12,7 +16,6 @@ import {
   useLoaderData,
 } from "@remix-run/react"
 import invariant from "tiny-invariant"
-import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
 import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons"
 import { getUserId, requireUserId } from "~/session.server"

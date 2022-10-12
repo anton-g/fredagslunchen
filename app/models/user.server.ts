@@ -8,7 +8,7 @@ import { prisma } from "~/db.server"
 import type { Theme } from "~/styles/theme"
 import { cleanEmail, getAverageNumber } from "~/utils"
 
-export type { User } from "@prisma/client"
+export type { User, Email } from "@prisma/client"
 
 const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({

@@ -1,8 +1,7 @@
-import type { Email } from "@prisma/client"
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
 
-import type { User } from "~/models/user.server"
+import type { Email, User } from "~/models/user.server"
 
 const DEFAULT_REDIRECT = "/"
 
