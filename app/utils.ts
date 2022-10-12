@@ -109,7 +109,7 @@ export function formatTimeAgo(date: Date) {
   const diffAbs = Math.abs(diff)
   for (const interval of intervals) {
     if (diffAbs >= interval.ge) {
-      const x = Math.round(Math.abs(diff) / interval.divisor)
+      const x = Math.floor(Math.abs(diff) / interval.divisor)
       const isFuture = diff < 0
       return formatter.format(isFuture ? x : -x, interval.unit)
     }
