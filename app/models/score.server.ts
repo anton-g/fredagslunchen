@@ -2,7 +2,7 @@ import type { Group, Lunch, Score, ScoreRequest, User } from "@prisma/client"
 
 import { prisma } from "~/db.server"
 
-export type { Score } from "@prisma/client"
+export type { Score, ScoreRequest } from "@prisma/client"
 
 export async function createScore({
   score,

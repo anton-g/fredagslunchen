@@ -1,5 +1,5 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
-import type { Group } from "~/models/group.server"
+import type { Group, GroupMember } from "~/models/group.server"
 import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
 import {
@@ -21,7 +21,6 @@ import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
-import type { GroupMember } from "@prisma/client"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {

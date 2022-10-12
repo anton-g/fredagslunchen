@@ -2,13 +2,16 @@ import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import {
   Form,
+  Link,
   useActionData,
   useLoaderData,
   useLocation,
 } from "@remix-run/react"
-import { useEffect, useRef } from "react"
+import isSameDay from "date-fns/isSameDay"
+import { useEffect, useRef, useState } from "react"
 import invariant from "tiny-invariant"
 import { Button, LinkButton } from "~/components/Button"
+import { Card } from "~/components/Card"
 import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
@@ -94,6 +97,11 @@ export default function NewLunchPage() {
   const locationRef = useRef<HTMLInputElement>(null!)
   const dateRef = useRef<HTMLInputElement>(null)
 
+  const defaultDate = new Date().toISOString().split("T")[0]
+
+  const [selectedLocation, setSelectedLocation] = useState<number | null>(null)
+  const [selectedDate, setSelectedDate] = useState<string | null>(defaultDate)
+
   useEffect(() => {
     if (actionData?.errors?.date) {
       dateRef.current?.focus()
@@ -115,6 +123,15 @@ export default function NewLunchPage() {
     name: member.user.name,
   }))
 
+  const existingLunch =
+    selectedLocation && selectedDate
+      ? group.groupLocations
+          .find((x) => x.locationId === selectedLocation)
+          ?.lunches.find((x) =>
+            isSameDay(new Date(x.date), new Date(selectedDate))
+          )
+      : null
+
   return (
     <>
       <h3>New lunch</h3>
@@ -133,10 +150,11 @@ export default function NewLunchPage() {
               <span>Date</span>
               <Input
                 ref={dateRef}
-                defaultValue={new Date().toISOString().split("T")[0]}
+                defaultValue={defaultDate}
                 name="date"
                 type="date"
                 required
+                onChange={(e) => setSelectedDate(e.target.value)}
                 aria-invalid={actionData?.errors?.date ? true : undefined}
                 aria-errormessage={
                   actionData?.errors?.date ? "date-error" : undefined
@@ -177,6 +195,11 @@ export default function NewLunchPage() {
               defaultItems={locations}
               inputRef={locationRef}
               menuTrigger="focus"
+              onSelectionChange={(key) => {
+                if (!key) return
+
+                setSelectedLocation(parseInt(key.toString()))
+              }}
               defaultSelectedKey={
                 preSelectedLocationId
                   ? parseInt(preSelectedLocationId)
@@ -196,6 +219,20 @@ export default function NewLunchPage() {
               <div id="location-error">{actionData.errors.locationId}</div>
             )}
           </div>
+
+          {existingLunch && (
+            <Card>
+              There already exists a lunch for this day at{" "}
+              {locations.find((x) => x.id === selectedLocation)?.name}, do you
+              want to{" "}
+              <Link
+                to={`/groups/${group.id}/lunches/${existingLunch.id}`}
+                style={{ textDecoration: "underline" }}
+              >
+                add a score to the existing lunch instead?
+              </Link>
+            </Card>
+          )}
 
           <Stack gap={16} axis="horizontal">
             <LinkButton

@@ -8,6 +8,8 @@ const light: DefaultTheme = {
   colors: {
     primary: "black",
     secondary: "white",
+    avatarBackground: "white",
+    avatarForeground: "black",
   },
 }
 
@@ -16,6 +18,8 @@ const dark: DefaultTheme = {
   colors: {
     primary: "white",
     secondary: "black",
+    avatarBackground: "white",
+    avatarForeground: "black",
   },
 }
 
@@ -24,6 +28,8 @@ const smorgasbord: DefaultTheme = {
   colors: {
     primary: "gold",
     secondary: "dodgerblue",
+    avatarBackground: "gold",
+    avatarForeground: "dodgerblue",
   },
 }
 
@@ -36,6 +42,7 @@ const availableThemes = {
 export const themeToMapStyle: Record<Theme, string> = {
   light: "mapbox://styles/mapbox/light-v10",
   dark: "mapbox://styles/mapbox/dark-v10",
+  // smorgasbord: "mapbox://styles/mapbox/dark-v10",
 }
 
 export type Theme = keyof typeof availableThemes

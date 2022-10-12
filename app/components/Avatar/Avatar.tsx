@@ -32,8 +32,8 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   svg {
     height: 100%;
     width: 100%;
-    background-color: ${({ theme }) => theme.colors.secondary};
-    fill: ${({ theme }) => theme.colors.primary};
+    background-color: ${({ theme }) => theme.colors.avatarBackground};
+    color: ${({ theme }) => theme.colors.avatarForeground};
   }
 `
 

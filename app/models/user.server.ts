@@ -5,9 +5,10 @@ import sub from "date-fns/sub"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
+import type { Theme } from "~/styles/theme"
 import { cleanEmail, getAverageNumber } from "~/utils"
 
-export type { User } from "@prisma/client"
+export type { User, Email } from "@prisma/client"
 
 const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
@@ -97,6 +98,23 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   })
 }
 
+export async function getUserForAdmin({ id }: { id: User["id"] }) {
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      passwordResetToken: true,
+      email: {
+        select: {
+          verified: true,
+          email: true,
+        },
+      },
+    },
+  })
+}
+
 export async function getFullUserById({
   id,
   requestUserId,
@@ -122,6 +140,7 @@ export async function getFullUserById({
 
   return {
     ...filteredUser,
+    theme: filteredUser.theme as Theme,
     stats,
   }
 }
@@ -388,6 +407,21 @@ export async function verifyLogin(
   const { password: _password, ...userWithoutPassword } = userWithPassword
 
   return userWithoutPassword
+}
+
+export async function forceCreateResetPasswordTokenForUserId(id: User["id"]) {
+  const user = await prisma.user.update({
+    where: { id },
+    data: {
+      passwordResetTime: null,
+      passwordResetToken: null,
+    },
+    select: { email: { select: { email: true } } },
+  })
+
+  if (!user.email) return ""
+
+  return createResetPasswordToken(user.email.email)
 }
 
 export async function createResetPasswordToken(email: Email["email"]) {

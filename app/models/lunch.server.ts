@@ -2,7 +2,7 @@ import type { Group, Location, Lunch, User } from "@prisma/client"
 
 import { prisma } from "~/db.server"
 
-export type { Location } from "@prisma/client"
+export type { Lunch, Location } from "@prisma/client"
 
 export async function getGroupLunch({ id }: Pick<Location, "id">) {
   return await prisma.lunch.findUnique({

@@ -1,4 +1,10 @@
 # Next
+- Themes
+  - Improve dark theme map
+- More stats
+  - Best average picker
+  - Average score on choice vs others choice
+  - Avg score per month / last 5 lunches / something something
 - Help / FAQ
   - Where can I find coordinates?
   Google Maps, right click copy
@@ -19,7 +25,6 @@
 - Refactor to not use delete methods
   - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 - Test the cypress workaround in updated Indie Stack
-- Show stat for most successful picker
 
 # Later
 - Restructure api routes

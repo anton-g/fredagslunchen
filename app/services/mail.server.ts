@@ -1,4 +1,4 @@
-import type { Email, User } from "@prisma/client"
+import type { Email, User } from "~/models/user.server"
 import sgMail from "@sendgrid/mail"
 
 if (ENV.SENDGRID_API_KEY) sgMail.setApiKey(ENV.SENDGRID_API_KEY)

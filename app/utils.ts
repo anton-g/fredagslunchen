@@ -1,8 +1,7 @@
-import type { Email } from "@prisma/client"
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
 
-import type { User } from "~/models/user.server"
+import type { Email, User } from "~/models/user.server"
 
 const DEFAULT_REDIRECT = "/"
 
@@ -110,7 +109,7 @@ export function formatTimeAgo(date: Date) {
   const diffAbs = Math.abs(diff)
   for (const interval of intervals) {
     if (diffAbs >= interval.ge) {
-      const x = Math.round(Math.abs(diff) / interval.divisor)
+      const x = Math.floor(Math.abs(diff) / interval.divisor)
       const isFuture = diff < 0
       return formatter.format(isFuture ? x : -x, interval.unit)
     }

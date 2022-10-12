@@ -6,6 +6,7 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import {
+  checkIsAdmin,
   createEmailVerificationToken,
   getFullUserById,
 } from "~/models/user.server"
@@ -29,7 +30,10 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   if (!user) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ user, isYou: userId === params.userId })
+
+  const isAdmin = userId ? await checkIsAdmin(userId) : false
+
+  return json({ user, isYou: userId === params.userId, isAdmin })
 }
 
 interface ActionData {
@@ -48,13 +52,15 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function Index() {
-  const { user, isYou } = useLoaderData<typeof loader>()
+  const { user, isYou, isAdmin } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
     (a, b) =>
       new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
   )
+
+  const canEditUser = isYou || isAdmin
 
   return (
     <Wrapper>
@@ -65,7 +71,7 @@ export default function Index() {
         </TitleRow>
         <Spacer size={24} />
         <Stack gap={16} axis="horizontal">
-          {isYou && (
+          {canEditUser && (
             <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
           )}
           {isYou && !user.email?.verified && (

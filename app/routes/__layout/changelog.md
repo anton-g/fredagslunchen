@@ -1,5 +1,11 @@
 # Changelog
 
+## 2022-10-12
+
+- **Duplicate lunch warning**
+
+  - You now get a warning if you try to add a new lunch on the same date and location as a previous lunch.
+
 ## 2022-09-29
 
 - **Dark theme**
