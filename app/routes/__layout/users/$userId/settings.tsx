@@ -9,7 +9,7 @@ import {
 import * as React from "react"
 import styled, { css } from "styled-components"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
 import { Input } from "~/components/Input"
 import { RadioGroup } from "~/components/RadioGroup"
@@ -281,10 +281,11 @@ const ColorTitle = styled.h2`
 
 const RadioItemCard = ({
   children,
+  style,
   ...props
 }: React.ComponentProps<typeof RadioGroup.Item>) => {
   return (
-    <Wrapper>
+    <Wrapper style={style}>
       <Content>{children}</Content>
       <Spacer size={24} />
       <RadioGroup.Item {...props} />
@@ -329,6 +330,7 @@ const ThemePicker = () => {
     name: val.name,
     primary: val.colors.primary,
     secondary: val.colors.secondary,
+    premium: val.premium,
   }))
 
   return (
@@ -343,17 +345,96 @@ const ThemePicker = () => {
         name="theme"
       >
         <Stack gap={16}>
-          {themes.map((t) => (
-            <RadioItemCard value={t.key} id={t.key} key={t.key}>
-              <ColorStack gap={0} axis="horizontal">
-                <Color color={t.secondary} />
-                <Color color={t.primary} />
-                <ColorTitle>{t.name}</ColorTitle>
-              </ColorStack>
-            </RadioItemCard>
-          ))}
+          {themes
+            .filter((t) => !t.premium)
+            .map((t) => (
+              <RadioItemCard value={t.key} id={t.key} key={t.key}>
+                <ColorStack gap={0} axis="horizontal">
+                  <Color color={t.secondary} />
+                  <Color color={t.primary} />
+                  <ColorTitle>{t.name}</ColorTitle>
+                </ColorStack>
+              </RadioItemCard>
+            ))}
+        </Stack>
+        <Spacer size={16} />
+        <Stack gap={16} style={{ position: "relative" }}>
+          <PremiumOverlay />
+          {themes
+            .filter((t) => t.premium)
+            .map((t, i) => (
+              <RadioItemCard
+                value={t.key}
+                id={t.key}
+                key={t.key}
+                disabled
+                style={{
+                  userSelect: "none",
+                  marginTop: i === 0 ? 0 : i * 0.9 * -32,
+                  zIndex: -i,
+                  transform: `scale(${1 - i * 0.07})`,
+                  filter: `blur(${2 + i * 0.4}px) grayscale(80%)`,
+                }}
+              >
+                <ColorStack gap={0} axis="horizontal">
+                  <Color color={t.secondary} />
+                  <Color color={t.primary} />
+                  <ColorTitle>{t.name}</ColorTitle>
+                </ColorStack>
+              </RadioItemCard>
+            ))}
         </Stack>
       </RadioGroup>
     </fetcher.Form>
   )
 }
+
+const PremiumOverlay = () => {
+  return (
+    <PremiumWrapper>
+      <Backdrop />
+      <h3>Support Fredagslunchen</h3>
+      <Spacer size={8} />
+      <p>Get access to themes, avatars and more!</p>
+      <Spacer size={16} />
+      <LinkButton to="/support" size="large">
+        Become a supporter
+      </LinkButton>
+    </PremiumWrapper>
+  )
+}
+
+const PremiumWrapper = styled.div`
+  position: absolute;
+  inset: -8px;
+  font-weight: bold;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+
+  > h3 {
+    margin: 0;
+    font-size: 36px;
+    padding: 0 8px;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.secondary};
+  }
+
+  > p {
+    margin: 0;
+    padding: 0 8px;
+    background-color: ${({ theme }) => theme.colors.primary};
+    color: ${({ theme }) => theme.colors.secondary};
+    line-height: 1.5;
+  }
+`
+
+const Backdrop = styled.div`
+  position: absolute;
+  inset: 0;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  opacity: 0.5;
+  z-index: -1;
+`
