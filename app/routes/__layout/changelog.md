@@ -1,10 +1,8 @@
 # Changelog
 
-## -
+## 2022-10-15
 
-- **Quality of life improvements**
-
-  - Pasting coordinates with the "{lon},{lat}" format will automatically populate both inputs.
+- Pasting coordinates with the "{lon},{lat}" format will automatically populate both inputs.
 
 ## 2022-10-12
 
