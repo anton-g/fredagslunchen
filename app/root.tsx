@@ -17,7 +17,6 @@ import { getUser } from "./session.server"
 import { ThemeProvider } from "styled-components"
 import { getEnv } from "./env.server"
 import { getDomainUrl, removeTrailingSlash } from "./utils"
-import type { Theme } from "./styles/theme"
 import {
   availableThemes,
   InternalThemeProvider,
@@ -175,17 +174,26 @@ const Content = () => {
   )
 }
 
-export function ErrorBoundary() {
+export function ErrorBoundary({ error }: { error: Error }) {
   return (
-    <div>
-      <h1>Uh oh!</h1>
-      <p> Something went wrong!</p>
-      <p>
-        Try again later or{" "}
-        <a rel="nofollow" href="https://twitter.com/awnton">
-          let me know!
-        </a>
-      </p>
-    </div>
+    <html>
+      <head>
+        <Links />
+        <Meta />
+      </head>
+      <body>
+        <div>
+          <h1>Uh oh!</h1>
+          <p> Something went wrong!</p>
+          <p>
+            Try again later or{" "}
+            <a rel="nofollow" href="https://twitter.com/awnton">
+              let me know!
+            </a>
+          </p>
+        </div>
+        <Scripts />
+      </body>
+    </html>
   )
 }
