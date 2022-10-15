@@ -1,5 +1,11 @@
 # Changelog
 
+## -
+
+- **Quality of life improvements**
+
+  - Pasting coordinates with the "{lon},{lat}" format will automatically populate both inputs.
+
 ## 2022-10-12
 
 - **Duplicate lunch warning**
