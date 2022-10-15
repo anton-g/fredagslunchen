@@ -28,7 +28,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   invariant(params.groupId, "groupId is required")
   const group = await getGroup({
     id: params.groupId,
-    userId,
   })
 
   if (!group) throw new Response("Not found", { status: 404 })
@@ -157,7 +156,7 @@ export default function GroupSettingsPage() {
           </div>
         </div>
         <Spacer size={16} />
-        <Subtitle>Club location</Subtitle>
+        <Subtitle>Location</Subtitle>
         <FieldDescription>
           Your clubs "home base". Setting this will update the center of the
           map.
@@ -234,7 +233,36 @@ export default function GroupSettingsPage() {
         </tbody>
       </Table>
       <Spacer size={24} />
-      <Subtitle>Destructive actions</Subtitle>
+      <Subtitle>Locations</Subtitle>
+      <Table>
+        <Table.Head>
+          <tr>
+            <Table.Heading wide>Name</Table.Heading>
+            <Table.Heading>Address</Table.Heading>
+            <Table.Heading>Lunches</Table.Heading>
+          </tr>
+        </Table.Head>
+        <tbody>
+          {group.groupLocations.map((groupLocation) => (
+            <Table.LinkRow
+              to={`/groups/${group.id}/locations/${groupLocation.locationId}/edit`}
+              key={groupLocation.locationId}
+            >
+              <Table.Cell wide>
+                <Link
+                  to={`/groups/${group.id}/locations/${groupLocation.locationId}/edit`}
+                >
+                  {groupLocation.location.name}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>{groupLocation.location.address}</Table.Cell>
+              <Table.Cell>{groupLocation.lunches.length}</Table.Cell>
+            </Table.LinkRow>
+          ))}
+        </tbody>
+      </Table>
+      <Spacer size={24} />
+      <Subtitle>Danger Zone</Subtitle>
       <DeleteGroupAction groupName={group.name} />
     </div>
   )

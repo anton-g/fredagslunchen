@@ -1,7 +1,7 @@
 # Next
 - Club locations
   - View all
-  - Update
+  - Update (how should this work with data being global?)
   - Delete (require club admin?)
 - Themes
   - Improve dark theme map
@@ -25,6 +25,7 @@
 - Refactor to not use delete methods
   - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 - Test the cypress workaround in updated Indie Stack
+- Rename group admin to group owner
 
 # Later
 - Restructure api routes

@@ -107,7 +107,7 @@ export function CatchBoundary() {
 }
 
 const Title = styled.h2`
-  font-size: 48px;
+  font-size: 36px;
   margin: 0;
   margin-bottom: 24px;
 `
