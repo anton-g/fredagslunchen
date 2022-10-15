@@ -189,6 +189,19 @@ export default function NewLocationPage() {
     lonRef.current!.value = selectedLocation.lon || ""
   }
 
+  const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const value = e.clipboardData.getData("Text")
+
+    if (!value || value.indexOf(",") === -1) return
+
+    const [lat, lon] = value.split(",")
+
+    requestAnimationFrame(() => {
+      latRef.current!.value = lat
+      lonRef.current!.value = lon
+    })
+  }
+
   return (
     <>
       <h3>New location</h3>
@@ -289,6 +302,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={latRef}
                   name="lat"
+                  onPaste={handleCoordinatePaste}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lat ? "lat-error" : undefined
@@ -306,6 +320,7 @@ export default function NewLocationPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
+                  onPaste={handleCoordinatePaste}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
                     actionData?.errors?.lon ? "lon-error" : undefined
