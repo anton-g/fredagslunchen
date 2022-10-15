@@ -13,11 +13,7 @@ import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
 
 export type { Group, GroupMember } from "@prisma/client"
 
-export function getGroup({
-  id,
-}: Pick<Group, "id"> & {
-  userId: User["id"]
-}) {
+export function getGroup({ id }: Pick<Group, "id">) {
   return prisma.group.findUnique({
     where: { id },
     include: {
