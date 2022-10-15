@@ -176,24 +176,15 @@ const Content = () => {
 
 export function ErrorBoundary({ error }: { error: Error }) {
   return (
-    <html>
-      <head>
-        <Links />
-        <Meta />
-      </head>
-      <body>
-        <div>
-          <h1>Uh oh!</h1>
-          <p> Something went wrong!</p>
-          <p>
-            Try again later or{" "}
-            <a rel="nofollow" href="https://twitter.com/awnton">
-              let me know!
-            </a>
-          </p>
-        </div>
-        <Scripts />
-      </body>
-    </html>
+    <div>
+      <h1>Uh oh!</h1>
+      <p> Something went wrong!</p>
+      <p>
+        Try again later or{" "}
+        <a rel="nofollow" href="https://twitter.com/awnton">
+          let me know!
+        </a>
+      </p>
+    </div>
   )
 }
