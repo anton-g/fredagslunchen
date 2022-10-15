@@ -11,6 +11,10 @@ import { checkIsAdmin } from "~/models/user.server"
 import { LinkButton } from "~/components/Button"
 
 export const meta: MetaFunction = ({ data }) => {
+  if (!data || !data.details) {
+    return {}
+  }
+
   return {
     "twitter:title": `${data.details.group.name} on Fredagslunchen`,
     "og:title": `${data.details.group.name} on Fredagslunchen`,
@@ -90,8 +94,7 @@ export function CatchBoundary() {
     return (
       <div>
         <h2>Access denied</h2>
-        If someone sent you this link, create an account and ask them to add you
-        to their club.
+        If someone sent you this link, ask them to add you to their club.
       </div>
     )
   }
