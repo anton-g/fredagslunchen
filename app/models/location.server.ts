@@ -175,3 +175,57 @@ export async function updateLocation(update: Location) {
     },
   })
 }
+
+export async function mergeLocations({
+  locationFromId,
+  locationToId,
+}: {
+  locationFromId: Location["id"]
+  locationToId: Location["id"]
+}) {
+  const lunchesToUpdate = await prisma.lunch.findMany({
+    where: {
+      groupLocationLocationId: locationFromId,
+    },
+    include: {
+      groupLocation: true,
+    },
+  })
+
+  for (const lunch of lunchesToUpdate) {
+    await prisma.lunch.update({
+      where: {
+        id: lunch.id,
+      },
+      data: {
+        groupLocation: {
+          connectOrCreate: {
+            where: {
+              locationId_groupId: {
+                groupId: lunch.groupLocationGroupId,
+                locationId: locationToId,
+              },
+            },
+            create: {
+              discoveredById: lunch.groupLocation.discoveredById,
+              groupId: lunch.groupLocationGroupId,
+              locationId: locationToId,
+            },
+          },
+        },
+      },
+    })
+  }
+
+  await prisma.groupLocation.deleteMany({
+    where: {
+      locationId: locationFromId,
+    },
+  })
+
+  await prisma.location.delete({
+    where: {
+      id: locationFromId,
+    },
+  })
+}

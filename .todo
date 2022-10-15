@@ -1,4 +1,8 @@
 # Next
+- Club locations
+  - View all
+  - Update
+  - Delete (require club admin?)
 - Themes
   - Improve dark theme map
 - More stats
@@ -11,10 +15,6 @@
 - Investigate issue with map ENV
 - Better error boundaries
 - Feedback
-- Club locations
-  - View all
-  - Update
-  - Delete (require club admin?)
 - Delete user
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
@@ -28,8 +28,6 @@
 
 # Later
 - Restructure api routes
-- Admin page
-  - Merge locations (ie Sandhäxan and Sandhaxan)
 - Role based -> Permissions based access
 - Investigate how to reduce db calls when on a deeply nested route
 - Export club data
