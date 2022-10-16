@@ -56,19 +56,38 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ groupLunch, isAdmin, isOwner, isMember, userId })
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
-  if (request.method !== "DELETE") return null
+type ActionData = {
+  errors?: {
+    action?: string
+  }
+}
 
+export const action: ActionFunction = async ({ request, params }) => {
   const userId = await requireUserId(request)
   invariant(params.lunchId, "lunchId not found")
   invariant(params.groupId, "groupId not found")
 
-  await deleteLunch({
-    id: parseInt(params.lunchId),
-    requestedByUserId: userId,
-  })
+  const formData = await request.formData()
+  const action = formData.get("action")
 
-  return redirect(`/groups/${params.groupId}`)
+  if (typeof action !== "string" || action.length === 0) {
+    return json<ActionData>({
+      errors: {
+        action: "Action is required",
+      },
+    })
+  }
+
+  if (action === "delete") {
+    await deleteLunch({
+      id: parseInt(params.lunchId),
+      requestedByUserId: userId,
+    })
+
+    return redirect(`/groups/${params.groupId}`)
+  }
+
+  return null
 }
 
 export default function LunchDetailsPage() {
@@ -526,7 +545,8 @@ const AdminActions = () => {
             This will delete this lunch including all scores. This action{" "}
             <strong>cannot be undone</strong>!
           </DialogDescription>
-          <Form method="delete">
+          <Form method="post">
+            <input type="hidden" name="action" value="delete" />
             <Button size="large" style={{ marginLeft: "auto" }}>
               I am sure
             </Button>

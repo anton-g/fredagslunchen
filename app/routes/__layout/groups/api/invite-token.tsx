@@ -12,6 +12,7 @@ type ActionData = {
     user?: string
     lunchId?: string
     groupId?: string
+    action?: string
   }
 }
 
@@ -21,6 +22,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const formData = await request.formData()
   const userId = formData.get("userId")
   const groupId = formData.get("groupId")
+  const action = formData.get("action")
 
   if (typeof userId !== "string" || userId.length === 0) {
     return json<ActionData>(
@@ -36,7 +38,14 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  if (request.method === "DELETE") {
+  if (typeof action !== "string" || action.length === 0) {
+    return json<ActionData>(
+      { errors: { action: "Action is required" } },
+      { status: 400 }
+    )
+  }
+
+  if (action === "delete") {
     await deleteGroupInviteToken({
       userId,
       groupId,

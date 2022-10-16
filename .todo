@@ -18,8 +18,6 @@
 - Add optimistic UI when possible
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
-- Refactor to not use delete methods
-  - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 - Test the cypress workaround in updated Indie Stack
 - Use zod (+ zod-form-data?) for validating inputs
 

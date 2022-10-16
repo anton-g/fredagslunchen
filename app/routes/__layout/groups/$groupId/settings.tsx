@@ -40,6 +40,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 type ActionData = {
   errors?: {
+    action?: string
     name?: string
     lat?: string
     lon?: string
@@ -50,16 +51,25 @@ export const action: ActionFunction = async ({ request, params }) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
-  switch (request.method) {
-    case "DELETE":
+  const formData = await request.formData()
+  const action = formData.get("action")
+
+  if (typeof action !== "string" || action.length === 0) {
+    return json<ActionData>(
+      { errors: { action: "Action is required" } },
+      { status: 400 }
+    )
+  }
+
+  switch (action) {
+    case "delete":
       return deleteGroupAction(userId, params.groupId)
     default:
-      return updateGroupAction(request, params.groupId)
+      return updateGroupAction(formData, params.groupId)
   }
 }
 
-const updateGroupAction = async (request: Request, groupId: Group["id"]) => {
-  const formData = await request.formData()
+const updateGroupAction = async (formData: FormData, groupId: Group["id"]) => {
   const name = formData.get("name")
   const latInput = formData.get("lat")
   const lonInput = formData.get("lon")
@@ -201,6 +211,7 @@ export default function GroupSettingsPage() {
           </div>
         </Stack>
         <Spacer size={16} />
+        <input type="hidden" name="action" value="update" />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
       <Subtitle>Members</Subtitle>
@@ -280,7 +291,8 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
           onChange={(e) => setConfirmNameValue(e.target.value)}
         />
         <Spacer size={16} />
-        <Form method="delete">
+        <Form method="post">
+          <input type="hidden" name="action" value="delete" />
           <Button
             size="large"
             style={{ marginLeft: "auto" }}
@@ -322,9 +334,10 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
           <strong>cannot be undone</strong>!
         </DialogDescription>
         <Spacer size={16} />
-        <fetcher.Form action="/groups/api/member" method="delete">
+        <fetcher.Form action="/groups/api/member" method="post">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
+          <input name="action" value={"delete"} type="hidden" />
           <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
@@ -376,6 +389,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
         <fetcher.Form action="/groups/api/member" method="post">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
+          <input name="action" value={"update"} type="hidden" />
           <input
             name="role"
             value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"}

@@ -132,7 +132,8 @@ export default function InvitePage() {
               aria-label="Invite link"
             />
             <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
-              <fetcher.Form method="delete" action="/groups/api/invite-token">
+              <fetcher.Form method="post" action="/groups/api/invite-token">
+                <input type="hidden" name="action" value={"delete"} />
                 <input type="hidden" name="groupId" value={groupId} />
                 <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
@@ -167,6 +168,7 @@ export default function InvitePage() {
           <InviteDescription>
             Create a link that anyone can use to join your club.
           </InviteDescription>
+          <input type="hidden" name="action" value={"create"} />
           <input type="hidden" name="groupId" value={groupId} />
           <input type="hidden" name="userId" value={userId} />
           <Button>Create invite link</Button>
