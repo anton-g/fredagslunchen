@@ -28,7 +28,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   invariant(params.groupId, "groupId is required")
   const group = await getGroup({
     id: params.groupId,
-    userId,
   })
 
   if (!group) throw new Response("Not found", { status: 404 })
@@ -120,6 +119,19 @@ export default function GroupSettingsPage() {
     }
   }, [actionData])
 
+  const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const value = e.clipboardData.getData("Text")
+
+    if (!value || value.indexOf(",") === -1) return
+
+    const [lat, lon] = value.split(",")
+
+    requestAnimationFrame(() => {
+      latRef.current!.value = lat
+      lonRef.current!.value = lon
+    })
+  }
+
   return (
     <div>
       <Form method="post">
@@ -156,6 +168,7 @@ export default function GroupSettingsPage() {
               <Input
                 ref={latRef}
                 name="lat"
+                onPaste={handleCoordinatePaste}
                 defaultValue={group.lat ?? ""}
                 aria-invalid={actionData?.errors?.lat ? true : undefined}
                 aria-errormessage={
@@ -174,6 +187,7 @@ export default function GroupSettingsPage() {
               <Input
                 ref={lonRef}
                 name="lon"
+                onPaste={handleCoordinatePaste}
                 defaultValue={group.lon ?? ""}
                 aria-invalid={actionData?.errors?.lon ? true : undefined}
                 aria-errormessage={

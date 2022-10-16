@@ -22,10 +22,10 @@ import { requireUserId } from "~/session.server"
 import { useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
-  const group = await getGroup({ userId, id: params.groupId })
+  const group = await getGroup({ id: params.groupId })
   if (!group) {
     throw new Response("Not Found", { status: 404 })
   }

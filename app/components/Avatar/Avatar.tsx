@@ -28,6 +28,7 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   max-width: ${({ size }) => sizes[size]}px;
   max-height: ${({ size }) => sizes[size]}px;
   padding: 0;
+  border-color: ${({ theme }) => theme.colors.avatarForeground};
 
   svg {
     height: 100%;

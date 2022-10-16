@@ -9,12 +9,16 @@ import {
 import * as React from "react"
 import styled, { css } from "styled-components"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Avatar, SeedAvatar } from "~/components/Avatar"
+import { Button, LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
 import { Input } from "~/components/Input"
 import { RadioGroup } from "~/components/RadioGroup"
 import { Spacer } from "~/components/Spacer"
+import { PremiumOverlay } from "~/components/PremiumOverlay"
 import { Stack } from "~/components/Stack"
+import { useFeatureFlags } from "~/FeatureFlagContext"
+import type { User } from "~/models/user.server"
 import {
   changeUserPassword,
   checkIsAdmin,
@@ -26,16 +30,19 @@ import { requireUserId } from "~/session.server"
 import { availableThemes, useThemeContext } from "~/styles/theme"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  const currentUserId = await requireUserId(request)
   invariant(params.userId, "userId is required")
 
-  const isAdmin = checkIsAdmin(userId)
+  const isAdmin = checkIsAdmin(currentUserId)
 
-  if (userId !== params.userId && !isAdmin) {
+  if (currentUserId !== params.userId && !isAdmin) {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const user = await getFullUserById({ id: userId, requestUserId: userId })
+  const user = await getFullUserById({
+    id: params.userId,
+    requestUserId: currentUserId,
+  })
 
   if (!user) {
     throw new Response("Not Found", { status: 404 })
@@ -157,6 +164,7 @@ export default function UserSettingsPage() {
   return (
     <div>
       <Title>Your settings</Title>
+      <AvatarPicker userId={user.id} />
       <Form method="post">
         <Stack gap={16}>
           <div>
@@ -281,10 +289,11 @@ const ColorTitle = styled.h2`
 
 const RadioItemCard = ({
   children,
+  style,
   ...props
 }: React.ComponentProps<typeof RadioGroup.Item>) => {
   return (
-    <Wrapper>
+    <Wrapper style={style}>
       <Content>{children}</Content>
       <Spacer size={24} />
       <RadioGroup.Item {...props} />
@@ -321,6 +330,7 @@ const Color = styled(Card)<{ color: string }>`
 `
 
 const ThemePicker = () => {
+  const { premium } = useFeatureFlags()
   const { theme, setTheme } = useThemeContext()
   const fetcher = useFetcher()
 
@@ -329,6 +339,7 @@ const ThemePicker = () => {
     name: val.name,
     primary: val.colors.primary,
     secondary: val.colors.secondary,
+    premium: val.premium,
   }))
 
   return (
@@ -343,17 +354,128 @@ const ThemePicker = () => {
         name="theme"
       >
         <Stack gap={16}>
-          {themes.map((t) => (
-            <RadioItemCard value={t.key} id={t.key} key={t.key}>
-              <ColorStack gap={0} axis="horizontal">
-                <Color color={t.secondary} />
-                <Color color={t.primary} />
-                <ColorTitle>{t.name}</ColorTitle>
-              </ColorStack>
-            </RadioItemCard>
-          ))}
+          {themes
+            .filter((t) => !t.premium)
+            .map((t) => (
+              <RadioItemCard value={t.key} id={t.key} key={t.key}>
+                <ColorStack gap={0} axis="horizontal">
+                  <Color color={t.secondary} />
+                  <Color color={t.primary} />
+                  <ColorTitle>{t.name}</ColorTitle>
+                </ColorStack>
+              </RadioItemCard>
+            ))}
         </Stack>
+        {premium && (
+          <>
+            <Spacer size={16} />
+            <Stack gap={16} style={{ position: "relative" }}>
+              <PremiumOverlay />
+              {themes
+                .filter((t) => t.premium)
+                .map((t, i) => (
+                  <RadioItemCard
+                    value={t.key}
+                    id={t.key}
+                    key={t.key}
+                    disabled
+                    style={{
+                      userSelect: "none",
+                      marginTop: i === 0 ? 0 : i * 0.9 * -32,
+                      zIndex: -i,
+                      transform: `scale(${1 - i * 0.07})`,
+                      filter: `blur(${2 + i * 0.4}px) grayscale(80%)`,
+                    }}
+                  >
+                    <ColorStack gap={0} axis="horizontal">
+                      <Color color={t.secondary} />
+                      <Color color={t.primary} />
+                      <ColorTitle>{t.name}</ColorTitle>
+                    </ColorStack>
+                  </RadioItemCard>
+                ))}
+            </Stack>
+          </>
+        )}
       </RadioGroup>
     </fetcher.Form>
   )
 }
+
+const AvatarPicker = ({ userId }: { userId: User["id"] }) => {
+  const { premium } = useFeatureFlags()
+
+  if (!premium) return null
+
+  return (
+    <>
+      <Stack axis="horizontal" gap={10}>
+        <SeedAvatar seed={userId} />
+        <Stack
+          axis="horizontal"
+          gap={16}
+          style={{
+            position: "relative",
+            paddingLeft: 6,
+            paddingBottom: 6,
+            overflow: "hidden",
+          }}
+        >
+          <AvatarPremiumCTA />
+          <Avatar variant={2} size="medium" />
+          <Avatar variant={17} size="medium" />
+          <Avatar variant={24} size="medium" />
+          <Avatar variant={24} size="medium" />
+          <Avatar variant={12} size="medium" />
+          <Avatar variant={19} size="medium" />
+          <Avatar variant={23} size="medium" />
+          <Avatar variant={16} size="medium" />
+        </Stack>
+      </Stack>
+      <Spacer size={24} />
+    </>
+  )
+}
+
+const AvatarPremiumCTA = () => {
+  return (
+    <PremiumWrapper>
+      <Backdrop />
+      <LinkButton to="/supporter" size="normal">
+        Unlock more avatars
+      </LinkButton>
+    </PremiumWrapper>
+  )
+}
+
+const PremiumWrapper = styled.div`
+  position: absolute;
+  font-weight: bold;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inset: 0;
+  /* inset: -8px -8px -16px -8px; */
+  ::after {
+    content: "";
+    position: absolute;
+    background: transparent;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      ${({ theme }) => theme.colors.secondary} 70%
+    );
+    width: 32px;
+    height: 100%;
+    right: 0;
+  }
+`
+
+const Backdrop = styled.div`
+  position: absolute;
+  inset: 0;
+  background-color: ${({ theme }) => theme.colors.secondary};
+  opacity: 0.7;
+  z-index: -1;
+`

@@ -131,6 +131,19 @@ export default function AdminLocationDetailsPage() {
 
   if (!location) return null
 
+  const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+    const value = e.clipboardData.getData("Text")
+
+    if (!value || value.indexOf(",") === -1) return
+
+    const [lat, lon] = value.split(",")
+
+    requestAnimationFrame(() => {
+      latRef.current!.value = lat
+      lonRef.current!.value = lon
+    })
+  }
+
   return (
     <div>
       <Title>{location.name}</Title>
@@ -225,6 +238,7 @@ export default function AdminLocationDetailsPage() {
                 <Input
                   ref={latRef}
                   name="lat"
+                  onPaste={handleCoordinatePaste}
                   defaultValue={location.lat || ""}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
                   aria-errormessage={
@@ -243,6 +257,7 @@ export default function AdminLocationDetailsPage() {
                 <Input
                   ref={lonRef}
                   name="lon"
+                  onPaste={handleCoordinatePaste}
                   defaultValue={location.lon || ""}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
                   aria-errormessage={
