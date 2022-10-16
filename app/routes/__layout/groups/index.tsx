@@ -22,6 +22,7 @@ export default function GroupsPage() {
 
   return (
     <main>
+      <h1>Your clubs</h1>
       <div>
         {data.groups.length === 0 ? (
           <>

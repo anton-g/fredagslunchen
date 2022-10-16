@@ -1,4 +1,6 @@
 # Next
+- Move map bool to feature flag
+- Role based -> Permissions based access
 - Club locations
   - View all
   - Update
@@ -28,7 +30,6 @@
 
 # Later
 - Restructure api routes
-- Role based -> Permissions based access
 - Investigate how to reduce db calls when on a deeply nested route
 - Export club data
 - Premium / Supporter?

@@ -23,6 +23,7 @@ import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
 import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
+import { checkIsAdmin } from "~/models/user.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -33,24 +34,26 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const isAdmin = details.group.members.some(
+  const isOwner = details.group.members.some(
     (m) => m.userId === userId && m.role === "ADMIN"
   )
 
+  const isAdmin = userId ? await checkIsAdmin(userId) : false
   const isMember = details.group.members.some((x) => x.userId === userId)
-  const canEdit = isAdmin || isMember
+  const canEdit = isOwner || isMember
 
   return json({
     details,
     isMapsEnabled: getEnv().ENABLE_MAPS,
     isAdmin,
+    isOwner,
     isMember,
     canEdit,
   })
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin, isMember, canEdit } =
+  const { details, isMapsEnabled, isAdmin, isOwner, isMember, canEdit } =
     useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members.slice().sort((a, b) => {
@@ -268,6 +271,7 @@ export default function GroupDetailsPage() {
         groupId={details.group.id}
         groupName={details.group.name}
         isAdmin={isAdmin}
+        isOwner={isOwner}
         isMember={isMember}
       />
     </div>
@@ -333,6 +337,7 @@ const MapCard = styled(Card)`
 
 type GroupActionBarProps = {
   isAdmin: boolean
+  isOwner: boolean
   isMember: boolean
   groupId: Group["id"]
   groupName: Group["name"]
@@ -340,6 +345,7 @@ type GroupActionBarProps = {
 
 const GroupActionBar = ({
   isAdmin,
+  isOwner,
   isMember,
   groupId,
   groupName,
@@ -348,7 +354,7 @@ const GroupActionBar = ({
 
   return (
     <Wrapper axis="horizontal" gap={16}>
-      {isAdmin && (
+      {(isOwner || isAdmin) && (
         <Tooltip>
           <Tooltip.Trigger asChild>
             <LinkButton
@@ -362,7 +368,7 @@ const GroupActionBar = ({
           <Tooltip.Content>Club settings</Tooltip.Content>
         </Tooltip>
       )}
-      {!isAdmin && isMember && (
+      {!isOwner && isMember && (
         <Dialog>
           <Tooltip>
             <Dialog.Trigger asChild>

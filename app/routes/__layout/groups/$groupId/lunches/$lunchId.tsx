@@ -2,6 +2,7 @@ import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import type { Lunch } from "~/models/lunch.server"
 import type { Score, ScoreRequest } from "~/models/score.server"
 import type { User } from "~/models/user.server"
+import { checkIsAdmin } from "~/models/user.server"
 import type { Group } from "~/models/group.server"
 import type { MouseEventHandler, ReactNode } from "react"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
@@ -42,16 +43,17 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     id: parseInt(params.lunchId),
   })
 
+  const isAdmin = userId ? await checkIsAdmin(userId) : false
   const currentMember = groupLunch?.groupLocation.group.members.find(
     (m) => m.userId === userId
   )
-  const isAdmin = currentMember?.role === "ADMIN"
+  const isOwner = currentMember?.role === "ADMIN"
   const isMember = Boolean(currentMember)
 
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLunch, isAdmin, isMember, userId })
+  return json({ groupLunch, isAdmin, isOwner, isMember, userId })
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
@@ -70,7 +72,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin, userId, isMember } =
+  const { groupLunch, isAdmin, isOwner, userId, isMember } =
     useLoaderData<typeof loader>()
 
   const scores = groupLunch.scores
@@ -149,7 +151,7 @@ export default function LunchDetailsPage() {
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    {(isAdmin || score.userId === userId) && (
+                    {(isOwner || score.userId === userId) && (
                       <ScoreDeleteAction
                         scoreId={score.id}
                         description={
@@ -200,7 +202,7 @@ export default function LunchDetailsPage() {
           />
         </>
       )}
-      {isAdmin && (
+      {(isOwner || isAdmin) && (
         <>
           <Spacer size={48} />
           <AdminActions />

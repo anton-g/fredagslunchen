@@ -1,6 +1,7 @@
 import type { Group, Location, Lunch, User } from "@prisma/client"
 
 import { prisma } from "~/db.server"
+import { checkIsAdmin } from "./user.server"
 
 export type { Lunch, Location } from "@prisma/client"
 
@@ -81,19 +82,26 @@ export async function deleteLunch({
   id: Lunch["id"]
   requestedByUserId: User["id"]
 }) {
+  const requestedByAdmin = await checkIsAdmin(requestedByUserId)
+
+  // TODO should really be able to write this in a less messy way
   await prisma.lunch.deleteMany({
     where: {
       id,
-      groupLocation: {
-        group: {
-          members: {
-            some: {
-              userId: requestedByUserId,
-              role: "ADMIN",
+      ...(!requestedByAdmin
+        ? {
+            groupLocation: {
+              group: {
+                members: {
+                  some: {
+                    userId: requestedByUserId,
+                    role: "ADMIN",
+                  },
+                },
+              },
             },
-          },
-        },
-      },
+          }
+        : {}),
     },
   })
 }
