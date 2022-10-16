@@ -128,6 +128,45 @@ export default function Kitchensink() {
             <SeedAvatar seed={"BassLabb"} />
             <SeedAvatar seed={"Tessan"} />
           </Stack>
+          <Spacer size={24} />
+          <Stack gap={8} axis={"vertical"}>
+            <Stack gap={8} axis={"horizontal"}>
+              <Avatar variant={1} size="small" />
+              <Avatar variant={2} size="small" />
+              <Avatar variant={3} size="small" />
+              <Avatar variant={4} size="small" />
+              <Avatar variant={5} size="small" />
+              <Avatar variant={6} size="small" />
+              <Avatar variant={7} size="small" />
+              <Avatar variant={8} size="small" />
+              <Avatar variant={9} size="small" />
+              <Avatar variant={10} size="small" />
+            </Stack>
+            <Stack gap={8} axis={"horizontal"}>
+              <Avatar variant={11} size="small" />
+              <Avatar variant={12} size="small" />
+              <Avatar variant={13} size="small" />
+              <Avatar variant={14} size="small" />
+              <Avatar variant={15} size="small" />
+              <Avatar variant={16} size="small" />
+              <Avatar variant={17} size="small" />
+              <Avatar variant={18} size="small" />
+              <Avatar variant={19} size="small" />
+              <Avatar variant={20} size="small" />
+            </Stack>
+            <Stack gap={8} axis={"horizontal"}>
+              <Avatar variant={21} size="small" />
+              <Avatar variant={22} size="small" />
+              <Avatar variant={23} size="small" />
+              <Avatar variant={24} size="small" />
+              <Avatar variant={25} size="small" />
+              <Avatar variant={26} size="small" />
+              <Avatar variant={27} size="small" />
+              <Avatar variant={28} size="small" />
+              <Avatar variant={29} size="small" />
+              <Avatar variant={30} size="small" />
+            </Stack>
+          </Stack>
         </Component>
         <Component title="Table">
           <TableExample />

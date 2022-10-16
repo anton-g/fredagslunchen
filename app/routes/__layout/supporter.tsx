@@ -38,8 +38,9 @@ export default function SupporterPage() {
       <p>
         By supporting Fredagslunchen you help ensure its continued development.
       </p>
-      <strong>Supporter</strong> costs 10€ per year and as a token of gratitude
-      for believing in us, you get some perks only available to Supporters:
+      <strong>Supporter</strong> costs <strong>10€ per year</strong> and as a
+      token of gratitude for believing in us, you get some perks only available
+      to Supporters:
       <ul>
         <li>Exclusive themes</li>
         <li>Custom avatars</li>
@@ -48,8 +49,10 @@ export default function SupporterPage() {
       <p>Some more text here before the CTA.</p>
       <Spacer size={16} />
       <Button size="huge" variant="inverted" style={{ margin: "0 auto" }}>
-        Become a Supporter - $10/year
+        Become a Supporter
       </Button>
+      <Spacer size={24} />
+      FAQ
     </Wrapper>
   )
 }
