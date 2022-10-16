@@ -15,6 +15,7 @@ import { Input } from "~/components/Input"
 import { RadioGroup } from "~/components/RadioGroup"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
+import { useFeatureFlags } from "~/FeatureFlagContext"
 import {
   changeUserPassword,
   checkIsAdmin,
@@ -322,6 +323,7 @@ const Color = styled(Card)<{ color: string }>`
 `
 
 const ThemePicker = () => {
+  const { premium } = useFeatureFlags()
   const { theme, setTheme } = useThemeContext()
   const fetcher = useFetcher()
 
@@ -357,33 +359,37 @@ const ThemePicker = () => {
               </RadioItemCard>
             ))}
         </Stack>
-        <Spacer size={16} />
-        <Stack gap={16} style={{ position: "relative" }}>
-          <PremiumOverlay />
-          {themes
-            .filter((t) => t.premium)
-            .map((t, i) => (
-              <RadioItemCard
-                value={t.key}
-                id={t.key}
-                key={t.key}
-                disabled
-                style={{
-                  userSelect: "none",
-                  marginTop: i === 0 ? 0 : i * 0.9 * -32,
-                  zIndex: -i,
-                  transform: `scale(${1 - i * 0.07})`,
-                  filter: `blur(${2 + i * 0.4}px) grayscale(80%)`,
-                }}
-              >
-                <ColorStack gap={0} axis="horizontal">
-                  <Color color={t.secondary} />
-                  <Color color={t.primary} />
-                  <ColorTitle>{t.name}</ColorTitle>
-                </ColorStack>
-              </RadioItemCard>
-            ))}
-        </Stack>
+        {premium && (
+          <>
+            <Spacer size={16} />
+            <Stack gap={16} style={{ position: "relative" }}>
+              <PremiumOverlay />
+              {themes
+                .filter((t) => t.premium)
+                .map((t, i) => (
+                  <RadioItemCard
+                    value={t.key}
+                    id={t.key}
+                    key={t.key}
+                    disabled
+                    style={{
+                      userSelect: "none",
+                      marginTop: i === 0 ? 0 : i * 0.9 * -32,
+                      zIndex: -i,
+                      transform: `scale(${1 - i * 0.07})`,
+                      filter: `blur(${2 + i * 0.4}px) grayscale(80%)`,
+                    }}
+                  >
+                    <ColorStack gap={0} axis="horizontal">
+                      <Color color={t.secondary} />
+                      <Color color={t.primary} />
+                      <ColorTitle>{t.name}</ColorTitle>
+                    </ColorStack>
+                  </RadioItemCard>
+                ))}
+            </Stack>
+          </>
+        )}
       </RadioGroup>
     </fetcher.Form>
   )
@@ -395,7 +401,7 @@ const PremiumOverlay = () => {
       <Backdrop />
       <h3>Support Fredagslunchen</h3>
       <Spacer size={8} />
-      <p>Get access to more themes, avatars and more!</p>
+      <p>Get access to exclusive themes, avatars and more!</p>
       <Spacer size={16} />
       <LinkButton to="/supporter" size="large">
         Become a supporter
