@@ -28,7 +28,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   invariant(params.groupId, "groupId is required")
   const group = await getGroup({
     id: params.groupId,
-    userId,
   })
 
   if (!group) throw new Response("Not found", { status: 404 })
