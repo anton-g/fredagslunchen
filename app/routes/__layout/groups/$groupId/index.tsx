@@ -24,6 +24,7 @@ import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
 import { checkIsAdmin } from "~/models/user.server"
+import { useFeatureFlags } from "~/FeatureFlagContext"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -44,7 +45,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   return json({
     details,
-    isMapsEnabled: getEnv().ENABLE_MAPS,
     isAdmin,
     isOwner,
     isMember,
@@ -53,7 +53,8 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMapsEnabled, isAdmin, isOwner, isMember, canEdit } =
+  const { maps } = useFeatureFlags()
+  const { details, isAdmin, isOwner, isMember, canEdit } =
     useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members.slice().sort((a, b) => {
@@ -234,7 +235,7 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
-      {isMapsEnabled && (
+      {maps && (
         <>
           <Subtitle>Map</Subtitle>
           <Spacer size={8} />

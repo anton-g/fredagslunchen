@@ -1,6 +1,8 @@
 # Next
-- Move map bool to feature flag
 - Role based -> Permissions based access
+- Fix future date descriptions
+- Enable long comments to show on mobile
+- Update user email
 - Club locations
   - View all
   - Update
@@ -46,7 +48,6 @@
 - Check security of all models
 - Write tests
   - New lunch from location
-  - Invite user with email
   - Invite user with link
   - Creating anonymous user
   - Claiming anonymous user

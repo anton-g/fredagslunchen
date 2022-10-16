@@ -7,6 +7,7 @@ import { Map } from "~/components/Map"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import { getEnv } from "~/env.server"
+import { useFeatureFlags } from "~/FeatureFlagContext"
 
 import { getAllLocationsStats } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
@@ -15,7 +16,7 @@ import { formatNumber } from "~/utils"
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
   const locations = await getAllLocationsStats()
-  return json({ locations, isMapsEnabled: getEnv().ENABLE_MAPS })
+  return json({ locations })
 }
 
 export const meta: MetaFunction = () => {
@@ -25,7 +26,8 @@ export const meta: MetaFunction = () => {
 }
 
 export default function DiscoverPage() {
-  const { locations, isMapsEnabled } = useLoaderData<typeof loader>()
+  const { maps } = useFeatureFlags()
+  const { locations } = useLoaderData<typeof loader>()
 
   return (
     <main>
@@ -55,7 +57,7 @@ export default function DiscoverPage() {
             })}
         </tbody>
       </Table>
-      {isMapsEnabled && (
+      {maps && (
         <>
           <Spacer size={24} />
           <Subtitle>Map</Subtitle>
