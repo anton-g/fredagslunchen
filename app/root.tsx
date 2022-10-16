@@ -17,12 +17,12 @@ import { getUser } from "./session.server"
 import { ThemeProvider } from "styled-components"
 import { getEnv } from "./env.server"
 import { getDomainUrl, removeTrailingSlash } from "./utils"
-import type { Theme } from "./styles/theme"
 import {
   availableThemes,
   InternalThemeProvider,
   useThemeContext,
 } from "./styles/theme"
+import { FeatureFlagProvider } from "./FeatureFlagContext"
 
 declare global {
   interface Window {
@@ -127,9 +127,13 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <InternalThemeProvider defaultTheme={data.theme}>
-          <Content />
-        </InternalThemeProvider>
+        <FeatureFlagProvider
+          defaultValue={{ premium: data.ENV.ENABLE_PREMIUM }}
+        >
+          <InternalThemeProvider defaultTheme={data.theme}>
+            <Content />
+          </InternalThemeProvider>
+        </FeatureFlagProvider>
         <ScrollRestoration />
         {ENV.NODE_ENV === "development" ? null : (
           <script
