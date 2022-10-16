@@ -3,6 +3,7 @@ import { createContext, useContext } from "react"
 
 type FeatureFlags = {
   premium: boolean
+  maps: boolean
 }
 
 const FeatureFlagContext = createContext<FeatureFlags>(null!)

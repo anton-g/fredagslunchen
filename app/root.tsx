@@ -100,9 +100,19 @@ export const meta: MetaFunction = () => ({
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request)
+
+  const env = getEnv()
+
   return json({
     user,
-    ENV: getEnv(),
+    // Do not include tokens with sensitive data
+    ENV: {
+      ENABLE_MAPS: env.ENABLE_MAPS,
+      ENABLE_PREMIUM: env.ENABLE_PREMIUM,
+      FATHOM_SITE_ID: env.FATHOM_SITE_ID,
+      NODE_ENV: env.NODE_ENV,
+      MAPBOX_ACCESS_TOKEN: env.MAPBOX_ACCESS_TOKEN,
+    },
     requestInfo: {
       origin: getDomainUrl(request),
     },
@@ -128,7 +138,10 @@ export default function App() {
       </head>
       <body>
         <FeatureFlagProvider
-          defaultValue={{ premium: data.ENV.ENABLE_PREMIUM }}
+          defaultValue={{
+            premium: data.ENV.ENABLE_PREMIUM,
+            maps: data.ENV.ENABLE_MAPS,
+          }}
         >
           <InternalThemeProvider defaultTheme={data.theme}>
             <Content />
