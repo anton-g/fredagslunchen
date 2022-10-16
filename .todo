@@ -12,25 +12,25 @@
 - More stats
   - Best average picker
   - Average score on choice vs others choice
-  - Avg score per month / last 5 lunches / something something
-- Help / FAQ
-  - Where can I find coordinates?
-  Google Maps, right click copy
-- Investigate issue with map ENV
-- Better error boundaries
 - Feedback
 - Delete user
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
-- Social login
-- Improve map design
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Refactor to not use delete methods
   - https://remix.run/docs/en/v1/pages/faq#how-do-i-handle-multiple-forms-in-one-route
 - Test the cypress workaround in updated Indie Stack
+- Use zod (+ zod-form-data?) for validating inputs
+
+# Premium
+- Map designs for themes
+- Exclusive stats
+  - Historical stats
+  - Avg score per month / last 5 lunches / something something
 
 # Later
+- Social login
 - Restructure api routes
 - Investigate how to reduce db calls when on a deeply nested route
 - Export club data
@@ -51,6 +51,5 @@
   - Invite user with link
   - Creating anonymous user
   - Claiming anonymous user
-- Improved landing page
 - Show map image before loading interactive map
 - Fix issues when JS is disabled
