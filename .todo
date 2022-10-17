@@ -1,5 +1,7 @@
 # Next
 - Role based -> Permissions based access
+  - Check that all child routes are protected
+  - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Fix future date descriptions
 - Enable long comments to show on mobile
 - Update user email
@@ -16,8 +18,6 @@
 - Delete user
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
-- Check that all child routes are protected
-  - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Test the cypress workaround in updated Indie Stack
 - Use zod (+ zod-form-data?) for validating inputs
 

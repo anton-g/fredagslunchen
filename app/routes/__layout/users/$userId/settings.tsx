@@ -1,3 +1,4 @@
+import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import {
@@ -9,7 +10,7 @@ import {
 import * as React from "react"
 import styled, { css } from "styled-components"
 import invariant from "tiny-invariant"
-import { Avatar, SeedAvatar } from "~/components/Avatar"
+import { Avatar, UserAvatar } from "~/components/Avatar"
 import { Button, LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
 import { Input } from "~/components/Input"
@@ -28,6 +29,8 @@ import {
 
 import { requireUserId } from "~/session.server"
 import { availableThemes, useThemeContext } from "~/styles/theme"
+import { RecursivelyConvertDatesToStrings } from "~/utils"
+import { ComponentProps } from "react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const currentUserId = await requireUserId(request)
@@ -164,7 +167,7 @@ export default function UserSettingsPage() {
   return (
     <div>
       <Title>Your settings</Title>
-      <AvatarPicker userId={user.id} />
+      <AvatarPicker user={user} />
       <Form method="post">
         <Stack gap={16}>
           <div>
@@ -402,15 +405,47 @@ const ThemePicker = () => {
   )
 }
 
-const AvatarPicker = ({ userId }: { userId: User["id"] }) => {
+const AvatarPicker = ({
+  user,
+}: {
+  user: RecursivelyConvertDatesToStrings<User>
+}) => {
   const { premium } = useFeatureFlags()
-
   if (!premium) return null
+
+  const avatars = [
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+    22, 23, 24, 25, 26, 27, 28, 29, 30,
+  ].filter((x) => x !== user.avatarId)
+
+  const hasPremium = true
+  if (hasPremium) {
+    return (
+      <>
+        <AvatarRadioGroup defaultValue={`${user.avatarId}`}>
+          <AvatarScrollArea axis="horizontal" gap={16}>
+            <AvatarRadio
+              variant={user.avatarId || 1}
+              value={`${user.avatarId}`}
+            />
+            {avatars.map((variant) => (
+              <AvatarRadio
+                key={variant}
+                variant={variant}
+                value={`${variant}`}
+              />
+            ))}
+          </AvatarScrollArea>
+        </AvatarRadioGroup>
+        <Spacer size={24} />
+      </>
+    )
+  }
 
   return (
     <>
       <Stack axis="horizontal" gap={10}>
-        <SeedAvatar seed={userId} />
+        <UserAvatar user={user} />
         <Stack
           axis="horizontal"
           gap={16}
@@ -478,4 +513,75 @@ const Backdrop = styled.div`
   background-color: ${({ theme }) => theme.colors.secondary};
   opacity: 0.7;
   z-index: -1;
+`
+
+const AvatarRadio = (
+  props: ComponentProps<typeof RadioGroupPrimitive.Item> & { variant: number }
+) => {
+  return (
+    <AvatarRadioItem {...props}>
+      <AvatarFoo variant={props.variant} size="medium" />
+    </AvatarRadioItem>
+  )
+}
+
+const AvatarRadioGroup = styled(RadioGroup)`
+  position: relative;
+  margin: 0 -20px;
+
+  ::after {
+    content: "";
+    position: absolute;
+    background: transparent;
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0) 0%,
+      ${({ theme }) => theme.colors.secondary} 70%
+    );
+    width: 32px;
+    height: 100%;
+    top: 0;
+    right: 0;
+  }
+
+  ::before {
+    content: "";
+    position: absolute;
+    background: transparent;
+
+    background: linear-gradient(
+      90deg,
+      ${({ theme }) => theme.colors.secondary} 0%,
+      rgba(255, 0, 0, 0) 70%
+    );
+    width: 32px;
+    height: 100%;
+    top: 0;
+    left: 0;
+  }
+`
+
+const AvatarScrollArea = styled(Stack)`
+  max-width: 100%;
+  padding: 0 20px;
+  padding-bottom: 6px;
+  overflow-x: scroll;
+`
+
+const AvatarFoo = styled(Avatar)`
+  cursor: pointer;
+  box-shadow: 0px 0px 0px 0px ${({ theme }) => theme.colors.primary};
+  &:hover {
+    box-shadow: -3px 3px 0px 0px ${({ theme }) => theme.colors.primary};
+  }
+
+  transition: box-shadow 100ms ease-in-out;
+`
+
+const AvatarRadioItem = styled(RadioGroupPrimitive.Item)`
+  all: unset;
+
+  &[data-state="checked"] ${AvatarFoo} {
+    box-shadow: -5px 5px 0px 0px ${({ theme }) => theme.colors.primary};
+  }
 `

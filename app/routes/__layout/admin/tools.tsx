@@ -4,6 +4,7 @@ import { Form } from "@remix-run/react"
 import styled from "styled-components"
 import { Button } from "~/components/Button"
 import { recreateDemoGroup } from "~/models/admin.server"
+import { setAllUserAvatars } from "~/models/user.server"
 import { requireUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
@@ -15,7 +16,21 @@ export const loader = async ({ request }: LoaderArgs) => {
 export const action: ActionFunction = async ({ request }) => {
   await requireUserId(request)
 
-  await recreateDemoGroup()
+  const formData = await request.formData()
+  const action = formData.get("action")
+
+  if (typeof action !== "string" || action.length === 0) {
+    return json({}, { status: 400 })
+  }
+
+  switch (action) {
+    case "demo":
+      await recreateDemoGroup()
+      break
+    case "avatars":
+      await setAllUserAvatars()
+      break
+  }
 
   return json({ ok: true })
 }
@@ -25,7 +40,12 @@ export default function AdminToolsPage() {
     <div>
       <Title>Tools</Title>
       <Form method="post">
+        <input type="hidden" name="action" value="demo" />
         <Button>Recreate demo</Button>
+      </Form>
+      <Form method="post">
+        <input type="hidden" name="action" value="avatars" />
+        <Button>Set all user avatars</Button>
       </Form>
     </div>
   )

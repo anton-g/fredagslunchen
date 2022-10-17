@@ -12,7 +12,7 @@ import {
 } from "~/models/user.server"
 import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
-import { SeedAvatar } from "~/components/Avatar"
+import { SeedAvatar, UserAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Button, LinkButton } from "~/components/Button"
@@ -66,7 +66,7 @@ export default function Index() {
     <Wrapper>
       <Section>
         <TitleRow>
-          <SeedAvatar seed={user.id} />
+          <UserAvatar user={user} />
           <Title>{isYou ? "You" : user.name}</Title>
         </TitleRow>
         <Spacer size={24} />
