@@ -176,3 +176,8 @@ export function hashStr(str: string) {
   }
   return hash
 }
+
+export const getRandomAvatarId = (input: string) => {
+  const hash = hashStr(input)
+  return (hash % 30) + 1
+}

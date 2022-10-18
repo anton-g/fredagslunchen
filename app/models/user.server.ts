@@ -6,7 +6,12 @@ import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
 import type { Theme } from "~/styles/theme"
-import { cleanEmail, getAverageNumber, hashStr } from "~/utils"
+import {
+  cleanEmail,
+  getAverageNumber,
+  getRandomAvatarId,
+  hashStr,
+} from "~/utils"
 
 export type { User, Email } from "@prisma/client"
 
@@ -209,6 +214,8 @@ export async function createUser(
 ) {
   const hashedPassword = await hashPassword(password)
 
+  const avatarId = getRandomAvatarId(email)
+
   const user = await prisma.user.create({
     data: {
       email: {
@@ -219,6 +226,7 @@ export async function createUser(
         },
       },
       name,
+      avatarId,
       password: {
         create: {
           hash: hashedPassword,
@@ -273,10 +281,13 @@ export async function createUser(
 }
 
 export async function createAnonymousUser(name: string, groupId: Group["id"]) {
+  const avatarId = getRandomAvatarId(name)
+
   const user = await prisma.user.create({
     data: {
       name,
       role: "ANONYMOUS",
+      avatarId,
       groups: {
         create: {
           groupId,

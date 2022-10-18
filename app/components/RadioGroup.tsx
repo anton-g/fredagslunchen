@@ -1,5 +1,5 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
-import type { ComponentProps, FC } from "react"
+import type { ComponentProps } from "react"
 import styled from "styled-components"
 
 const RadioGroup = (props: ComponentProps<typeof RadioGroupPrimitive.Root>) => {

@@ -60,6 +60,7 @@ export async function createScoreWithNewAnonymousUser({
       },
       user: {
         create: {
+          avatarId: 4,
           name: newUserName,
           role: "ANONYMOUS",
         },

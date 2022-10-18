@@ -414,6 +414,9 @@ const NewScoreForm = ({
         alignItems: "flex-end",
       }}
     >
+      {isFromNewAnonymousUser && (
+        <input type="hidden" name="anonymous" value="true" />
+      )}
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>

@@ -27,6 +27,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const user = formData.get("user")
   const userId = formData.get("user-key")
   const lunchId = formData.get("lunchId")
+  const anonymous = formData.get("anonymous")
 
   if (typeof user !== "string" || user.length === 0) {
     return json<ActionData>(
@@ -56,6 +57,28 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
+  // Score for anonymous user
+  if (anonymous) {
+    const groupId = formData.get("groupId")
+
+    if (typeof groupId !== "string" || groupId.length === 0) {
+      return json<ActionData>(
+        { errors: { groupId: "Club is required" } },
+        { status: 400 }
+      )
+    }
+
+    await createScoreWithNewAnonymousUser({
+      comment: comment ? comment.toString() : null,
+      lunchId: parseInt(lunchId),
+      groupId: groupId,
+      score,
+      newUserName: user,
+    })
+
+    return json({ ok: true })
+  }
+
   // Score for existing user
   if (typeof userId === "string" && userId.length > 0) {
     await createScore({
@@ -75,23 +98,5 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json({ ok: true })
   }
 
-  // Score for new anonymous user
-  const groupId = formData.get("groupId")
-
-  if (typeof groupId !== "string" || groupId.length === 0) {
-    return json<ActionData>(
-      { errors: { groupId: "Club is required" } },
-      { status: 400 }
-    )
-  }
-
-  await createScoreWithNewAnonymousUser({
-    comment: comment ? comment.toString() : null,
-    lunchId: parseInt(lunchId),
-    groupId: groupId,
-    score,
-    newUserName: user,
-  })
-
-  return json({ ok: true })
+  return json({ ok: false })
 }
