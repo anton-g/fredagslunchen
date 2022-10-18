@@ -167,3 +167,12 @@ export function getDomainUrl(request: Request) {
 export function cleanEmail(email: Email["email"]) {
   return email.toLowerCase().trim()
 }
+
+export function hashStr(str: string) {
+  var hash = 0
+  for (var i = 0; i < str.length; i++) {
+    var charCode = str.charCodeAt(i)
+    hash += charCode
+  }
+  return hash
+}

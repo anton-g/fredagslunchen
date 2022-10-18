@@ -6,7 +6,7 @@ import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
 import type { Theme } from "~/styles/theme"
-import { cleanEmail, getAverageNumber } from "~/utils"
+import { cleanEmail, getAverageNumber, hashStr } from "~/utils"
 
 export type { User, Email } from "@prisma/client"
 
@@ -232,6 +232,17 @@ export async function createUser(
           email: true,
         },
       },
+    },
+  })
+
+  const hash = hashStr(user.id)
+  const randomAvatarId = (hash % 30) + 1
+  await prisma.user.update({
+    where: {
+      id: user.id,
+    },
+    data: {
+      avatarId: randomAvatarId,
     },
   })
 
@@ -627,6 +638,23 @@ export async function updateUser(update: Partial<User>) {
       ...update,
     },
   })
+}
+
+export async function setAllUserAvatars() {
+  const users = await prisma.user.findMany()
+
+  for (const user of users) {
+    const hash = hashStr(user.id)
+    const randomAvatarId = (hash % 30) + 1
+    await prisma.user.update({
+      where: {
+        id: user.id,
+      },
+      data: {
+        avatarId: randomAvatarId,
+      },
+    })
+  }
 }
 
 // TODO stats generation duplicated in group.server.ts

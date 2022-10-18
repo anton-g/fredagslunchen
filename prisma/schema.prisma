@@ -31,7 +31,8 @@ model User {
   passwordResetToken String?
   passwordResetTime  DateTime?
 
-  theme String @default("light")
+  theme    String @default("light")
+  avatarId Int?
 
   groups              GroupMember[]
   scores              Score[]

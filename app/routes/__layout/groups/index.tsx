@@ -2,7 +2,7 @@ import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { NavLink, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
-import { SeedAvatar } from "~/components/Avatar"
+import { UserAvatar } from "~/components/Avatar"
 import { LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
 import { Spacer } from "~/components/Spacer"
@@ -47,9 +47,9 @@ export default function GroupsPage() {
                         style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
                       >
                         {group.members.map((m) => (
-                          <SeedAvatar
+                          <UserAvatar
                             key={m.userId}
-                            seed={m.userId}
+                            user={m.user}
                             size="small"
                           />
                         ))}

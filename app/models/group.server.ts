@@ -133,7 +133,9 @@ export function getUserGroups({ userId }: { userId: User["id"] }) {
           },
         },
       },
-      members: { include: { user: { select: { name: true } } } },
+      members: {
+        include: { user: { select: { name: true, id: true, avatarId: true } } },
+      },
     },
   })
 }
