@@ -74,5 +74,6 @@ export const UserAvatar = ({
     return <Avatar variant={user.avatarId} size={size} />
   }
 
+  // TODO remove after migrating
   return <SeedAvatar seed={user.id} size={size} />
 }
