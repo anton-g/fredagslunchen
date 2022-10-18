@@ -8,6 +8,7 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
+import type { User } from "~/models/user.server"
 import {
   changeUserPassword,
   checkIsAdmin,
@@ -62,91 +63,20 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const formData = await request.formData()
 
-  const avatar = formData.get("avatar")
-  if (avatar) {
-    if (typeof avatar !== "string" || avatar.length === 0) {
-      return json<ActionData>(
-        { errors: { avatar: "Invalid avatar" } },
-        { status: 400 }
-      )
-    }
-
-    const avatarId = parseInt(avatar)
-
-    if (avatarId < 1 || avatarId > 30) {
-      return json<ActionData>(
-        { errors: { avatar: "Invalid avatar" } },
-        { status: 400 }
-      )
-    }
-
-    await updateUser({
-      id: userId,
-      avatarId,
-    })
-
-    return json({ ok: true })
+  const action = formData.get("action")
+  switch (action) {
+    case "updateAvatar":
+      return await updateAvatar(formData, userId)
+    case "updateTheme":
+      return await updateTheme(formData, userId)
+    case "updateDetails":
+      return await updateDetails(formData, userId)
+    case "changePassword":
+      return await updatePassword(formData, userId)
   }
+}
 
-  const theme = formData.get("theme")
-  if (theme) {
-    if (typeof theme !== "string" || theme.length === 0) {
-      return json<ActionData>(
-        { errors: { theme: "Invalid theme" } },
-        { status: 400 }
-      )
-    }
-
-    await updateUser({
-      id: userId,
-      theme,
-    })
-
-    return json({ ok: true })
-  }
-
-  const password = formData.get("current-password")
-  if (password) {
-    // todo move to func
-    const newPassword = formData.get("new-password")
-
-    if (typeof password !== "string" || password.length === 0) {
-      return json<ActionData>(
-        { errors: { password: "Current password is required" } },
-        { status: 400 }
-      )
-    }
-
-    if (typeof newPassword !== "string" || newPassword.length === 0) {
-      return json<ActionData>(
-        { errors: { newPassword: "New password is required" } },
-        { status: 400 }
-      )
-    }
-
-    if (newPassword.length < 8) {
-      return json<ActionData>(
-        { errors: { newPassword: "Password is too short" } },
-        { status: 400 }
-      )
-    }
-
-    const userOrError = await changeUserPassword({
-      id: userId,
-      oldPassword: password,
-      newPassword,
-    })
-
-    if ("error" in userOrError) {
-      return json<ActionData>(
-        { errors: { password: userOrError.error } },
-        { status: 400 }
-      )
-    }
-
-    return redirect(`/users/${userOrError.id}`)
-  }
-
+const updateDetails = async (formData: FormData, userId: User["id"]) => {
   const name = formData.get("name")
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
@@ -161,6 +91,90 @@ export const action: ActionFunction = async ({ request, params }) => {
   })
 
   return redirect(`/users/${user.id}`)
+}
+
+const updateAvatar = async (formData: FormData, userId: User["id"]) => {
+  const avatar = formData.get("avatar")
+  if (typeof avatar !== "string" || avatar.length === 0) {
+    return json<ActionData>(
+      { errors: { avatar: "Invalid avatar" } },
+      { status: 400 }
+    )
+  }
+
+  const avatarId = parseInt(avatar)
+
+  if (avatarId < 1 || avatarId > 30) {
+    return json<ActionData>(
+      { errors: { avatar: "Invalid avatar" } },
+      { status: 400 }
+    )
+  }
+
+  await updateUser({
+    id: userId,
+    avatarId,
+  })
+
+  return json({ ok: true })
+}
+
+const updateTheme = async (formData: FormData, userId: User["id"]) => {
+  const theme = formData.get("theme")
+  if (typeof theme !== "string" || theme.length === 0) {
+    return json<ActionData>(
+      { errors: { theme: "Invalid theme" } },
+      { status: 400 }
+    )
+  }
+
+  await updateUser({
+    id: userId,
+    theme,
+  })
+
+  return json({ ok: true })
+}
+
+const updatePassword = async (formData: FormData, userId: User["id"]) => {
+  const password = formData.get("current-password")
+  const newPassword = formData.get("new-password")
+
+  if (typeof password !== "string" || password.length === 0) {
+    return json<ActionData>(
+      { errors: { password: "Current password is required" } },
+      { status: 400 }
+    )
+  }
+
+  if (typeof newPassword !== "string" || newPassword.length === 0) {
+    return json<ActionData>(
+      { errors: { newPassword: "New password is required" } },
+      { status: 400 }
+    )
+  }
+
+  if (newPassword.length < 8) {
+    return json<ActionData>(
+      { errors: { newPassword: "Password is too short" } },
+      { status: 400 }
+    )
+  }
+
+  const userOrError = await changeUserPassword({
+    id: userId,
+    oldPassword: password,
+    newPassword,
+  })
+
+  if ("error" in userOrError) {
+    return json<ActionData>(
+      { errors: { password: userOrError.error } },
+      { status: 400 }
+    )
+  }
+
+  return redirect(`/users/${userOrError.id}`)
 }
 
 export default function UserSettingsPage() {
@@ -181,6 +195,7 @@ export default function UserSettingsPage() {
       <Title>Your settings</Title>
       <AvatarPicker user={user} />
       <Form method="post">
+        <input type="hidden" name="action" value="updateDetails" />
         <Stack gap={16}>
           <div>
             <label htmlFor="name">Name</label>
@@ -225,6 +240,7 @@ export default function UserSettingsPage() {
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
       <Form method="post">
+        <input type="hidden" name="action" value="changePassword" />
         <Subtitle>Change password</Subtitle>
         <Stack gap={16}>
           <div>

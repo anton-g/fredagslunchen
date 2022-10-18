@@ -1,9 +1,9 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
-import { RecursivelyConvertDatesToStrings } from "~/utils"
-import { ComponentProps } from "react"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import type { ComponentProps } from "react"
+import type { User } from "~/models/user.server"
 import { useRef } from "react"
 import { useFetcher } from "@remix-run/react"
-import * as React from "react"
 import styled from "styled-components"
 import { Avatar, UserAvatar } from "~/components/Avatar"
 import { LinkButton } from "~/components/Button"
@@ -11,7 +11,6 @@ import { RadioGroup } from "~/components/RadioGroup"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { useFeatureFlags } from "~/FeatureFlagContext"
-import { User } from "~/models/user.server"
 
 export const AvatarPicker = ({
   user,
@@ -38,6 +37,7 @@ export const AvatarPicker = ({
           method="post"
           onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
         >
+          <input type="hidden" name="action" value="updateAvatar" />
           <AvatarRadioGroup defaultValue={`${initialAvatar}`} name="avatar">
             <AvatarScrollArea axis="horizontal" gap={16}>
               <AvatarRadio

@@ -79,6 +79,7 @@ export const ThemePicker = () => {
       method="post"
       onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
     >
+      <input type="hidden" name="action" value="updateTheme" />
       <Subtitle>Theme</Subtitle>
       <RadioGroup
         defaultValue={theme}
