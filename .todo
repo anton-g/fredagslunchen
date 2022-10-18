@@ -15,7 +15,6 @@
   - Best average picker
   - Average score on choice vs others choice
 - Feedback
-- Delete user
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
 - Test the cypress workaround in updated Indie Stack
@@ -32,6 +31,7 @@
 - Check security of all models
 
 # Later
+- Delete user
 - Social login
 - Restructure api routes
 - Investigate how to reduce db calls when on a deeply nested route
@@ -51,3 +51,4 @@
   - Claiming anonymous user
 - Show map image before loading interactive map
 - Fix issues when JS is disabled
+- Remove anonymous users or make them more discoverable
