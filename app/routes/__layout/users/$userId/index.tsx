@@ -12,7 +12,7 @@ import {
 } from "~/models/user.server"
 import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
-import { SeedAvatar, UserAvatar } from "~/components/Avatar"
+import { UserAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Button, LinkButton } from "~/components/Button"

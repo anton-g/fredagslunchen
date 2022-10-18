@@ -6,7 +6,6 @@ import { Card } from "~/components/Card"
 import { Map } from "~/components/Map"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
-import { getEnv } from "~/env.server"
 import { useFeatureFlags } from "~/FeatureFlagContext"
 
 import { getAllLocationsStats } from "~/models/location.server"
