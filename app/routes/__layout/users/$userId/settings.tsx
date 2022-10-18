@@ -1,5 +1,8 @@
 import * as RadioGroupPrimitive from "@radix-ui/react-radio-group"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import type { ComponentProps } from "react"
+import { useRef } from "react"
 import { json, redirect } from "@remix-run/node"
 import {
   Form,
@@ -29,8 +32,6 @@ import {
 
 import { requireUserId } from "~/session.server"
 import { availableThemes, useThemeContext } from "~/styles/theme"
-import { RecursivelyConvertDatesToStrings } from "~/utils"
-import { ComponentProps } from "react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const currentUserId = await requireUserId(request)
@@ -62,6 +63,7 @@ type ActionData = {
     password?: string
     newPassword?: string
     theme?: string
+    avatar?: string
   }
 }
 
@@ -74,6 +76,32 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const formData = await request.formData()
+
+  const avatar = formData.get("avatar")
+  if (avatar) {
+    if (typeof avatar !== "string" || avatar.length === 0) {
+      return json<ActionData>(
+        { errors: { avatar: "Invalid avatar" } },
+        { status: 400 }
+      )
+    }
+
+    const avatarId = parseInt(avatar)
+
+    if (avatarId < 1 || avatarId > 30) {
+      return json<ActionData>(
+        { errors: { avatar: "Invalid avatar" } },
+        { status: 400 }
+      )
+    }
+
+    await updateUser({
+      id: userId,
+      avatarId,
+    })
+
+    return json({ ok: true })
+  }
 
   const theme = formData.get("theme")
   if (theme) {
@@ -135,7 +163,6 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const name = formData.get("name")
-
   if (typeof name !== "string" || name.length === 0) {
     return json<ActionData>(
       { errors: { name: "Name is required" } },
@@ -410,33 +437,42 @@ const AvatarPicker = ({
 }: {
   user: RecursivelyConvertDatesToStrings<User>
 }) => {
+  const fetcher = useFetcher()
+  const { current: initialAvatar } = useRef(user.avatarId)
+  const { current: avatars } = useRef(
+    [
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
+      22, 23, 24, 25, 26, 27, 28, 29, 30,
+    ].filter((x) => x !== user.avatarId)
+  )
+
   const { premium } = useFeatureFlags()
   if (!premium) return null
 
-  const avatars = [
-    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-    22, 23, 24, 25, 26, 27, 28, 29, 30,
-  ].filter((x) => x !== user.avatarId)
-
-  const hasPremium = true
+  const hasPremium = false
   if (hasPremium) {
     return (
       <>
-        <AvatarRadioGroup defaultValue={`${user.avatarId}`}>
-          <AvatarScrollArea axis="horizontal" gap={16}>
-            <AvatarRadio
-              variant={user.avatarId || 1}
-              value={`${user.avatarId}`}
-            />
-            {avatars.map((variant) => (
+        <fetcher.Form
+          method="post"
+          onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
+        >
+          <AvatarRadioGroup defaultValue={`${initialAvatar}`} name="avatar">
+            <AvatarScrollArea axis="horizontal" gap={16}>
               <AvatarRadio
-                key={variant}
-                variant={variant}
-                value={`${variant}`}
+                variant={initialAvatar || 1}
+                value={`${initialAvatar}`}
               />
-            ))}
-          </AvatarScrollArea>
-        </AvatarRadioGroup>
+              {avatars.map((variant) => (
+                <AvatarRadio
+                  key={variant}
+                  variant={variant}
+                  value={`${variant}`}
+                />
+              ))}
+            </AvatarScrollArea>
+          </AvatarRadioGroup>
+        </fetcher.Form>
         <Spacer size={24} />
       </>
     )
