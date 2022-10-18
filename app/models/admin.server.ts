@@ -3,6 +3,7 @@ import { prisma } from "~/db.server"
 import { faker } from "@faker-js/faker"
 import sub from "date-fns/sub"
 import type { Location } from "@prisma/client"
+import { getRandomAvatarId } from "~/utils"
 
 export async function getAdminStats() {
   const users = await prisma.user.aggregate({
@@ -450,6 +451,7 @@ async function demoUser(gender: "male" | "female", key: string) {
     update: {},
     create: {
       id,
+      avatarId: getRandomAvatarId(id),
       email: {
         connectOrCreate: {
           where: {

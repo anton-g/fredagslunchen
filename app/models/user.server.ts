@@ -6,7 +6,12 @@ import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
 import type { Theme } from "~/styles/theme"
-import { cleanEmail, getAverageNumber, hashStr } from "~/utils"
+import {
+  cleanEmail,
+  getAverageNumber,
+  getRandomAvatarId,
+  hashStr,
+} from "~/utils"
 
 export type { User, Email } from "@prisma/client"
 
@@ -273,11 +278,6 @@ export async function createUser(
   }
 
   return { user, groupId: group?.id }
-}
-
-const getRandomAvatarId = (input: string) => {
-  const hash = hashStr(input)
-  return (hash % 30) + 1
 }
 
 export async function createAnonymousUser(name: string, groupId: Group["id"]) {
