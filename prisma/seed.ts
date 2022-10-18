@@ -1,7 +1,6 @@
-// @ts-check
-const { PrismaClient } = require("@prisma/client")
-const bcrypt = require("bcryptjs")
-const { sub } = require("date-fns")
+import { PrismaClient } from "@prisma/client"
+import bcrypt from "bcryptjs"
+import { sub } from "date-fns"
 
 const prisma = new PrismaClient()
 
