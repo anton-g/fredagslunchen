@@ -64,8 +64,6 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const result = formSchema.safeParse(await request.formData())
 
-  console.log(result)
-
   if (!result.success) {
     return json<ActionData>(
       {
