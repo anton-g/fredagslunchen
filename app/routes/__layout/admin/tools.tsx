@@ -3,6 +3,7 @@ import { json } from "@remix-run/node"
 import { Form } from "@remix-run/react"
 import styled from "styled-components"
 import { Button } from "~/components/Button"
+import { Spacer } from "~/components/Spacer"
 import { recreateDemoGroup } from "~/models/admin.server"
 import { setAllUserAvatars } from "~/models/user.server"
 import { requireUserId } from "~/session.server"
@@ -43,6 +44,7 @@ export default function AdminToolsPage() {
         <input type="hidden" name="action" value="demo" />
         <Button>Recreate demo</Button>
       </Form>
+      <Spacer size={16} />
       <Form method="post">
         <input type="hidden" name="action" value="avatars" />
         <Button>Set all user avatars</Button>

@@ -21,6 +21,7 @@ async function seed() {
           email: "bassman@nosegrove.com",
         },
       },
+      avatarId: 15,
       name: "Bass Labb",
       role: "ADMIN",
       password: {
@@ -35,6 +36,7 @@ async function seed() {
     data: {
       email: { create: { email: "teko@cool.se" } },
       name: "Tessan",
+      avatarId: 1,
       password: {
         create: {
           hash: hashedPassword,
@@ -47,6 +49,7 @@ async function seed() {
     data: {
       email: { create: { email: "martin@cool.se" } },
       name: "Marre",
+      avatarId: 2,
       password: {
         create: {
           hash: hashedPassword,
@@ -59,6 +62,7 @@ async function seed() {
     data: {
       email: { create: { email: "katten@cool.se" } },
       name: "Katten",
+      avatarId: 3,
       password: {
         create: {
           hash: hashedPassword,
@@ -114,6 +118,7 @@ async function seed() {
               create: {
                 name: "Anonymous user",
                 role: "ANONYMOUS",
+                avatarId: 12,
               },
             },
           },
@@ -122,6 +127,7 @@ async function seed() {
               create: {
                 name: "Anonymous user 2",
                 role: "ANONYMOUS",
+                avatarId: 17,
               },
             },
           },

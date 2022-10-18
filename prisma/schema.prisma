@@ -32,7 +32,7 @@ model User {
   passwordResetTime  DateTime?
 
   theme    String @default("light")
-  avatarId Int?
+  avatarId Int
 
   groups              GroupMember[]
   scores              Score[]

@@ -68,12 +68,7 @@ export const UserAvatar = ({
   user,
   size = "medium",
 }: Omit<AvatarProps, "variant"> & {
-  user: Pick<User, "avatarId" | "id">
+  user: Pick<User, "avatarId">
 }) => {
-  if (user.avatarId) {
-    return <Avatar variant={user.avatarId} size={size} />
-  }
-
-  // TODO remove after migrating
-  return <SeedAvatar seed={user.id} size={size} />
+  return <Avatar variant={user.avatarId} size={size} />
 }

@@ -209,6 +209,8 @@ export async function createUser(
 ) {
   const hashedPassword = await hashPassword(password)
 
+  const avatarId = getRandomAvatarId(email)
+
   const user = await prisma.user.create({
     data: {
       email: {
@@ -219,6 +221,7 @@ export async function createUser(
         },
       },
       name,
+      avatarId,
       password: {
         create: {
           hash: hashedPassword,
@@ -272,11 +275,19 @@ export async function createUser(
   return { user, groupId: group?.id }
 }
 
+const getRandomAvatarId = (input: string) => {
+  const hash = hashStr(input)
+  return (hash % 30) + 1
+}
+
 export async function createAnonymousUser(name: string, groupId: Group["id"]) {
+  const avatarId = getRandomAvatarId(name)
+
   const user = await prisma.user.create({
     data: {
       name,
       role: "ANONYMOUS",
+      avatarId,
       groups: {
         create: {
           groupId,
