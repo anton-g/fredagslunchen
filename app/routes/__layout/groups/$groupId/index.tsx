@@ -10,9 +10,8 @@ import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Table } from "~/components/Table"
 import { Spacer } from "~/components/Spacer"
-import { Button, LinkButton } from "~/components/Button"
+import { Button, LinkButton, UnstyledButton } from "~/components/Button"
 import { Stat } from "~/components/Stat"
-import { HoverCard } from "~/components/HoverCard"
 import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
@@ -24,6 +23,7 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
 import { checkIsAdmin } from "~/models/user.server"
 import { useFeatureFlags } from "~/FeatureFlagContext"
+import { Popover } from "~/components/Popover"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -170,12 +170,14 @@ export default function GroupDetailsPage() {
       <Subtitle>Recommendations</Subtitle>
       <Spacer size={8} />
       <StatsGrid>
-        <HoverCard>
-          <HoverCard.Trigger>
-            <Stat label="Location picker" value={suggestedPicker.user.name} />
-          </HoverCard.Trigger>
+        <Popover>
+          <Popover.Trigger asChild>
+            <UnstyledButton>
+              <Stat label="Location picker" value={suggestedPicker.user.name} />
+            </UnstyledButton>
+          </Popover.Trigger>
           {alternativePickers.length > 0 && (
-            <HoverCard.Content align="start" alignOffset={16}>
+            <Popover.Content align="start" alignOffset={16}>
               <h4 style={{ margin: 0 }}>Alternatives</h4>
               <Spacer size={8} />
               <PickerAlternativesList start={2}>
@@ -183,9 +185,9 @@ export default function GroupDetailsPage() {
                   <li key={member.userId}>{member.user.name}</li>
                 ))}
               </PickerAlternativesList>
-            </HoverCard.Content>
+            </Popover.Content>
           )}
-        </HoverCard>
+        </Popover>
       </StatsGrid>
       <Spacer size={48} />
       <SectionHeader>

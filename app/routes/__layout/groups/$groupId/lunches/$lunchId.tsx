@@ -28,11 +28,12 @@ import { Input } from "~/components/Input"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
 import { Stack } from "~/components/Stack"
-import { Button } from "~/components/Button"
+import { Button, UnstyledButton } from "~/components/Button"
 import { Tooltip } from "~/components/Tooltip"
 import { Dialog } from "~/components/Dialog"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
+import { Popover } from "~/components/Popover"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -164,8 +165,15 @@ export default function LunchDetailsPage() {
                     <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell title={score.comment ?? undefined} wide>
-                    {shorten(score.comment, { length: 45 })}
+                  <Table.Cell wide>
+                    <Popover>
+                      <Popover.Trigger asChild>
+                        <UnstyledButton>
+                          {shorten(score.comment, { length: 45 })}
+                        </UnstyledButton>
+                      </Popover.Trigger>
+                      <Popover.Content>{score.comment}</Popover.Content>
+                    </Popover>
                   </Table.Cell>
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}

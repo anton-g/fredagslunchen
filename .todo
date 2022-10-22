@@ -1,9 +1,9 @@
 # Next
+- Use zod (+ zod-form-data?) for validating inputs
 - Role based -> Permissions based access
   - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Fix future date descriptions
-- Enable long comments to show on mobile
 - Update user email
 - Club locations
   - View all
@@ -18,7 +18,7 @@
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
 - Test the cypress workaround in updated Indie Stack
-- Use zod (+ zod-form-data?) for validating inputs
+- Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
 
 # Before premium
 - Map designs for themes
