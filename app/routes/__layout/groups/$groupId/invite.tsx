@@ -14,19 +14,30 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { Tooltip } from "~/components/Tooltip"
-import { addUserEmailToGroup, getGroupInviteToken } from "~/models/group.server"
+import {
+  addUserEmailToGroup,
+  getGroup,
+  getGroupPermissions,
+} from "~/models/group.server"
 
 import { requireUserId } from "~/session.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId is required")
-  const group = await getGroupInviteToken({
-    groupId: params.groupId,
-    userId,
+  const group = await getGroup({
+    id: params.groupId,
   })
 
   if (!group) throw new Response("Not found", { status: 404 })
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group,
+  })
+
+  if (!permissions.invite)
+    throw new Response("Permission denied", { status: 401 })
 
   const { origin } = new URL(request.url)
 

@@ -15,7 +15,7 @@ import { Card } from "~/components/Card"
 import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
-import { getGroup } from "~/models/group.server"
+import { getGroup, getGroupPermissions } from "~/models/group.server"
 import { zfd } from "zod-form-data"
 import type z from "zod"
 import { createLunch } from "~/models/lunch.server"
@@ -23,12 +23,21 @@ import { requireUserId } from "~/session.server"
 import { mapToActualErrors, useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request)
+  const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const group = await getGroup({ id: params.groupId })
   if (!group) {
     throw new Response("Not Found", { status: 404 })
+  }
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group,
+  })
+
+  if (!permissions.addLunch) {
+    throw new Response("Unauthorized", { status: 401 })
   }
 
   const url = new URL(request.url)

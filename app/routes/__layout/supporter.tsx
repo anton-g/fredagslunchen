@@ -36,7 +36,8 @@ export default function SupporterPage() {
     <Wrapper>
       <h2>Support Fredagslunchen</h2>
       <p>
-        By supporting Fredagslunchen you help ensure its continued development.
+        By supporting Fredagslunchen you help ensure its continued existence and
+        further development.
       </p>
       <strong>Supporter</strong> costs <strong>10€ per year</strong> and as a
       token of gratitude for believing in us, you get some perks only available

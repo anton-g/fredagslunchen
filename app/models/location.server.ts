@@ -30,8 +30,8 @@ export function getGroupLocation({
       group: {
         include: {
           members: {
-            select: {
-              userId: true,
+            include: {
+              user: true,
             },
           },
         },

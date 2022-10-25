@@ -3,7 +3,7 @@ import type { Lunch } from "~/models/lunch.server"
 import type { Score, ScoreRequest } from "~/models/score.server"
 import type { User } from "~/models/user.server"
 import { checkIsAdmin } from "~/models/user.server"
-import type { Group } from "~/models/group.server"
+import { getGroupPermissions, Group } from "~/models/group.server"
 import type { MouseEventHandler, ReactNode } from "react"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { useEffect, useRef, useState } from "react"
@@ -44,17 +44,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     id: parseInt(params.lunchId),
   })
 
-  const isAdmin = userId ? await checkIsAdmin(userId) : false
-  const currentMember = groupLunch?.groupLocation.group.members.find(
-    (m) => m.userId === userId
-  )
-  const isOwner = currentMember?.role === "ADMIN"
-  const isMember = Boolean(currentMember)
-
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLunch, isAdmin, isOwner, isMember, userId })
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group: groupLunch.groupLocation.group,
+  })
+
+  if (!permissions.view) {
+    throw new Response("Unauthorized", { status: 401 })
+  }
+
+  return json({ groupLunch, userId, permissions })
 }
 
 type ActionData = {
@@ -92,8 +95,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin, isOwner, userId, isMember } =
-    useLoaderData<typeof loader>()
+  const { groupLunch, userId, permissions } = useLoaderData<typeof loader>()
 
   const scores = groupLunch.scores
 
@@ -178,7 +180,8 @@ export default function LunchDetailsPage() {
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    {(isOwner || score.userId === userId) && (
+                    {(permissions.deleteAllScores ||
+                      score.userId === userId) && (
                       <ScoreDeleteAction
                         scoreId={score.id}
                         description={
@@ -206,7 +209,7 @@ export default function LunchDetailsPage() {
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    {isMember && (
+                    {permissions.deleteScoreRequest && (
                       <ScoreRequestDeleteAction requestId={request.id} />
                     )}
                   </Table.Cell>
@@ -217,7 +220,7 @@ export default function LunchDetailsPage() {
         </>
       )}
       <Spacer size={24} />
-      {usersWithoutScoresOrRequests.length > 0 && isMember && (
+      {usersWithoutScoresOrRequests.length > 0 && permissions.addScore && (
         <>
           <Subtitle>New rating</Subtitle>
           <Spacer size={8} />
@@ -229,7 +232,7 @@ export default function LunchDetailsPage() {
           />
         </>
       )}
-      {(isOwner || isAdmin) && (
+      {permissions.deleteLunch && (
         <>
           <Spacer size={48} />
           <AdminActions />

@@ -12,7 +12,7 @@ import { Button } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
-import { getGroup } from "~/models/group.server"
+import { getGroup, getGroupPermissions } from "~/models/group.server"
 import { zfd } from "zod-form-data"
 import z from "zod"
 import {
@@ -23,12 +23,21 @@ import { requireUserId } from "~/session.server"
 import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request)
+  const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const group = await getGroup({ id: params.groupId })
   if (!group) {
     throw new Response("Not Found", { status: 404 })
+  }
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group,
+  })
+
+  if (!permissions.addLocation) {
+    throw new Response("Unauthorized", { status: 401 })
   }
 
   const locations = await getAllLocationsForGroup({ groupId: params.groupId })

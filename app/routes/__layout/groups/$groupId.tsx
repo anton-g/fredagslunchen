@@ -3,12 +3,14 @@ import { json } from "@remix-run/node"
 import { useCatch, useLoaderData, Outlet, Link } from "@remix-run/react"
 import invariant from "tiny-invariant"
 
-import { getGroupDetails } from "~/models/group.server"
-import { getUserId, requireUserId } from "~/session.server"
+import {
+  getGroupDetails,
+  getGroupPermissionsForRequest,
+} from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
-import { checkIsAdmin } from "~/models/user.server"
 import { LinkButton } from "~/components/Button"
+import { getUserId } from "~/session.server"
 
 export const meta: MetaFunction = ({ data }) => {
   if (!data || !data.details) {
@@ -23,7 +25,7 @@ export const meta: MetaFunction = ({ data }) => {
 }
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  let userId = await getUserId(request)
+  const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const details = await getGroupDetails({ id: params.groupId })
@@ -31,23 +33,22 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const isPublicGroup = details.group.public
-  if (!isPublicGroup) {
-    userId = await requireUserId(request)
-  }
+  const permissions = await getGroupPermissionsForRequest({
+    request,
+    group: details.group,
+  })
 
-  const isGlobalAdmin = userId ? await checkIsAdmin(userId) : false
-  const isMember = details.group.members.some((x) => x.userId === userId)
-
-  if (!isMember && !isGlobalAdmin && !isPublicGroup) {
+  if (!permissions.view) {
     throw new Response("Unauthorized", { status: 401 })
   }
 
-  return json({ details, isMember, isPublicGroup })
+  const showJoinCTA = !userId && details.group.public
+
+  return json({ details, showJoinCTA })
 }
 
 export default function GroupDetailsPage() {
-  const { details, isMember, isPublicGroup } = useLoaderData<typeof loader>()
+  const { details, showJoinCTA } = useLoaderData<typeof loader>()
 
   return (
     <div>
@@ -56,7 +57,7 @@ export default function GroupDetailsPage() {
       </Title>
       <Spacer size={8} />
       <Outlet />
-      {!isMember && isPublicGroup && (
+      {showJoinCTA && (
         <>
           <Spacer size={56} />
           <LinkButton

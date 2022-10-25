@@ -1,17 +1,82 @@
-import type {
-  User,
-  Group,
-  Prisma,
-  Location,
-  Email,
-  GroupMember,
-} from "@prisma/client"
+import type { User, Group, Location, Email, GroupMember } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
+import { requireUserId } from "~/session.server"
 import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
+import { checkIsAdmin } from "./user.server"
 
 export type { Group, GroupMember } from "@prisma/client"
+
+const fullInterview = Prisma.validator<Prisma.GroupArgs>()({
+  include: {
+    members: {
+      include: {
+        user: true,
+      },
+    },
+  },
+})
+export type FullGroup = Prisma.GroupGetPayload<typeof fullInterview>
+
+export type GroupPermissions = {
+  view: boolean
+  invite: boolean
+  leave: boolean
+  recommendations: boolean
+  settings: boolean
+  addLocation: boolean
+  addScore: boolean
+  deleteAllScores: boolean
+  addLunch: boolean
+  deleteLunch: boolean
+  deleteScoreRequest: boolean
+}
+// TODO maybe we should include this in every request for a group? Would force us to pass userId and make sure permissions are calculated.
+export const getGroupPermissions = async ({
+  currentUserId,
+  group,
+}: {
+  currentUserId?: User["id"]
+  group: FullGroup
+}): Promise<GroupPermissions> => {
+  const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
+  const isOwner = group.members.some(
+    (m) => m.userId === currentUserId && m.role === "ADMIN"
+  )
+  const isMember = group.members.some((x) => x.userId === currentUserId)
+
+  return {
+    view: isMember || group.public,
+    settings: isOwner || isAdmin,
+    invite: isMember,
+    leave: !isOwner && isMember,
+    recommendations: isMember || group.id === "demo",
+    addLocation: isMember,
+    addLunch: isMember,
+    addScore: isMember,
+    deleteAllScores: isOwner,
+    deleteScoreRequest: isMember,
+    deleteLunch: isOwner || isAdmin,
+  }
+}
+export const getGroupPermissionsForRequest = async ({
+  request,
+  group,
+}: {
+  request: Request
+  group: FullGroup
+}) => {
+  const isPublicGroup = group.public
+
+  let currentUserId
+  if (!isPublicGroup) {
+    currentUserId = await requireUserId(request)
+  }
+
+  return getGroupPermissions({ currentUserId, group })
+}
 
 export function getGroup({ id }: Pick<Group, "id">) {
   return prisma.group.findUnique({
@@ -39,7 +104,6 @@ export function getGroup({ id }: Pick<Group, "id">) {
 }
 
 type GetGroupDetailsInput = Pick<Group, "id">
-
 async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
   return await prisma.group.findUnique({
     where: { id },
@@ -49,6 +113,7 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           location: true,
           lunches: {
             include: {
+              groupLocation: true,
               choosenBy: true,
               scores: true,
             },
@@ -277,28 +342,6 @@ export async function addUserEmailToGroup({
   } catch (err) {
     return { error: "User does not exist" }
   }
-}
-
-export async function getGroupInviteToken({
-  groupId,
-  userId,
-}: {
-  groupId: Group["id"]
-  userId: User["id"]
-}) {
-  return prisma.group.findFirst({
-    where: {
-      id: groupId,
-      members: {
-        some: {
-          userId,
-        },
-      },
-    },
-    select: {
-      inviteToken: true,
-    },
-  })
 }
 
 export async function createGroupInviteToken({

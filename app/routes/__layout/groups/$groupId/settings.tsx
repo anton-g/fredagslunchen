@@ -1,5 +1,6 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import type { Group, GroupMember } from "~/models/group.server"
+import { getGroupPermissions } from "~/models/group.server"
 import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
 import {
@@ -31,6 +32,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   })
 
   if (!group) throw new Response("Not found", { status: 404 })
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group,
+  })
+
+  if (!permissions.settings)
+    throw new Response("Permission denied", { status: 401 })
 
   return json({
     group,
