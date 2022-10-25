@@ -9,6 +9,7 @@ import {
   checkIsAdmin,
   createEmailVerificationToken,
   getFullUserById,
+  getUserPermissions,
 } from "~/models/user.server"
 import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
@@ -31,9 +32,13 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const isAdmin = userId ? await checkIsAdmin(userId) : false
+  const permissions = await getUserPermissions({ user, currentUserId: userId })
 
-  return json({ user, isYou: userId === params.userId, isAdmin })
+  if (!permissions.view) {
+    throw new Response("Unauthorized", { status: 401 })
+  }
+
+  return json({ user, isYou: userId === params.userId, permissions })
 }
 
 interface ActionData {
@@ -52,15 +57,13 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function Index() {
-  const { user, isYou, isAdmin } = useLoaderData<typeof loader>()
+  const { user, isYou, permissions } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
     (a, b) =>
       new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
   )
-
-  const canEditUser = isYou || isAdmin
 
   return (
     <Wrapper>
@@ -71,7 +74,7 @@ export default function Index() {
         </TitleRow>
         <Spacer size={24} />
         <Stack gap={16} axis="horizontal">
-          {canEditUser && (
+          {permissions.settings && (
             <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
           )}
           {isYou && !user.email?.verified && (

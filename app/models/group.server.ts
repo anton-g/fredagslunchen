@@ -48,7 +48,7 @@ export const getGroupPermissions = async ({
   const isMember = group.members.some((x) => x.userId === currentUserId)
 
   return {
-    view: isMember || group.public,
+    view: isAdmin || isMember || group.public,
     settings: isOwner || isAdmin,
     invite: isMember,
     leave: !isOwner && isMember,

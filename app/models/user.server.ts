@@ -15,6 +15,34 @@ import {
 
 export type { User, Email } from "@prisma/client"
 
+export type FullUser = NonNullable<
+  Prisma.PromiseReturnType<typeof fetchUserDetails>
+>
+
+export type UserPermissions = {
+  view: boolean
+  settings: boolean
+}
+export const getUserPermissions = async ({
+  currentUserId,
+  user,
+}: {
+  currentUserId?: User["id"]
+  user: FullUser
+}): Promise<UserPermissions> => {
+  const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
+  const isUser = currentUserId === user.id
+
+  const sharesGroup = user.groups.some((x) =>
+    x.group.members.some((m) => m.userId === currentUserId)
+  )
+
+  return {
+    view: isUser || isAdmin || sharesGroup,
+    settings: isUser || isAdmin,
+  }
+}
+
 const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
   return await prisma.user.findUnique({
     where: { id },
@@ -131,8 +159,6 @@ export async function getFullUserById({
 
   if (!user) return null
 
-  const stats = generateUserStats(user)
-
   const filteredUser: typeof user = {
     ...user,
     scores: user.scores.filter((score) =>
@@ -142,6 +168,8 @@ export async function getFullUserById({
       )
     ),
   }
+
+  const stats = generateUserStats(filteredUser)
 
   return {
     ...filteredUser,

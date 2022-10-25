@@ -33,8 +33,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  // TODO fix permissions for this
-
   return json({
     user,
   })

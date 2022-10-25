@@ -1,6 +1,8 @@
 # Next
+- Add public setting
+  - Group
+  - User
 - Use zod (+ zod-form-data?) for validating inputs
-- Role based -> Permissions based access
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Fix future date descriptions
