@@ -6,7 +6,6 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import {
-  checkIsAdmin,
   createEmailVerificationToken,
   getFullUserById,
   getUserPermissions,

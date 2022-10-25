@@ -1,5 +1,18 @@
 # Changelog
 
+## 2022-10-25
+
+### New features
+
+- **Public clubs**
+
+  - You can now set a club as public to show off all of your juicy stats.
+
+### Bug fixes
+
+- You can now see all recommendations on mobile by clicking the title
+- You can now see long comments on mobile by clicking the text
+
 ## 2022-10-15
 
 - Pasting coordinates with the "{lon},{lat}" format will automatically populate both inputs.
@@ -55,19 +68,14 @@
 
   - Updated the landing page to be a bit clearer and more inviting.
 
-- **Clearer naming**
-
-  - Renamed "Score" to "Rating"
-  - Renamed "Group" to "Club"
-
 ## 2022-09-04
 
 ### New features
 
-- **Manage group users**
+- **Manage club users**
 
-  - You can now remove group members.
-  - You can now change roles for group members.
+  - You can now remove club members.
+  - You can now change roles for club members.
 
 - **Change password**
 
@@ -77,10 +85,10 @@
 
 ### New features
 
-- **Group settings**
+- **club settings**
 
-  - You can now set a group location that updates where the center of your group map is.
-  - You can now change group name.
+  - You can now set a club location that updates where the center of your club map is.
+  - You can now change club name.
 
 - **User settings**
   - You can now change your name and your password.
@@ -95,7 +103,7 @@
 ### New features
 
 - **Rating requests**
-  - You can now request a rating from another member in your group. They will get a notification on their start page.
+  - You can now request a rating from another member in your club. They will get a notification on their start page.
 
 ## 2022-08-23
 
