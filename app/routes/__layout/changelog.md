@@ -15,7 +15,7 @@
 
 ## 2022-10-15
 
-- Pasting coordinates with the "{lon},{lat}" format will automatically populate both inputs.
+- Pasting coordinates with the "lon,lat" format will automatically populate both inputs.
 
 ## 2022-10-12
 

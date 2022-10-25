@@ -39,7 +39,7 @@ const sendEmail = async ({
   dynamicData: Record<string, any>
 }) => {
   if (!ENV.SENDGRID_API_KEY) {
-    console.info(
+    console.warn(
       `Missing Sendgrid API Key. Ignoring email: ${email} - ${templateId}`
     )
     return
@@ -52,5 +52,11 @@ const sendEmail = async ({
     dynamicTemplateData: dynamicData,
   }
 
-  await sgMail.send(msg).catch((error) => console.error(error))
+  await sgMail
+    .send(msg)
+    .then(
+      (x) => console.log(x),
+      (x) => console.log(x)
+    )
+    .catch((error) => console.error(error))
 }
