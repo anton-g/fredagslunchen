@@ -22,6 +22,7 @@ export type FullUser = NonNullable<
 export type UserPermissions = {
   view: boolean
   settings: boolean
+  claim: boolean
 }
 export const getUserPermissions = async ({
   currentUserId,
@@ -40,6 +41,7 @@ export const getUserPermissions = async ({
   return {
     view: isUser || isAdmin || sharesGroup,
     settings: isUser || isAdmin,
+    claim: isUser && sharesGroup,
   }
 }
 
@@ -161,12 +163,14 @@ export async function getFullUserById({
 
   const filteredUser: typeof user = {
     ...user,
-    scores: user.scores.filter((score) =>
-      score.lunch.groupLocation.group.members.some(
+    scores: user.scores.filter((score) => {
+      if (score.lunch.groupLocation.group.public) return true
+
+      return score.lunch.groupLocation.group.members.some(
         (x) =>
           x.userId === requestUserId || score.lunch.groupLocation.group.public
       )
-    ),
+    }),
   }
 
   const stats = generateUserStats(filteredUser)

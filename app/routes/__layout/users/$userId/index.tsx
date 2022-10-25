@@ -34,11 +34,14 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   const permissions = await getUserPermissions({ user, currentUserId: userId })
 
-  if (!permissions.view) {
-    throw new Response("Unauthorized", { status: 401 })
-  }
+  const noPublicData = !user.groups.some((x) => x.group.public)
 
-  return json({ user, isYou: userId === params.userId, permissions })
+  return json({
+    user,
+    isYou: userId === params.userId,
+    permissions,
+    noPublicData,
+  })
 }
 
 interface ActionData {
@@ -57,7 +60,8 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function Index() {
-  const { user, isYou, permissions } = useLoaderData<typeof loader>()
+  const { user, isYou, permissions, noPublicData } =
+    useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
@@ -87,21 +91,25 @@ export default function Index() {
           )}
         </Stack>
         <Spacer size={24} />
-        <StatsGrid>
-          <Stat label="Number of lunches" value={user.stats.lunchCount} />
-          <Stat
-            label="Average rating"
-            value={formatNumber(user.stats.averageScore)}
-          />
-          <Stat
-            label="Most popular choice"
-            value={
-              user.stats.bestChoosenLunch?.groupLocation.location.name || "-"
-            }
-          />
-          <Stat label="Lowest rating" value={user.stats.lowestScore} />
-          <Stat label="Highest rating" value={user.stats.highestScore} />
-        </StatsGrid>
+        {noPublicData ? (
+          <Subtitle>Sorry, {user.name} has no public data.</Subtitle>
+        ) : (
+          <StatsGrid>
+            <Stat label="Number of lunches" value={user.stats.lunchCount} />
+            <Stat
+              label="Average rating"
+              value={formatNumber(user.stats.averageScore)}
+            />
+            <Stat
+              label="Most popular choice"
+              value={
+                user.stats.bestChoosenLunch?.groupLocation.location.name || "-"
+              }
+            />
+            <Stat label="Lowest rating" value={user.stats.lowestScore} />
+            <Stat label="Highest rating" value={user.stats.highestScore} />
+          </StatsGrid>
+        )}
       </Section>
       <Spacer size={64} />
       {sortedScores.length > 0 && (
@@ -150,7 +158,7 @@ export default function Index() {
           </Table>
         </Section>
       )}
-      {user.role === "ANONYMOUS" && (
+      {user.role === "ANONYMOUS" && permissions.claim && (
         <>
           <Spacer size={128} />
           <Footer>

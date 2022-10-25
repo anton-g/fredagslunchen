@@ -18,11 +18,15 @@ import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
-
+import { zfd } from "zod-form-data"
+import z from "zod"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import { mapToActualErrors } from "~/utils"
+import { Checkbox } from "~/components/Checkbox"
+import { Help } from "~/components/Help"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -53,6 +57,7 @@ type ActionData = {
     name?: string
     lat?: string
     lon?: string
+    public?: string
   }
 }
 
@@ -78,39 +83,33 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 }
 
+const updateGroupSchema = zfd.formData({
+  name: zfd.text(),
+  lat: zfd.numeric(z.number().nullish()),
+  lon: zfd.numeric(z.number().nullish()),
+  public: zfd.checkbox(),
+})
+
 const updateGroupAction = async (formData: FormData, groupId: Group["id"]) => {
-  const name = formData.get("name")
-  const latInput = formData.get("lat")
-  const lonInput = formData.get("lon")
+  const result = updateGroupSchema.safeParse(formData)
 
-  if (typeof name !== "string" || name.length === 0) {
+  if (!result.success) {
     return json<ActionData>(
-      { errors: { name: "Name is required" } },
+      {
+        errors: mapToActualErrors<typeof updateGroupSchema>(result),
+      },
       { status: 400 }
     )
   }
 
-  const lat = parseFloat(latInput?.toString().replace(",", ".") || "")
-  if (latInput && isNaN(lat)) {
-    return json<ActionData>(
-      { errors: { lat: "Invalid value" } },
-      { status: 400 }
-    )
-  }
-
-  const lon = parseFloat(lonInput?.toString().replace(",", ".") || "")
-  if (lonInput && isNaN(lon)) {
-    return json<ActionData>(
-      { errors: { lon: "Invalid value" } },
-      { status: 400 }
-    )
-  }
+  const { name, lat, lon, public: isGroupPublic } = result.data
 
   const group = await updateGroup({
     id: groupId,
     name,
     lat,
     lon,
+    public: isGroupPublic,
   })
 
   return redirect(`/groups/${group.id}`)
@@ -220,6 +219,21 @@ export default function GroupSettingsPage() {
           </div>
         </Stack>
         <Spacer size={16} />
+        <Subtitle>Settings</Subtitle>
+        <div>
+          <Stack axis="horizontal" gap={8} align="center">
+            <Checkbox name="public" id="public" defaultChecked={group.public} />
+            <label htmlFor="public">Public</label>
+            <Help>
+              Public groups are accessible by anyone, even if they're not a user
+              of Fredagslunchen or a member of your group.
+            </Help>
+          </Stack>
+          {actionData?.errors?.public && (
+            <div id="public-error">{actionData.errors.public}</div>
+          )}
+        </div>
+        <Spacer size={16} />
         <input type="hidden" name="action" value="update" />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
@@ -264,7 +278,7 @@ const FieldDescription = styled.p`
 `
 
 const Subtitle = styled.h3`
-  font-size: 24px;
+  font-size: 18px;
   margin: 16px 0;
 
   + ${FieldDescription} {
