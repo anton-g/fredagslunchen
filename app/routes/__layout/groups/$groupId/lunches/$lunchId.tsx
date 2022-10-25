@@ -2,10 +2,10 @@ import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import type { Lunch } from "~/models/lunch.server"
 import type { Score, ScoreRequest } from "~/models/score.server"
 import type { User } from "~/models/user.server"
-import { checkIsAdmin } from "~/models/user.server"
 import type { Group } from "~/models/group.server"
 import type { MouseEventHandler, ReactNode } from "react"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import { getGroupPermissions } from "~/models/group.server"
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { json, redirect } from "@remix-run/node"
@@ -28,11 +28,12 @@ import { Input } from "~/components/Input"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
 import { Stack } from "~/components/Stack"
-import { Button } from "~/components/Button"
+import { Button, UnstyledButton } from "~/components/Button"
 import { Tooltip } from "~/components/Tooltip"
 import { Dialog } from "~/components/Dialog"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
+import { Popover } from "~/components/Popover"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -43,17 +44,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     id: parseInt(params.lunchId),
   })
 
-  const isAdmin = userId ? await checkIsAdmin(userId) : false
-  const currentMember = groupLunch?.groupLocation.group.members.find(
-    (m) => m.userId === userId
-  )
-  const isOwner = currentMember?.role === "ADMIN"
-  const isMember = Boolean(currentMember)
-
   if (!groupLunch) {
     throw new Response("Not Found", { status: 404 })
   }
-  return json({ groupLunch, isAdmin, isOwner, isMember, userId })
+
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group: groupLunch.groupLocation.group,
+  })
+
+  if (!permissions.view) {
+    throw new Response("Unauthorized", { status: 401 })
+  }
+
+  return json({ groupLunch, userId, permissions })
 }
 
 type ActionData = {
@@ -91,8 +95,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function LunchDetailsPage() {
-  const { groupLunch, isAdmin, isOwner, userId, isMember } =
-    useLoaderData<typeof loader>()
+  const { groupLunch, userId, permissions } = useLoaderData<typeof loader>()
 
   const scores = groupLunch.scores
 
@@ -164,13 +167,21 @@ export default function LunchDetailsPage() {
                     <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
                   </Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell title={score.comment ?? undefined} wide>
-                    {shorten(score.comment, { length: 45 })}
+                  <Table.Cell wide>
+                    <Popover>
+                      <Popover.Trigger asChild>
+                        <UnstyledButton>
+                          {shorten(score.comment, { length: 45 })}
+                        </UnstyledButton>
+                      </Popover.Trigger>
+                      <Popover.Content>{score.comment}</Popover.Content>
+                    </Popover>
                   </Table.Cell>
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    {(isOwner || score.userId === userId) && (
+                    {(permissions.deleteAllScores ||
+                      score.userId === userId) && (
                       <ScoreDeleteAction
                         scoreId={score.id}
                         description={
@@ -198,7 +209,7 @@ export default function LunchDetailsPage() {
                   <Table.Cell
                     style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
                   >
-                    {isMember && (
+                    {permissions.deleteScoreRequest && (
                       <ScoreRequestDeleteAction requestId={request.id} />
                     )}
                   </Table.Cell>
@@ -209,7 +220,7 @@ export default function LunchDetailsPage() {
         </>
       )}
       <Spacer size={24} />
-      {usersWithoutScoresOrRequests.length > 0 && isMember && (
+      {usersWithoutScoresOrRequests.length > 0 && permissions.addScore && (
         <>
           <Subtitle>New rating</Subtitle>
           <Spacer size={8} />
@@ -221,7 +232,7 @@ export default function LunchDetailsPage() {
           />
         </>
       )}
-      {(isOwner || isAdmin) && (
+      {permissions.deleteLunch && (
         <>
           <Spacer size={48} />
           <AdminActions />

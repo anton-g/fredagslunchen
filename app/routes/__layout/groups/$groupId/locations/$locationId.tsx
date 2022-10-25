@@ -11,6 +11,7 @@ import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { formatNumber } from "~/utils"
+import { getGroupPermissions } from "~/models/group.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -26,16 +27,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const currentMember = groupLocation.group.members.find(
-    (m) => m.userId === userId
-  )
-  const isMember = Boolean(currentMember)
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group: groupLocation.group,
+  })
 
-  return json({ groupLocation, isMember })
+  if (!permissions.view) {
+    throw new Response("Unauthorized", { status: 401 })
+  }
+
+  return json({ groupLocation, permissions })
 }
 
 export default function LocationDetailsPage() {
-  const { groupLocation, isMember } = useLoaderData<typeof loader>()
+  const { groupLocation, permissions } = useLoaderData<typeof loader>()
 
   return (
     <div>
@@ -75,7 +80,7 @@ export default function LocationDetailsPage() {
           ))}
         </tbody>
       </Table>
-      {isMember && (
+      {permissions.addLunch && (
         <>
           <Spacer size={16} />
           <LinkButton

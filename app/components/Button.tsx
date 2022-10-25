@@ -143,4 +143,10 @@ const TextButton = styled.button`
   cursor: pointer;
 `
 
-export { Button, LinkButton, NavLink, TextButton }
+const UnstyledButton = styled.button`
+  all: unset;
+  width: fit-content;
+  cursor: pointer;
+`
+
+export { Button, LinkButton, NavLink, TextButton, UnstyledButton }

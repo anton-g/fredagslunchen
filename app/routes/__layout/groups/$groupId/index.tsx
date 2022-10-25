@@ -3,16 +3,16 @@ import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
 import { useCatch, useFetcher, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
-import type { Group } from "~/models/group.server"
+import type { Group, GroupPermissions } from "~/models/group.server"
+import { getGroupPermissions } from "~/models/group.server"
 import { getGroupDetails } from "~/models/group.server"
 import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Table } from "~/components/Table"
 import { Spacer } from "~/components/Spacer"
-import { Button, LinkButton } from "~/components/Button"
+import { Button, LinkButton, UnstyledButton } from "~/components/Button"
 import { Stat } from "~/components/Stat"
-import { HoverCard } from "~/components/HoverCard"
 import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
@@ -22,8 +22,8 @@ import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
 import { Stack } from "~/components/Stack"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
-import { checkIsAdmin } from "~/models/user.server"
 import { useFeatureFlags } from "~/FeatureFlagContext"
+import { Popover } from "~/components/Popover"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -34,27 +34,20 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
-  const isOwner = details.group.members.some(
-    (m) => m.userId === userId && m.role === "ADMIN"
-  )
-
-  const isAdmin = userId ? await checkIsAdmin(userId) : false
-  const isMember = details.group.members.some((x) => x.userId === userId)
-  const canEdit = isOwner || isMember
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group: details.group,
+  })
 
   return json({
     details,
-    isAdmin,
-    isOwner,
-    isMember,
-    canEdit,
+    permissions,
   })
 }
 
 export default function GroupDetailsPage() {
   const { maps } = useFeatureFlags()
-  const { details, isAdmin, isOwner, isMember, canEdit } =
-    useLoaderData<typeof loader>()
+  const { details, permissions } = useLoaderData<typeof loader>()
 
   const orderedPickers = details.group.members.slice().sort((a, b) => {
     if (a.stats.lunchCount === 0) return 1
@@ -131,7 +124,7 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
-        {canEdit && (
+        {permissions.invite && (
           <ActionBar>
             <LinkButton to={`/groups/${details.group.id}/invite`}>
               Invite user
@@ -166,38 +159,51 @@ export default function GroupDetailsPage() {
           ))}
         </tbody>
       </Table>
-      <Spacer size={48} />
-      <Subtitle>Recommendations</Subtitle>
-      <Spacer size={8} />
-      <StatsGrid>
-        <HoverCard>
-          <HoverCard.Trigger>
-            <Stat label="Location picker" value={suggestedPicker.user.name} />
-          </HoverCard.Trigger>
-          {alternativePickers.length > 0 && (
-            <HoverCard.Content align="start" alignOffset={16}>
-              <h4 style={{ margin: 0 }}>Alternatives</h4>
-              <Spacer size={8} />
-              <PickerAlternativesList start={2}>
-                {alternativePickers.map((member) => (
-                  <li key={member.userId}>{member.user.name}</li>
-                ))}
-              </PickerAlternativesList>
-            </HoverCard.Content>
-          )}
-        </HoverCard>
-      </StatsGrid>
+      {permissions.recommendations && (
+        <>
+          <Spacer size={48} />
+          <Subtitle>Recommendations</Subtitle>
+          <Spacer size={8} />
+          <StatsGrid>
+            <Popover>
+              <Popover.Trigger asChild>
+                <UnstyledButton>
+                  <Stat
+                    label="Location picker"
+                    value={suggestedPicker.user.name}
+                  />
+                </UnstyledButton>
+              </Popover.Trigger>
+              {alternativePickers.length > 0 && (
+                <Popover.Content align="start" alignOffset={16}>
+                  <h4 style={{ margin: 0 }}>Alternatives</h4>
+                  <Spacer size={8} />
+                  <PickerAlternativesList start={2}>
+                    {alternativePickers.map((member) => (
+                      <li key={member.userId}>{member.user.name}</li>
+                    ))}
+                  </PickerAlternativesList>
+                </Popover.Content>
+              )}
+            </Popover>
+          </StatsGrid>
+        </>
+      )}
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
-        {canEdit && (
+        {(permissions.addLocation || permissions.addLunch) && (
           <ActionBar>
-            <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-              New lunch
-            </LinkButton>
-            <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-              New location
-            </LinkButton>
+            {permissions.addLunch && (
+              <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
+                New lunch
+              </LinkButton>
+            )}
+            {permissions.addLocation && (
+              <LinkButton to={`/groups/${details.group.id}/locations/new`}>
+                New location
+              </LinkButton>
+            )}
           </ActionBar>
         )}
       </SectionHeader>
@@ -270,9 +276,7 @@ export default function GroupDetailsPage() {
       <GroupActionBar
         groupId={details.group.id}
         groupName={details.group.name}
-        isAdmin={isAdmin}
-        isOwner={isOwner}
-        isMember={isMember}
+        permissions={permissions}
       />
     </div>
   )
@@ -336,25 +340,21 @@ const MapCard = styled(Card)`
 `
 
 type GroupActionBarProps = {
-  isAdmin: boolean
-  isOwner: boolean
-  isMember: boolean
   groupId: Group["id"]
   groupName: Group["name"]
+  permissions: GroupPermissions
 }
 
 const GroupActionBar = ({
-  isAdmin,
-  isOwner,
-  isMember,
   groupId,
   groupName,
+  permissions,
 }: GroupActionBarProps) => {
   const fetcher = useFetcher()
 
   return (
     <Wrapper axis="horizontal" gap={16}>
-      {(isOwner || isAdmin) && (
+      {permissions.settings && (
         <Tooltip>
           <Tooltip.Trigger asChild>
             <LinkButton
@@ -368,7 +368,7 @@ const GroupActionBar = ({
           <Tooltip.Content>Club settings</Tooltip.Content>
         </Tooltip>
       )}
-      {!isOwner && isMember && (
+      {permissions.leave && (
         <Dialog>
           <Tooltip>
             <Dialog.Trigger asChild>

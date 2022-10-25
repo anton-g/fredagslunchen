@@ -33,7 +33,6 @@ const Icon = styled.button`
 `
 
 const Content = styled(Popover.Content)`
-  max-width: min(400px, 90vw);
   margin: 0 8px;
 
   p {

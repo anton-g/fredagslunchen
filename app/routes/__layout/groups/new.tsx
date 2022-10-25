@@ -2,31 +2,39 @@ import type { ActionFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData } from "@remix-run/react"
 import * as React from "react"
+import { zfd } from "zod-form-data"
+import type z from "zod"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 
 import { createGroup } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
+import { mapToActualErrors } from "~/utils"
+
+const formSchema = zfd.formData({
+  name: zfd.text(),
+})
 
 type ActionData = {
-  errors?: {
-    name?: string
-  }
+  errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
 }
 
 export const action: ActionFunction = async ({ request }) => {
   const userId = await requireUserId(request)
 
-  const formData = await request.formData()
-  const name = formData.get("name")
+  const result = formSchema.safeParse(await request.formData())
 
-  if (typeof name !== "string" || name.length === 0) {
+  if (!result.success) {
     return json<ActionData>(
-      { errors: { name: "Name is required" } },
+      {
+        errors: mapToActualErrors<typeof formSchema>(result),
+      },
       { status: 400 }
     )
   }
+
+  const name = result.data.name
 
   const group = await createGroup({ name, userId })
 

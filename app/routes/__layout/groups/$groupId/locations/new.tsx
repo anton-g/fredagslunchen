@@ -12,17 +12,18 @@ import { Button } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
-import { getGroup } from "~/models/group.server"
-
+import { getGroup, getGroupPermissions } from "~/models/group.server"
+import { zfd } from "zod-form-data"
+import z from "zod"
 import {
   createGroupLocation,
   getAllLocationsForGroup,
 } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
-import { safeRedirect, useUser } from "~/utils"
+import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request)
+  const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const group = await getGroup({ id: params.groupId })
@@ -30,111 +31,88 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
+  const permissions = await getGroupPermissions({
+    currentUserId: userId,
+    group,
+  })
+
+  if (!permissions.addLocation) {
+    throw new Response("Unauthorized", { status: 401 })
+  }
+
   const locations = await getAllLocationsForGroup({ groupId: params.groupId })
 
   return json({ group, locations })
 }
 
+const formSchema = zfd
+  .formData({
+    location: zfd.text(),
+    "location-key": zfd.numeric(z.number().optional()),
+    address: zfd.text(),
+    zipCode: zfd.text(),
+    city: zfd.text(),
+    lat: zfd.text(z.string().optional()),
+    lon: zfd.text(z.string().optional()),
+    "discoveredBy-key": zfd.text(),
+    redirectTo: zfd.text(z.string().optional()),
+  })
+  .refine((data) => !(data.location && data["location-key"]), {
+    message: "Location is required",
+    path: ["location"],
+  })
+
 type ActionData = {
-  errors?: {
-    name?: string
-    address?: string
-    lat?: string
-    lon?: string
-    discoveredBy?: string
-    city?: string
-    zipCode?: string
-  }
+  errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
   await requireUserId(request)
-
-  const formData = await request.formData()
-  const locationId = formData.get("location-key")
-  const name = formData.get("location")
-  const address = formData.get("address")
-  const zipCode = formData.get("zipCode")
-  const city = formData.get("city")
-  const lat = formData.get("lat")
-  const lon = formData.get("lon")
-  const discoveredById = formData.get("discoveredBy-key")
   const groupId = params.groupId
   invariant(groupId, "groupId not found")
 
-  if (typeof name !== "string" || name.length === 0) {
+  const result = formSchema.safeParse(await request.formData())
+
+  if (!result.success) {
     return json<ActionData>(
-      { errors: { name: "Name is required" } },
+      {
+        errors: mapToActualErrors<typeof formSchema>(result),
+      },
       { status: 400 }
     )
   }
 
-  if (typeof address !== "string" || address.length === 0) {
-    return json<ActionData>(
-      { errors: { address: "Street address is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof zipCode !== "string" || zipCode.length === 0) {
-    return json<ActionData>(
-      { errors: { zipCode: "Zip code is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof city !== "string" || city.length === 0) {
-    return json<ActionData>(
-      { errors: { city: "City is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (lat && (typeof lat !== "string" || lat.length === 0)) {
-    return json<ActionData>(
-      { errors: { lat: "Invalid format" } },
-      { status: 400 }
-    )
-  }
-
-  if (lon && (typeof lon !== "string" || lon.length === 0)) {
-    return json<ActionData>(
-      { errors: { lon: "Invalid format" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof discoveredById !== "string" || discoveredById.length === 0) {
-    return json<ActionData>(
-      { errors: { discoveredBy: "Discovered by is required" } },
-      { status: 400 }
-    )
-  }
-
-  const parsedId =
-    locationId && typeof locationId === "string"
-      ? parseInt(locationId)
-      : undefined
-
-  const location = await createGroupLocation({
-    groupId,
-    name,
+  const {
+    redirectTo,
+    location: name,
     address,
     lat,
     lon,
     city,
     zipCode,
+    "discoveredBy-key": discoveredById,
+    "location-key": locationId,
+  } = result.data
+
+  const location = await createGroupLocation({
+    groupId,
+    name,
+    address,
+    lat: lat ?? null,
+    lon: lon ?? null,
+    city,
+    zipCode,
     discoveredById,
-    locationId: parsedId,
+    locationId,
     global: false,
   })
 
-  const redirectTo = safeRedirect(
-    formData.get("redirectTo") + `?loc=${location.locationId}`,
+  const safeRedirectTo = safeRedirect(
+    redirectTo + `?loc=${location.locationId}`,
     `/groups/${groupId}/locations/${location.locationId}`
   )
 
-  return redirect(redirectTo)
+  return redirect(safeRedirectTo)
 }
 
 export default function NewLocationPage() {
@@ -143,7 +121,7 @@ export default function NewLocationPage() {
   const loaderData = useLoaderData<typeof loader>()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
-  const nameRef = useRef<HTMLInputElement>(null!)
+  const locationRef = useRef<HTMLInputElement>(null!)
   const addressRef = useRef<HTMLInputElement>(null)
   const zipCodeRef = useRef<HTMLInputElement>(null)
   const cityRef = useRef<HTMLInputElement>(null)
@@ -152,8 +130,8 @@ export default function NewLocationPage() {
   const discoveredByRef = useRef<HTMLInputElement>(null!)
 
   useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus()
+    if (actionData?.errors?.location) {
+      locationRef.current?.focus()
     } else if (actionData?.errors?.address) {
       addressRef.current?.focus()
     } else if (actionData?.errors?.zipCode) {
@@ -164,7 +142,7 @@ export default function NewLocationPage() {
       latRef.current?.focus()
     } else if (actionData?.errors?.lon) {
       lonRef.current?.focus()
-    } else if (actionData?.errors?.discoveredBy) {
+    } else if (actionData?.errors?.["discoveredBy-key"]) {
       discoveredByRef.current?.focus()
     }
   }, [actionData])
@@ -221,7 +199,7 @@ export default function NewLocationPage() {
               name="location"
               defaultItems={locations}
               defaultSelectedKey={user.id}
-              inputRef={nameRef}
+              inputRef={locationRef}
               allowsCustomValue={true}
               menuTrigger="focus"
               onSelectionChange={handleLocationSelect}
@@ -234,8 +212,8 @@ export default function NewLocationPage() {
                 </Item>
               )}
             </ComboBox>
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
+            {actionData?.errors?.location && (
+              <div id="name-error">{actionData.errors.location}</div>
             )}
           </div>
 
@@ -350,9 +328,9 @@ export default function NewLocationPage() {
                 </Item>
               )}
             </ComboBox>
-            {actionData?.errors?.discoveredBy && (
+            {actionData?.errors?.["discoveredBy-key"] && (
               <div id="discoveredBy-error">
-                {actionData.errors.discoveredBy}
+                {actionData.errors["discoveredBy-key"]}
               </div>
             )}
           </div>
