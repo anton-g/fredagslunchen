@@ -45,22 +45,17 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ group, locations })
 }
 
-const formSchema = zfd
-  .formData({
-    location: zfd.text(),
-    "location-key": zfd.numeric(z.number().optional()),
-    address: zfd.text(),
-    zipCode: zfd.text(),
-    city: zfd.text(),
-    lat: zfd.text(z.string().optional()),
-    lon: zfd.text(z.string().optional()),
-    "discoveredBy-key": zfd.text(),
-    redirectTo: zfd.text(z.string().optional()),
-  })
-  .refine((data) => !(data.location && data["location-key"]), {
-    message: "Location is required",
-    path: ["location"],
-  })
+const formSchema = zfd.formData({
+  location: zfd.text(),
+  "location-key": zfd.numeric(z.number().optional()),
+  address: zfd.text(),
+  zipCode: zfd.text(),
+  city: zfd.text(),
+  lat: zfd.text(z.string().optional()),
+  lon: zfd.text(z.string().optional()),
+  "discoveredBy-key": zfd.text(),
+  redirectTo: zfd.text(z.string().optional()),
+})
 
 type ActionData = {
   errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
