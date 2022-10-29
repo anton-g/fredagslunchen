@@ -115,6 +115,17 @@ LinkButton.defaultProps = {
   variant: "normal",
 }
 
+const ExternalLinkButton = styled("a")<{
+  variant?: ButtonVariant
+  size?: ButtonSize
+}>`
+  ${styles}
+`
+
+ExternalLinkButton.defaultProps = {
+  variant: "normal",
+}
+
 const NavLink = styled(RemixNavLink)`
   background-color: ${({ theme }) => theme.colors.primary};
   color: ${({ theme }) => theme.colors.secondary};
@@ -149,4 +160,11 @@ const UnstyledButton = styled.button`
   cursor: pointer;
 `
 
-export { Button, LinkButton, NavLink, TextButton, UnstyledButton }
+export {
+  Button,
+  LinkButton,
+  NavLink,
+  TextButton,
+  UnstyledButton,
+  ExternalLinkButton,
+}
