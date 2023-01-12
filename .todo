@@ -35,6 +35,8 @@
 - Check security of all models
 
 # Later
+- Integrations
+  - Slack notification when adding lunch, getting request?
 - Delete user
 - Social login
 - Restructure api routes
