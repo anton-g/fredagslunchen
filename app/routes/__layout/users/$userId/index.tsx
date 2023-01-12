@@ -33,7 +33,8 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   const permissions = await getUserPermissions({ user, currentUserId: userId })
 
-  const noPublicData = !user.groups.some((x) => x.group.public)
+  const noPublicData =
+    !user.groups.some((x) => x.group.public) && !permissions.view
 
   return json({
     user,

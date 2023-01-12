@@ -1,4 +1,4 @@
-// TODO move to TS, see example at https://github.com/kentcdodds/kentcdodds.com/blob/main/mocks/index.js
+// TODO move to TS, see example at https://github.com/kentcdodds/kentcdodds.com/blob/main/mocks/index.ts
 const util = require("util")
 const { rest } = require("msw")
 const { setupServer } = require("msw/node")

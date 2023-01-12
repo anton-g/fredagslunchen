@@ -1,8 +1,12 @@
-import { GlobeIcon, MixerHorizontalIcon } from "@radix-ui/react-icons"
+import {
+  GlobeIcon,
+  MagnifyingGlassIcon,
+  MixerHorizontalIcon,
+} from "@radix-ui/react-icons"
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
-import { LinkButton } from "~/components/Button"
+import { ExternalLinkButton, LinkButton } from "~/components/Button"
 import { Table } from "~/components/Table"
 import { getAllLocations } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
@@ -33,6 +37,7 @@ export default function AdminLocationsPage() {
             <Table.Heading>Clubs</Table.Heading>
             <Table.Heading>Lunches</Table.Heading>
             <Table.Heading></Table.Heading>
+            <Table.Heading></Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -54,6 +59,13 @@ export default function AdminLocationsPage() {
                 <LinkButton to={`/admin/locations/${location.id}`}>
                   <MixerHorizontalIcon />
                 </LinkButton>
+              </Table.Cell>
+              <Table.Cell>
+                <ExternalLinkButton
+                  href={`https://www.google.com/maps/search/${location.name}+${location.address}`}
+                >
+                  <MagnifyingGlassIcon />
+                </ExternalLinkButton>
               </Table.Cell>
             </tr>
           ))}
