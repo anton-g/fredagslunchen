@@ -1,9 +1,22 @@
 import type { Group, Location, Lunch, User } from "@prisma/client"
+import { Prisma } from "@prisma/client"
 
 import { prisma } from "~/db.server"
 import { checkIsAdmin } from "./user.server"
 
 export type { Lunch, Location } from "@prisma/client"
+
+const fullLunch = Prisma.validator<Prisma.LunchArgs>()({
+  include: {
+    groupLocation: {
+      include: {
+        location: true,
+      },
+    },
+    choosenBy: true,
+  },
+})
+export type FullLunch = Prisma.LunchGetPayload<typeof fullLunch>
 
 export async function getGroupLunch({ id }: Pick<Location, "id">) {
   return await prisma.lunch.findUnique({
@@ -104,4 +117,40 @@ export async function deleteLunch({
         : {}),
     },
   })
+}
+
+export type LunchStat = FullLunch & { stats: { avg: number | null } }
+export async function getGroupLunchStats({
+  id,
+}: Pick<Group, "id">): Promise<LunchStat[]> {
+  const lunches = await prisma.lunch.findMany({
+    where: {
+      groupLocationGroupId: id,
+    },
+    ...fullLunch,
+  })
+
+  const avgs = await prisma.score.groupBy({
+    by: ["lunchId"],
+    _avg: {
+      score: true,
+    },
+    where: {
+      lunch: {
+        groupLocationGroupId: id,
+      },
+    },
+  })
+
+  const result = lunches.map((lunch) => {
+    const avg = avgs.find((avg) => avg.lunchId === lunch.id)
+
+    const stats = {
+      avg: avg?._avg.score ?? null,
+    }
+
+    return { ...lunch, stats }
+  })
+
+  return result
 }

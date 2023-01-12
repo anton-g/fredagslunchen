@@ -9,7 +9,7 @@ import { checkIsAdmin } from "./user.server"
 
 export type { Group, GroupMember } from "@prisma/client"
 
-const fullInterview = Prisma.validator<Prisma.GroupArgs>()({
+const fullGroup = Prisma.validator<Prisma.GroupArgs>()({
   include: {
     members: {
       include: {
@@ -18,7 +18,7 @@ const fullInterview = Prisma.validator<Prisma.GroupArgs>()({
     },
   },
 })
-export type FullGroup = Prisma.GroupGetPayload<typeof fullInterview>
+export type FullGroup = Prisma.GroupGetPayload<typeof fullGroup>
 
 export type GroupPermissions = {
   view: boolean
