@@ -154,3 +154,34 @@ export async function getGroupLunchStats({
 
   return result
 }
+
+export type GroupMembersWithScores = NonNullable<
+  Prisma.PromiseReturnType<typeof getGroupLunchStatsPerMember>
+>
+export async function getGroupLunchStatsPerMember({ id }: Pick<Group, "id">) {
+  const users = await prisma.user.findMany({
+    where: {
+      groups: {
+        some: {
+          groupId: id,
+        },
+      },
+    },
+    include: {
+      scores: {
+        where: {
+          lunch: {
+            groupLocationGroupId: id,
+          },
+        },
+        include: {
+          lunch: {
+            ...fullLunch,
+          },
+        },
+      },
+    },
+  })
+
+  return users
+}
