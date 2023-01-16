@@ -49,15 +49,18 @@ export default function GroupDetailsPage() {
   const { maps } = useFeatureFlags()
   const { details, permissions } = useLoaderData<typeof loader>()
 
-  const orderedPickers = details.group.members.slice().sort((a, b) => {
-    if (a.stats.lunchCount === 0) return 1
-    if (b.stats.lunchCount === 0) return -1
+  const orderedPickers = details.group.members
+    .filter((x) => !x.inactive)
+    .slice()
+    .sort((a, b) => {
+      if (a.stats.lunchCount === 0) return 1
+      if (b.stats.lunchCount === 0) return -1
 
-    return (
-      a.stats.choiceCount / a.stats.lunchCount -
-      b.stats.choiceCount / b.stats.lunchCount
-    )
-  })
+      return (
+        a.stats.choiceCount / a.stats.lunchCount -
+        b.stats.choiceCount / b.stats.lunchCount
+      )
+    })
   const suggestedPicker = orderedPickers[0]
   const alternativePickers = orderedPickers.slice(1)
 

@@ -51,7 +51,21 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   const role = formData.get("role")
-  if (typeof role !== "string" || !["ADMIN", "MEMBER"].includes(role)) {
+  if (
+    role &&
+    (typeof role !== "string" || !["ADMIN", "MEMBER"].includes(role))
+  ) {
+    return json<ActionData>(
+      { errors: { error: "Something went wrong" } },
+      { status: 400 }
+    )
+  }
+
+  const inactive = formData.get("inactive")
+  if (
+    inactive &&
+    (typeof inactive !== "string" || !["true", "false"].includes(inactive))
+  ) {
     return json<ActionData>(
       { errors: { error: "Something went wrong" } },
       { status: 400 }
@@ -63,7 +77,8 @@ export const action: ActionFunction = async ({ request, params }) => {
     groupId,
     requestedByUserId: currentUserId,
     update: {
-      role,
+      role: role ?? undefined,
+      inactive: inactive ? inactive === "true" : undefined,
     },
   })
 
