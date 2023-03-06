@@ -1,7 +1,7 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons"
 import type { LoaderArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import type { FC } from "react"
+import type { FC, ReactNode } from "react"
 import { Link, useLoaderData } from "@remix-run/react"
 import { Button, LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
@@ -282,7 +282,13 @@ export default function Kitchensink() {
   )
 }
 
-const Component: FC<{ title: string }> = ({ title, children }) => {
+const Component = ({
+  title,
+  children,
+}: {
+  title: string
+  children: ReactNode
+}) => {
   return (
     <div>
       <h2>{title}</h2>

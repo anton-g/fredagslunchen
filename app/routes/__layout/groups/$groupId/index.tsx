@@ -16,6 +16,7 @@ import { Stat } from "~/components/Stat"
 import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
+import type { ReactNode } from "react"
 import { useRef } from "react"
 import { Tooltip } from "~/components/Tooltip"
 import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
@@ -330,7 +331,7 @@ const PickerAlternativesList = styled.ol`
   }
 `
 
-const LazyCard: React.FC = ({ children }) => {
+const LazyCard = ({ children }: { children: ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null!)
   const isOnScreen = useOnScreen(ref)
 
