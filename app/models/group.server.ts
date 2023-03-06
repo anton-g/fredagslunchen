@@ -121,6 +121,9 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
         },
       },
       members: {
+        where: {
+          inactive: false,
+        },
         include: {
           user: {
             include: {
@@ -176,8 +179,8 @@ export async function getGroupDetails({ id }: GetGroupDetailsInput) {
     },
     stats: {
       averageScore: formatNumber(stats.averageScore),
-      bestLocation: stats.bestLocation,
-      worstLocation: stats.worstLocation,
+      bestLunch: stats.bestLunch,
+      worstLunch: stats.worstLunch,
       mostPositive: stats.mostPositive,
       mostNegative: stats.mostNegative,
       mostAvarage: stats.mostAverage,
@@ -199,6 +202,7 @@ export function getUserGroups({ userId }: { userId: User["id"] }) {
         },
       },
       members: {
+        where: { inactive: false },
         include: { user: { select: { name: true, id: true, avatarId: true } } },
       },
     },
@@ -572,6 +576,16 @@ type StatsType = {
     name: Location["name"]
     id: Location["id"]
   }
+  bestLunch: {
+    score: number
+    name: Location["name"]
+    id: Location["id"]
+  }
+  worstLunch: {
+    score: number
+    name: Location["name"]
+    id: Location["id"]
+  }
   mostPositive: {
     score: number
     name: User["name"]
@@ -593,7 +607,9 @@ type StatsType = {
 const generateGroupStats = (
   group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>
 ): StatsType => {
-  const allLunches = group.groupLocations.flatMap((l) => l.lunches)
+  const allLunches = group.groupLocations.flatMap((l) =>
+    l.lunches.map((x) => ({ ...x, groupLocation: l }))
+  )
   const allScores = allLunches.flatMap((l) => l.scores)
 
   const averageScore = getAverageNumber(allScores, "score")
@@ -639,6 +655,32 @@ const generateGroupStats = (
       }
     )
 
+  const lunchStats = allLunches
+    .filter((x) => x.scores.length > 0)
+    .reduce(
+      (acc, cur) => {
+        const avg = getAverageNumber(cur.scores, "score")
+
+        if (acc.bestLunch.score < avg) {
+          acc.bestLunch.score = avg
+          acc.bestLunch.name = cur.groupLocation.location.name
+          acc.bestLunch.id = cur.id
+        }
+
+        if (acc.worstLunch.score > avg) {
+          acc.worstLunch.score = avg
+          acc.worstLunch.name = cur.groupLocation.location.name
+          acc.worstLunch.id = cur.id
+        }
+
+        return acc
+      },
+      {
+        bestLunch: { score: -1, name: "", id: 0 },
+        worstLunch: { score: 11, name: "", id: 0 },
+      }
+    )
+
   const mostPositive = memberStats[0]
     ? {
         score: memberStats[0].avg,
@@ -671,6 +713,7 @@ const generateGroupStats = (
 
   return {
     ...groupStats,
+    ...lunchStats,
     averageScore,
     mostNegative,
     mostPositive,

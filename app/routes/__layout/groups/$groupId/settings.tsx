@@ -242,7 +242,13 @@ export default function GroupSettingsPage() {
         <Table.Head>
           <tr>
             <Table.Heading wide>Name</Table.Heading>
-            <Table.Heading></Table.Heading>
+            <Table.Heading>
+              <Stack axis="horizontal" gap={4}>
+                Inactive
+                <Help>Inactive members are hidden from the group.</Help>
+              </Stack>
+            </Table.Heading>
+            <Table.Heading>Role</Table.Heading>
             <Table.Heading></Table.Heading>
           </tr>
         </Table.Head>
@@ -253,8 +259,13 @@ export default function GroupSettingsPage() {
                 <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
               </Table.Cell>
               <Table.Cell>
-                {member.userId !== userId && (
+                <InactiveMemberAction member={member} />
+              </Table.Cell>
+              <Table.Cell>
+                {member.userId !== userId ? (
                   <ChangeMemberRoleAction member={member} />
+                ) : (
+                  "You"
                 )}
               </Table.Cell>
               <Table.Cell>
@@ -381,13 +392,13 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
     if (fetcher.data?.ok) setOpen(false)
   }, [fetcher.data])
 
-  if (member.user.role === "ANONYMOUS") return null
+  if (member.user.role === "ANONYMOUS") return <span>Anonymous</span>
 
   // TODO rewrite the inline logic here
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <TextButton>
+        <TextButton style={{ paddingLeft: 0 }}>
           {member.role === "ADMIN" ? "Make user" : "Make admin"}
         </TextButton>
       </Dialog.Trigger>
@@ -424,5 +435,41 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
         </fetcher.Form>
       </Dialog.Content>
     </Dialog>
+  )
+}
+
+type InactiveMemberActionProps = {
+  member: RecursivelyConvertDatesToStrings<GroupMember & { user: User }>
+}
+const InactiveMemberAction = ({ member }: InactiveMemberActionProps) => {
+  const fetcher = useFetcher()
+
+  const handleChange = (value: boolean) => {
+    fetcher.submit(
+      {
+        userId: member.userId,
+        groupId: member.groupId,
+        action: "update",
+        inactive: value.toString(),
+      },
+      {
+        method: "post",
+        action: "/groups/api/member",
+      }
+    )
+  }
+
+  return (
+    <fetcher.Form action="/groups/api/member" method="post">
+      <input name="userId" value={member.userId} type="hidden" />
+      <input name="groupId" value={member.groupId} type="hidden" />
+      <input name="action" value={"update"} type="hidden" />
+      <input name="role" value={member.role} type="hidden" />
+      <Checkbox
+        name="inactive"
+        checked={member.inactive}
+        onCheckedChange={handleChange}
+      />
+    </fetcher.Form>
   )
 }

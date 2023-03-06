@@ -21,7 +21,7 @@ import type {
 import { getGroupLunchStatsPerMember } from "~/models/lunch.server"
 import { getGroupLunchStats } from "~/models/lunch.server"
 import { Stack } from "~/components/Stack"
-import { RecursivelyConvertDatesToStrings, shorten } from "~/utils"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await getUserId(request)

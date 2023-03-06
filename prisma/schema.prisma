@@ -73,7 +73,8 @@ model GroupMember {
   group   Group  @relation(fields: [groupId], references: [id], onDelete: Cascade)
   groupId String
 
-  role String @default("MEMBER") // MEMBER, ADMIN
+  role     String  @default("MEMBER") // MEMBER, ADMIN
+  inactive Boolean @default(false)
 
   joinedAt DateTime @default(now())
 

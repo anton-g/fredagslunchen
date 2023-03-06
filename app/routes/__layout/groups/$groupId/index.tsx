@@ -16,6 +16,7 @@ import { Stat } from "~/components/Stat"
 import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
+import type { ReactNode } from "react"
 import { useRef } from "react"
 import { Tooltip } from "~/components/Tooltip"
 import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
@@ -49,15 +50,18 @@ export default function GroupDetailsPage() {
   const { maps } = useFeatureFlags()
   const { details, permissions } = useLoaderData<typeof loader>()
 
-  const orderedPickers = details.group.members.slice().sort((a, b) => {
-    if (a.stats.lunchCount === 0) return 1
-    if (b.stats.lunchCount === 0) return -1
+  const orderedPickers = details.group.members
+    .filter((x) => !x.inactive)
+    .slice()
+    .sort((a, b) => {
+      if (a.stats.lunchCount === 0) return 1
+      if (b.stats.lunchCount === 0) return -1
 
-    return (
-      a.stats.choiceCount / a.stats.lunchCount -
-      b.stats.choiceCount / b.stats.lunchCount
-    )
-  })
+      return (
+        a.stats.choiceCount / a.stats.lunchCount -
+        b.stats.choiceCount / b.stats.lunchCount
+      )
+    })
   const suggestedPicker = orderedPickers[0]
   const alternativePickers = orderedPickers.slice(1)
 
@@ -70,20 +74,20 @@ export default function GroupDetailsPage() {
       <StatsGrid>
         <Stat label="Average rating" value={details.stats.averageScore} />
         <Stat
-          label="Best location"
-          value={`${details.stats.bestLocation.name || "-"}`}
+          label="Best lunch"
+          value={`${details.stats.bestLunch.name || "-"}`}
           detail={
-            details.stats.bestLocation.name
-              ? formatNumber(details.stats.bestLocation.score, 10)
+            details.stats.bestLunch.name
+              ? formatNumber(details.stats.bestLunch.score, 10)
               : undefined
           }
         />
         <Stat
-          label="Worst location"
-          value={`${details.stats.worstLocation.name || "-"}`}
+          label="Worst lunch"
+          value={`${details.stats.worstLunch.name || "-"}`}
           detail={
-            details.stats.worstLocation.name
-              ? formatNumber(details.stats.worstLocation.score, 10)
+            details.stats.worstLunch.name
+              ? formatNumber(details.stats.worstLunch.score, 10)
               : undefined
           }
         />
@@ -327,7 +331,7 @@ const PickerAlternativesList = styled.ol`
   }
 `
 
-const LazyCard: React.FC = ({ children }) => {
+const LazyCard = ({ children }: { children: ReactNode }) => {
   const ref = useRef<HTMLDivElement>(null!)
   const isOnScreen = useOnScreen(ref)
 

@@ -220,18 +220,20 @@ export default function LunchDetailsPage() {
         </>
       )}
       <Spacer size={24} />
-      {usersWithoutScoresOrRequests.length > 0 && permissions.addScore && (
-        <>
-          <Subtitle>New rating</Subtitle>
-          <Spacer size={8} />
-          <NewScoreForm
-            users={usersWithoutScoresOrRequests}
-            lunchId={groupLunch.id}
-            groupId={groupLunch.groupLocationGroupId}
-            userId={userId}
-          />
-        </>
-      )}
+      {usersWithoutScoresOrRequests.length > 0 &&
+        permissions.addScore &&
+        userId && (
+          <>
+            <Subtitle>New rating</Subtitle>
+            <Spacer size={8} />
+            <NewScoreForm
+              users={usersWithoutScoresOrRequests}
+              lunchId={groupLunch.id}
+              groupId={groupLunch.groupLocationGroupId}
+              userId={userId}
+            />
+          </>
+        )}
       {permissions.deleteLunch && (
         <>
           <Spacer size={48} />
