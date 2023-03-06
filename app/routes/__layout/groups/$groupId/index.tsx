@@ -73,20 +73,20 @@ export default function GroupDetailsPage() {
       <StatsGrid>
         <Stat label="Average rating" value={details.stats.averageScore} />
         <Stat
-          label="Best location"
-          value={`${details.stats.bestLocation.name || "-"}`}
+          label="Best lunch"
+          value={`${details.stats.bestLunch.name || "-"}`}
           detail={
-            details.stats.bestLocation.name
-              ? formatNumber(details.stats.bestLocation.score, 10)
+            details.stats.bestLunch.name
+              ? formatNumber(details.stats.bestLunch.score, 10)
               : undefined
           }
         />
         <Stat
-          label="Worst location"
-          value={`${details.stats.worstLocation.name || "-"}`}
+          label="Worst lunch"
+          value={`${details.stats.worstLunch.name || "-"}`}
           detail={
-            details.stats.worstLocation.name
-              ? formatNumber(details.stats.worstLocation.score, 10)
+            details.stats.worstLunch.name
+              ? formatNumber(details.stats.worstLunch.score, 10)
               : undefined
           }
         />
