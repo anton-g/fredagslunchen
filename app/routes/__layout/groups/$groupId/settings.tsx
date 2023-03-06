@@ -245,9 +245,7 @@ export default function GroupSettingsPage() {
             <Table.Heading>
               <Stack axis="horizontal" gap={4}>
                 Inactive
-                <Help>
-                  Inactive members aren't included in recommendations.
-                </Help>
+                <Help>Inactive members are hidden from the group.</Help>
               </Stack>
             </Table.Heading>
             <Table.Heading>Role</Table.Heading>

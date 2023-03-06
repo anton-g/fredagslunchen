@@ -121,6 +121,9 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
         },
       },
       members: {
+        where: {
+          inactive: false,
+        },
         include: {
           user: {
             include: {
@@ -199,6 +202,7 @@ export function getUserGroups({ userId }: { userId: User["id"] }) {
         },
       },
       members: {
+        where: { inactive: false },
         include: { user: { select: { name: true, id: true, avatarId: true } } },
       },
     },
