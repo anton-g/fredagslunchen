@@ -5,7 +5,7 @@ import type {
   MetaFunction,
 } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useTransition } from "@remix-run/react"
+import { Form, useActionData, useNavigation } from "@remix-run/react"
 
 import { getUserId } from "~/session.server"
 import { createResetPasswordToken } from "~/models/user.server"
@@ -56,7 +56,7 @@ export const meta: MetaFunction = () => {
 export default function ForgotPasswordPage() {
   const actionData = useActionData() as ActionData
   const emailRef = useRef<HTMLInputElement>(null)
-  const transition = useTransition()
+  const navigation = useNavigation()
 
   useEffect(() => {
     if (actionData?.errors?.email) {
@@ -94,7 +94,7 @@ export default function ForgotPasswordPage() {
                 )}
               </div>
             </div>
-            <SubmitButton type="submit" disabled={transition.state !== "idle"}>
+            <SubmitButton type="submit" disabled={navigation.state !== "idle"}>
               Reset password
             </SubmitButton>
           </Stack>
