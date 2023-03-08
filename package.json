@@ -20,7 +20,8 @@
     "validate": "run-p \"test -- --run\" lint typecheck test:e2e:run"
   },
   "prettier": {
-    "semi": false
+    "semi": false,
+    "printWidth": 110
   },
   "eslintIgnore": [
     "/node_modules",
@@ -29,6 +30,7 @@
   ],
   "dependencies": {
     "@faker-js/faker": "^6.3.1",
+    "@googlemaps/google-maps-services-js": "^3.3.27",
     "@nivo/core": "^0.80.0",
     "@nivo/line": "^0.80.0",
     "@prisma/client": "^4.11.0",
@@ -48,8 +50,10 @@
     "@react-aria/i18n": "^3.4.1",
     "@react-aria/listbox": "^3.5.1",
     "@react-aria/overlays": "^3.9.1",
+    "@react-aria/ssr": "^3.5.0",
     "@react-stately/collections": "^3.4.1",
     "@react-stately/combobox": "^3.1.1",
+    "@react-stately/data": "^3.9.0",
     "@react-stately/list": "^3.5.1",
     "@remix-run/node": "^1.14.0",
     "@remix-run/react": "^1.14.0",

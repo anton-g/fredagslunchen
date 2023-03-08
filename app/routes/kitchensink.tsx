@@ -24,6 +24,7 @@ import styled from "styled-components"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
 import { RadioGroup } from "~/components/RadioGroup"
+import { useAsyncList } from "@react-stately/data"
 
 export const meta: MetaFunction = () => {
   return {
@@ -65,8 +66,7 @@ export default function Kitchensink() {
             <Dialog.Content>
               <Dialog.Title>Title</Dialog.Title>
               <Dialog.Description>
-                An automatically accessible description. You can write anything
-                or nothing in here :)
+                An automatically accessible description. You can write anything or nothing in here :)
               </Dialog.Description>
               <Dialog.Close />
             </Dialog.Content>
@@ -81,11 +81,7 @@ export default function Kitchensink() {
           </Tooltip>
         </Component>
         <Component title="Map">
-          {ENV.ENABLE_MAPS ? (
-            <Map locations={locationsMock} />
-          ) : (
-            <span>Maps disabled</span>
-          )}
+          {ENV.ENABLE_MAPS ? <Map locations={locationsMock} /> : <span>Maps disabled</span>}
         </Component>
         <Component title="Hover Card">
           <HoverCard>
@@ -104,7 +100,10 @@ export default function Kitchensink() {
           </HoverCard>
         </Component>
         <Component title="ComboBox">
-          <ComboBoxExample />
+          <Stack gap={24} axis="horizontal">
+            <ComboBoxExample />
+            <AsyncComboBoxExample />
+          </Stack>
         </Component>
         <Component title="Select">
           <SelectExample />
@@ -172,11 +171,7 @@ export default function Kitchensink() {
           <TableExample />
         </Component>
         <Component title="Card">
-          <Stack
-            gap={24}
-            axis="horizontal"
-            style={{ alignItems: "flex-start" }}
-          >
+          <Stack gap={24} axis="horizontal" style={{ alignItems: "flex-start" }}>
             <Card>
               Hello hello hello hello <br />
               Hello hello hello hello hello hello <br />
@@ -282,13 +277,7 @@ export default function Kitchensink() {
   )
 }
 
-const Component = ({
-  title,
-  children,
-}: {
-  title: string
-  children: ReactNode
-}) => {
+const Component = ({ title, children }: { title: string; children: ReactNode }) => {
   return (
     <div>
       <h2>{title}</h2>
@@ -473,6 +462,36 @@ const ComboBoxExample = () => {
           <div>
             <Label>{item.name}</Label>
             <Description>{item.username}</Description>
+          </div>
+        </Item>
+      )}
+    </ComboBox>
+  )
+}
+
+const AsyncComboBoxExample = () => {
+  const list = useAsyncList<{ name: string }>({
+    async load({ signal, filterText }) {
+      let res = await fetch(`https://swapi.py4e.com/api/people/?search=${filterText}`, { signal })
+      let json = await res.json()
+
+      return {
+        items: json.results,
+      }
+    },
+  })
+
+  return (
+    <ComboBox
+      label="Star Wars (async)"
+      items={list.items}
+      inputValue={list.filterText}
+      onInputChange={list.setFilterText}
+    >
+      {(item) => (
+        <Item textValue={item.name} key={item.name}>
+          <div>
+            <Label>{item.name}</Label>
           </div>
         </Item>
       )}

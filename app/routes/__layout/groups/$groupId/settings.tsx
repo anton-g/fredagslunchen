@@ -3,13 +3,7 @@ import type { Group, GroupMember } from "~/models/group.server"
 import { getGroupPermissions } from "~/models/group.server"
 import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  Link,
-  useActionData,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react"
+import { Form, Link, useActionData, useFetcher, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
 import { Button, TextButton } from "~/components/Button"
@@ -42,8 +36,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     group,
   })
 
-  if (!permissions.settings)
-    throw new Response("Permission denied", { status: 401 })
+  if (!permissions.settings) throw new Response("Permission denied", { status: 401 })
 
   return json({
     group,
@@ -69,10 +62,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const action = formData.get("action")
 
   if (typeof action !== "string" || action.length === 0) {
-    return json<ActionData>(
-      { errors: { action: "Action is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { action: "Action is required" } }, { status: 400 })
   }
 
   switch (action) {
@@ -168,17 +158,12 @@ export default function GroupSettingsPage() {
               aria-invalid={actionData?.errors?.name ? true : undefined}
               aria-describedby="name-error"
             />
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
-            )}
+            {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
           </div>
         </div>
         <Spacer size={16} />
         <Subtitle>Club location</Subtitle>
-        <FieldDescription>
-          Your clubs "home base". Setting this will update the center of the
-          map.
-        </FieldDescription>
+        <FieldDescription>Your clubs home base. Affects maps and recommendations.</FieldDescription>
         <Stack axis="horizontal" gap={16}>
           <div style={{ width: "100%" }}>
             <label>
@@ -189,14 +174,10 @@ export default function GroupSettingsPage() {
                 onPaste={handleCoordinatePaste}
                 defaultValue={group.lat ?? ""}
                 aria-invalid={actionData?.errors?.lat ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.lat ? "lat-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.lat ? "lat-error" : undefined}
               />
             </label>
-            {actionData?.errors?.lat && (
-              <div id="lat-error">{actionData.errors.lat}</div>
-            )}
+            {actionData?.errors?.lat && <div id="lat-error">{actionData.errors.lat}</div>}
           </div>
 
           <div style={{ width: "100%" }}>
@@ -208,14 +189,10 @@ export default function GroupSettingsPage() {
                 onPaste={handleCoordinatePaste}
                 defaultValue={group.lon ?? ""}
                 aria-invalid={actionData?.errors?.lon ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.lon ? "lon-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.lon ? "lon-error" : undefined}
               />
             </label>
-            {actionData?.errors?.lon && (
-              <div id="lon-error">{actionData.errors.lon}</div>
-            )}
+            {actionData?.errors?.lon && <div id="lon-error">{actionData.errors.lon}</div>}
           </div>
         </Stack>
         <Spacer size={16} />
@@ -225,13 +202,11 @@ export default function GroupSettingsPage() {
             <Checkbox name="public" id="public" defaultChecked={group.public} />
             <label htmlFor="public">Public</label>
             <Help>
-              Public groups are accessible by anyone, even if they're not a user
-              of Fredagslunchen or a member of your group.
+              Public groups are accessible by anyone, even if they're not a user of Fredagslunchen or a member
+              of your group.
             </Help>
           </Stack>
-          {actionData?.errors?.public && (
-            <div id="public-error">{actionData.errors.public}</div>
-          )}
+          {actionData?.errors?.public && <div id="public-error">{actionData.errors.public}</div>}
         </div>
         <Spacer size={16} />
         <input type="hidden" name="action" value="update" />
@@ -262,17 +237,9 @@ export default function GroupSettingsPage() {
                 <InactiveMemberAction member={member} />
               </Table.Cell>
               <Table.Cell>
-                {member.userId !== userId ? (
-                  <ChangeMemberRoleAction member={member} />
-                ) : (
-                  "You"
-                )}
+                {member.userId !== userId ? <ChangeMemberRoleAction member={member} /> : "You"}
               </Table.Cell>
-              <Table.Cell>
-                {member.userId !== userId && (
-                  <RemoveMemberAction member={member} />
-                )}
-              </Table.Cell>
+              <Table.Cell>{member.userId !== userId && <RemoveMemberAction member={member} />}</Table.Cell>
             </tr>
           ))}
         </tbody>
@@ -308,30 +275,19 @@ const DeleteGroupAction = ({ groupName }: { groupName: Group["name"] }) => {
       </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Close />
-        <Dialog.Title>
-          Are you sure you want to delete the club {groupName}?
-        </Dialog.Title>
+        <Dialog.Title>Are you sure you want to delete the club {groupName}?</Dialog.Title>
         <DialogDescription>
-          This will delete this club including all locations, lunches and
-          scores. This action <strong>cannot be undone.</strong>
+          This will delete this club including all locations, lunches and scores. This action{" "}
+          <strong>cannot be undone.</strong>
         </DialogDescription>
         <label htmlFor="name">
           Please type <strong>{groupName}</strong> to confirm.
         </label>
-        <Input
-          id="name"
-          required
-          name="name"
-          onChange={(e) => setConfirmNameValue(e.target.value)}
-        />
+        <Input id="name" required name="name" onChange={(e) => setConfirmNameValue(e.target.value)} />
         <Spacer size={16} />
         <Form method="post">
           <input type="hidden" name="action" value="delete" />
-          <Button
-            size="large"
-            style={{ marginLeft: "auto" }}
-            disabled={confirmNameValue !== groupName}
-          >
+          <Button size="large" style={{ marginLeft: "auto" }} disabled={confirmNameValue !== groupName}>
             I am sure
           </Button>
         </Form>
@@ -360,12 +316,9 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
       </Dialog.Trigger>
       <Dialog.Content>
         <Dialog.Close />
-        <Dialog.Title>
-          Are you sure you want to remove {member.user.name} from the club?
-        </Dialog.Title>
+        <Dialog.Title>Are you sure you want to remove {member.user.name} from the club?</Dialog.Title>
         <DialogDescription>
-          This will delete all their scores and comments. This action{" "}
-          <strong>cannot be undone</strong>!
+          This will delete all their scores and comments. This action <strong>cannot be undone</strong>!
         </DialogDescription>
         <Spacer size={16} />
         <fetcher.Form action="/groups/api/member" method="post">
@@ -405,8 +358,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
       <Dialog.Content>
         <Dialog.Close />
         <Dialog.Title>
-          Are you sure you want to make {member.user.name}{" "}
-          {member.role === "ADMIN" ? "a user" : "an admin"}?
+          Are you sure you want to make {member.user.name} {member.role === "ADMIN" ? "a user" : "an admin"}?
         </Dialog.Title>
         <DialogDescription>
           {member.role === "ADMIN" ? (
@@ -424,11 +376,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
           <input name="action" value={"update"} type="hidden" />
-          <input
-            name="role"
-            value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"}
-            type="hidden"
-          />
+          <input name="role" value={member.role === "ADMIN" ? "MEMBER" : "ADMIN"} type="hidden" />
           <Button size="large" style={{ marginLeft: "auto" }}>
             I am sure
           </Button>
@@ -465,11 +413,7 @@ const InactiveMemberAction = ({ member }: InactiveMemberActionProps) => {
       <input name="groupId" value={member.groupId} type="hidden" />
       <input name="action" value={"update"} type="hidden" />
       <input name="role" value={member.role} type="hidden" />
-      <Checkbox
-        name="inactive"
-        checked={member.inactive}
-        onCheckedChange={handleChange}
-      />
+      <Checkbox name="inactive" checked={member.inactive} onCheckedChange={handleChange} />
     </fetcher.Form>
   )
 }

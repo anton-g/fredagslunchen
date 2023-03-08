@@ -17,12 +17,9 @@ import { getUser } from "./session.server"
 import { ThemeProvider } from "styled-components"
 import { getEnv } from "./env.server"
 import { getDomainUrl, removeTrailingSlash } from "./utils"
-import {
-  availableThemes,
-  InternalThemeProvider,
-  useThemeContext,
-} from "./styles/theme"
+import { availableThemes, InternalThemeProvider, useThemeContext } from "./styles/theme"
 import { FeatureFlagProvider } from "./FeatureFlagContext"
+import { SSRProvider } from "@react-aria/ssr"
 
 declare global {
   interface Window {
@@ -134,23 +131,22 @@ export default function App() {
       <head>
         <Meta />
         <Links />
-        <CanonicalLink
-          origin={data.requestInfo.origin}
-          fathomQueue={fathomQueue}
-        />
+        <CanonicalLink origin={data.requestInfo.origin} fathomQueue={fathomQueue} />
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <FeatureFlagProvider
-          defaultValue={{
-            premium: data.ENV.ENABLE_PREMIUM,
-            maps: data.ENV.ENABLE_MAPS,
-          }}
-        >
-          <InternalThemeProvider defaultTheme={data.theme}>
-            <Content />
-          </InternalThemeProvider>
-        </FeatureFlagProvider>
+        <SSRProvider>
+          <FeatureFlagProvider
+            defaultValue={{
+              premium: data.ENV.ENABLE_PREMIUM,
+              maps: data.ENV.ENABLE_MAPS,
+            }}
+          >
+            <InternalThemeProvider defaultTheme={data.theme}>
+              <Content />
+            </InternalThemeProvider>
+          </FeatureFlagProvider>
+        </SSRProvider>
         <ScrollRestoration />
         {ENV.NODE_ENV === "development" ? null : (
           <script
