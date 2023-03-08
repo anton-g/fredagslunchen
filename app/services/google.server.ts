@@ -25,13 +25,15 @@ export async function autocomplete(
       input,
       key: ENV.GOOGLE_PLACES_API_KEY,
       types: PlaceAutocompleteType.establishment,
-      location: options
-        ? {
-            lat: options.lat,
-            lng: options.lng,
-          }
-        : undefined,
       radius: 10_000,
+      ...(options
+        ? {
+            location: {
+              lat: options.lat,
+              lng: options.lng,
+            },
+          }
+        : {}),
     },
   })
 
