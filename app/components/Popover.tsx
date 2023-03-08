@@ -44,6 +44,7 @@ const slideLeftAndFade = keyframes`
 
 const StyledContent = styled(PopoverPrimitive.Content)`
   max-width: min(400px, 90vw);
+  white-space: pre-wrap;
 
   &:focus {
     outline: none;

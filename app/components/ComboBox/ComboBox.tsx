@@ -1,5 +1,5 @@
 import * as React from "react"
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import type { ComboBoxProps } from "@react-types/combobox"
 
 import { ListBox } from "./ListBox"
@@ -18,6 +18,7 @@ export { Item, Section } from "@react-stately/collections"
 export const ComboBox = <T extends object>(
   props: ComboBoxProps<T> & {
     inputRef?: React.MutableRefObject<HTMLInputElement>
+    hideButton?: true
   }
 ) => {
   const { contains } = useFilter({ sensitivity: "base" })
@@ -64,25 +65,17 @@ export const ComboBox = <T extends object>(
             }
           }}
           isFocused={state.isFocused}
+          fullBorder={props.hideButton}
         />
-        <input
-          type="hidden"
-          name={props.name + "-key"}
-          value={state.selectedItem?.key}
-        />
-        <Button {...buttonProps} ref={buttonRef}>
-          <ChevronDownIcon
-            style={{ width: 18, height: 18 }}
-            aria-hidden="true"
-          />
-        </Button>
+        {props.name && <input type="hidden" name={props.name + "-key"} value={state.selectedItem?.key} />}
+        {!props.hideButton && (
+          <Button {...buttonProps} ref={buttonRef}>
+            <ChevronDownIcon style={{ width: 18, height: 18 }} aria-hidden="true" />
+          </Button>
+        )}
       </InputGroup>
       {state.isOpen && (
-        <Popover
-          popoverRef={popoverRef}
-          isOpen={state.isOpen}
-          onClose={state.close}
-        >
+        <Popover popoverRef={popoverRef} isOpen={state.isOpen} onClose={state.close}>
           <ListBox {...listBoxProps} listBoxRef={listBoxRef} state={state} />
         </Popover>
       )}
@@ -104,9 +97,13 @@ const InputGroup = styled.div<StyleProps>`
   border-radius: 4px;
 `
 
-const ComboBoxInput = styled(Input)<StyleProps>`
+const ComboBoxInput = styled(Input)<StyleProps & { fullBorder?: boolean }>`
   outline: none;
-  border-right: none;
+  ${({ fullBorder }) =>
+    !fullBorder &&
+    css`
+      border-right: none;
+    `}
   border-radius: 4px 0 0 4px;
 `
 

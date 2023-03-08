@@ -13,10 +13,11 @@ const Input = styled.input`
   padding: 6px 8px;
   margin: 0;
   width: 100%;
-  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
 
-  &:disabled {
+  &:disabled,
+  &:read-only {
     opacity: 0.6;
     cursor: not-allowed;
   }

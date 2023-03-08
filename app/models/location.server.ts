@@ -13,6 +13,33 @@ export function getLocation({ id }: { id: Location["id"] }) {
   })
 }
 
+export async function findLocation({
+  city,
+  lat,
+  lon,
+  address,
+  name,
+  zipCode,
+}: {
+  name?: string
+  address?: string
+  city?: string
+  lat?: string
+  lon?: string
+  zipCode?: string
+}) {
+  return prisma.location.findFirst({
+    where: {
+      city,
+      lat,
+      lon,
+      address,
+      name,
+      zipCode,
+    },
+  })
+}
+
 export function getGroupLocation({
   id,
   groupId,
@@ -57,16 +84,22 @@ export async function createGroupLocation({
   discoveredById,
   locationId,
 }: CreateGroupLocationInput) {
-  return await prisma.groupLocation.create({
-    data: {
-      group: {
-        connect: {
-          id: groupId,
-        },
+  return prisma.groupLocation.upsert({
+    where: {
+      locationId_groupId: {
+        groupId,
+        locationId: locationId || -1,
       },
+    },
+    create: {
       discoveredBy: {
         connect: {
           id: discoveredById,
+        },
+      },
+      group: {
+        connect: {
+          id: groupId,
         },
       },
       location: {
@@ -85,6 +118,7 @@ export async function createGroupLocation({
         },
       },
     },
+    update: {},
   })
 }
 
@@ -140,9 +174,7 @@ export async function getAllLocationsStats() {
 
   const locationsWithStats = locations.map((loc) => {
     const allLunches = loc.groupLocation.flatMap((gl) => gl.lunches)
-    const allScores = allLunches
-      .flatMap((l) => l.scores)
-      .sort((a, b) => b.score - a.score)
+    const allScores = allLunches.flatMap((l) => l.scores).sort((a, b) => b.score - a.score)
 
     const averageScore = getAverageNumber(allScores, "score")
 

@@ -1,12 +1,7 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  useActionData,
-  useLoaderData,
-  useSearchParams,
-} from "@remix-run/react"
-import { useEffect, useRef } from "react"
+import { Form, useActionData, useLoaderData, useSearchParams } from "@remix-run/react"
+import { useEffect, useRef, useState } from "react"
 import invariant from "tiny-invariant"
 import { Button } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
@@ -15,12 +10,11 @@ import { Stack } from "~/components/Stack"
 import { getGroup, getGroupPermissions } from "~/models/group.server"
 import { zfd } from "zod-form-data"
 import z from "zod"
-import {
-  createGroupLocation,
-  getAllLocationsForGroup,
-} from "~/models/location.server"
+import { createGroupLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
 import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
+import { LocationAutocomplete } from "~/components/LocationAutocomplete"
+import type { ExternalLocation } from "~/services/google.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -40,14 +34,12 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Unauthorized", { status: 401 })
   }
 
-  const locations = await getAllLocationsForGroup({ groupId: params.groupId })
-
-  return json({ group, locations })
+  return json({ group })
 }
 
 const formSchema = zfd.formData({
-  location: zfd.text(),
-  "location-key": zfd.numeric(z.number().optional()),
+  id: zfd.numeric(z.number().optional()),
+  name: zfd.text(),
   address: zfd.text(),
   zipCode: zfd.text(),
   city: zfd.text(),
@@ -79,14 +71,14 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const {
     redirectTo,
-    location: name,
+    id,
+    name,
     address,
     lat,
     lon,
     city,
     zipCode,
     "discoveredBy-key": discoveredById,
-    "location-key": locationId,
   } = result.data
 
   const location = await createGroupLocation({
@@ -98,7 +90,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     city,
     zipCode,
     discoveredById,
-    locationId,
+    locationId: id,
     global: false,
   })
 
@@ -113,20 +105,22 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function NewLocationPage() {
   const user = useUser()
   const actionData = useActionData() as ActionData
-  const loaderData = useLoaderData<typeof loader>()
+  const { group } = useLoaderData<typeof loader>()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
-  const locationRef = useRef<HTMLInputElement>(null!)
+  const nameRef = useRef<HTMLInputElement>(null!)
   const addressRef = useRef<HTMLInputElement>(null)
   const zipCodeRef = useRef<HTMLInputElement>(null)
   const cityRef = useRef<HTMLInputElement>(null)
   const latRef = useRef<HTMLInputElement>(null)
   const lonRef = useRef<HTMLInputElement>(null)
+  const idRef = useRef<HTMLInputElement>(null)
   const discoveredByRef = useRef<HTMLInputElement>(null!)
+  const [manualEdit, setManualEdit] = useState(false)
 
   useEffect(() => {
-    if (actionData?.errors?.location) {
-      locationRef.current?.focus()
+    if (actionData?.errors?.name) {
+      nameRef.current?.focus()
     } else if (actionData?.errors?.address) {
       addressRef.current?.focus()
     } else if (actionData?.errors?.zipCode) {
@@ -142,24 +136,19 @@ export default function NewLocationPage() {
     }
   }, [actionData])
 
-  const locations = loaderData.locations.filter(
-    (l) => !loaderData.group.groupLocations.find((gl) => gl.locationId === l.id)
-  )
-
-  const members = loaderData.group.members.map((x) => ({
+  const members = group.members.map((x) => ({
     id: x.userId,
     name: x.user.name,
   }))
 
-  const handleLocationSelect = (key: any) => {
-    const selectedLocation = locations.find((x) => x.id === key)
-    if (!selectedLocation) return
-
-    addressRef.current!.value = selectedLocation.address
-    zipCodeRef.current!.value = selectedLocation.zipCode
-    cityRef.current!.value = selectedLocation.city
-    latRef.current!.value = selectedLocation.lat || ""
-    lonRef.current!.value = selectedLocation.lon || ""
+  const handleLocationSelect = (location: ExternalLocation) => {
+    nameRef.current!.value = location.name ?? ""
+    addressRef.current!.value = location.address ?? ""
+    zipCodeRef.current!.value = location.zipCode ?? ""
+    cityRef.current!.value = location.city ?? ""
+    latRef.current!.value = location.lat ?? ""
+    lonRef.current!.value = location.lon ?? ""
+    idRef.current!.value = location.id?.toString() ?? ""
   }
 
   const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -175,6 +164,12 @@ export default function NewLocationPage() {
     })
   }
 
+  const setManualEditing = () => {
+    setManualEdit(true)
+    nameRef.current.focus()
+    idRef.current!.value = ""
+  }
+
   return (
     <>
       <h3>New location</h3>
@@ -187,47 +182,52 @@ export default function NewLocationPage() {
           width: "100%",
         }}
       >
+        <input type="hidden" name="id" ref={idRef} />
         <Stack gap={16}>
+          <div style={{ marginBottom: 16 }}>
+            <LocationAutocomplete
+              label="Search location"
+              onSelect={handleLocationSelect}
+              origin={group.lat && group.lon ? { lat: group.lat, lng: group.lon } : undefined}
+            />
+          </div>
+          <Button
+            style={{ marginLeft: "auto", marginBottom: -28, visibility: manualEdit ? "hidden" : "visible" }}
+            onClick={setManualEditing}
+            type="button"
+          >
+            Manual edit
+          </Button>
           <div>
-            <ComboBox
-              label="Name"
-              name="location"
-              defaultItems={locations}
-              defaultSelectedKey={user.id}
-              inputRef={locationRef}
-              allowsCustomValue={true}
-              menuTrigger="focus"
-              onSelectionChange={handleLocationSelect}
-            >
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
-            {actionData?.errors?.location && (
-              <div id="name-error">{actionData.errors.location}</div>
-            )}
+            <label>
+              <span>Name</span>
+              <Input
+                readOnly={!manualEdit}
+                tabIndex={!manualEdit ? -1 : undefined}
+                ref={nameRef}
+                name="name"
+                required
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-errormessage={actionData?.errors?.name ? "name-error" : undefined}
+              />
+            </label>
+            {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
           </div>
 
           <div>
             <label>
               <span>Street address</span>
               <Input
+                readOnly={!manualEdit}
+                tabIndex={!manualEdit ? -1 : undefined}
                 ref={addressRef}
                 name="address"
                 required
                 aria-invalid={actionData?.errors?.address ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.address ? "address-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.address ? "address-error" : undefined}
               />
             </label>
-            {actionData?.errors?.address && (
-              <div id="address-error">{actionData.errors.address}</div>
-            )}
+            {actionData?.errors?.address && <div id="address-error">{actionData.errors.address}</div>}
           </div>
 
           <Stack axis="horizontal" gap={16}>
@@ -235,36 +235,32 @@ export default function NewLocationPage() {
               <label>
                 <span>Zip code</span>
                 <Input
+                  readOnly={!manualEdit}
+                  tabIndex={!manualEdit ? -1 : undefined}
                   ref={zipCodeRef}
                   name="zipCode"
                   required
                   aria-invalid={actionData?.errors?.zipCode ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.zipCode ? "zip-code-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.zipCode ? "zip-code-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.zipCode && (
-                <div id="zip-code-error">{actionData.errors.zipCode}</div>
-              )}
+              {actionData?.errors?.zipCode && <div id="zip-code-error">{actionData.errors.zipCode}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
               <label>
                 <span>City</span>
                 <Input
+                  readOnly={!manualEdit}
+                  tabIndex={!manualEdit ? -1 : undefined}
                   ref={cityRef}
                   name="city"
                   required
                   aria-invalid={actionData?.errors?.city ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.city ? "city-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.city ? "city-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.city && (
-                <div id="city-error">{actionData.errors.city}</div>
-              )}
+              {actionData?.errors?.city && <div id="city-error">{actionData.errors.city}</div>}
             </div>
           </Stack>
 
@@ -273,36 +269,32 @@ export default function NewLocationPage() {
               <label>
                 <span>Latitude</span>
                 <Input
+                  readOnly={!manualEdit}
+                  tabIndex={!manualEdit ? -1 : undefined}
                   ref={latRef}
                   name="lat"
                   onPaste={handleCoordinatePaste}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.lat ? "lat-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.lat ? "lat-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.lat && (
-                <div id="lat-error">{actionData.errors.lat}</div>
-              )}
+              {actionData?.errors?.lat && <div id="lat-error">{actionData.errors.lat}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
               <label>
                 <span>Longitude</span>
                 <Input
+                  readOnly={!manualEdit}
+                  tabIndex={!manualEdit ? -1 : undefined}
                   ref={lonRef}
                   name="lon"
                   onPaste={handleCoordinatePaste}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.lon ? "lon-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.lon ? "lon-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.lon && (
-                <div id="lon-error">{actionData.errors.lon}</div>
-              )}
+              {actionData?.errors?.lon && <div id="lon-error">{actionData.errors.lon}</div>}
             </div>
           </Stack>
 
@@ -324,9 +316,7 @@ export default function NewLocationPage() {
               )}
             </ComboBox>
             {actionData?.errors?.["discoveredBy-key"] && (
-              <div id="discoveredBy-error">
-                {actionData.errors["discoveredBy-key"]}
-              </div>
+              <div id="discoveredBy-error">{actionData.errors["discoveredBy-key"]}</div>
             )}
           </div>
 
