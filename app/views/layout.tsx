@@ -3,13 +3,7 @@ import { Link } from "@remix-run/react"
 import styled from "styled-components"
 import { Header } from "~/components/Header"
 
-export const Layout = ({
-  isAdmin,
-  children,
-}: {
-  isAdmin: boolean
-  children: ReactNode
-}) => {
+export const Layout = ({ isAdmin, children }: { isAdmin: boolean; children: ReactNode }) => {
   return (
     <Wrapper>
       <Header isAdmin={isAdmin} />
@@ -31,7 +25,7 @@ const Wrapper = styled.div`
 
 const Content = styled.main`
   margin-top: 48px;
-  max-width: 670px;
+  max-width: 800px;
   width: 100%;
   margin-bottom: 108px;
   padding: 0 16px;

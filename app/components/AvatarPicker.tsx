@@ -12,17 +12,13 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { useFeatureFlags } from "~/FeatureFlagContext"
 
-export const AvatarPicker = ({
-  user,
-}: {
-  user: RecursivelyConvertDatesToStrings<User>
-}) => {
+export const AvatarPicker = ({ user }: { user: RecursivelyConvertDatesToStrings<User> }) => {
   const fetcher = useFetcher()
   const { current: initialAvatar } = useRef(user.avatarId)
   const { current: avatars } = useRef(
     [
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21,
-      22, 23, 24, 25, 26, 27, 28, 29, 30,
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+      29, 30,
     ].filter((x) => x !== user.avatarId)
   )
 
@@ -33,23 +29,13 @@ export const AvatarPicker = ({
   if (hasPremium) {
     return (
       <>
-        <fetcher.Form
-          method="post"
-          onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
-        >
+        <fetcher.Form method="post" onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}>
           <input type="hidden" name="action" value="updateAvatar" />
           <AvatarRadioGroup defaultValue={`${initialAvatar}`} name="avatar">
             <AvatarScrollArea axis="horizontal" gap={16}>
-              <AvatarRadio
-                variant={initialAvatar || 1}
-                value={`${initialAvatar}`}
-              />
+              <AvatarRadio variant={initialAvatar || 1} value={`${initialAvatar}`} />
               {avatars.map((variant) => (
-                <AvatarRadio
-                  key={variant}
-                  variant={variant}
-                  value={`${variant}`}
-                />
+                <AvatarRadio key={variant} variant={variant} value={`${variant}`} />
               ))}
             </AvatarScrollArea>
           </AvatarRadioGroup>
@@ -82,6 +68,8 @@ export const AvatarPicker = ({
           <Avatar variant={19} size="medium" />
           <Avatar variant={23} size="medium" />
           <Avatar variant={16} size="medium" />
+          <Avatar variant={16} size="medium" />
+          <Avatar variant={16} size="medium" />
         </Stack>
       </Stack>
       <Spacer size={24} />
@@ -111,12 +99,8 @@ const PremiumWrapper = styled.div`
     content: "";
     position: absolute;
     background: transparent;
-    background: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0) 0%,
-      ${({ theme }) => theme.colors.secondary} 70%
-    );
-    width: 32px;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, ${({ theme }) => theme.colors.secondary} 70%);
+    width: 96px;
     height: 100%;
     right: 0;
   }
@@ -128,9 +112,7 @@ const Backdrop = styled.div`
   opacity: 0.7;
   z-index: -1;
 `
-const AvatarRadio = (
-  props: ComponentProps<typeof RadioGroupPrimitive.Item> & { variant: number }
-) => {
+const AvatarRadio = (props: ComponentProps<typeof RadioGroupPrimitive.Item> & { variant: number }) => {
   return (
     <AvatarRadioItem {...props}>
       <AvatarFoo variant={props.variant} size="medium" />
@@ -145,11 +127,7 @@ const AvatarRadioGroup = styled(RadioGroup)`
     content: "";
     position: absolute;
     background: transparent;
-    background: linear-gradient(
-      90deg,
-      rgba(0, 0, 0, 0) 0%,
-      ${({ theme }) => theme.colors.secondary} 70%
-    );
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0) 0%, ${({ theme }) => theme.colors.secondary} 70%);
     width: 32px;
     height: 100%;
     top: 0;
@@ -161,11 +139,7 @@ const AvatarRadioGroup = styled(RadioGroup)`
     position: absolute;
     background: transparent;
 
-    background: linear-gradient(
-      90deg,
-      ${({ theme }) => theme.colors.secondary} 0%,
-      rgba(255, 0, 0, 0) 70%
-    );
+    background: linear-gradient(90deg, ${({ theme }) => theme.colors.secondary} 0%, rgba(255, 0, 0, 0) 70%);
     width: 32px;
     height: 100%;
     top: 0;
