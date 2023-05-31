@@ -42,9 +42,7 @@ export const getGroupPermissions = async ({
   group: FullGroup
 }): Promise<GroupPermissions> => {
   const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
-  const isOwner = group.members.some(
-    (m) => m.userId === currentUserId && m.role === "ADMIN"
-  )
+  const isOwner = group.members.some((m) => m.userId === currentUserId && m.role === "ADMIN")
   const isMember = group.members.some((x) => x.userId === currentUserId)
 
   return {
@@ -128,6 +126,9 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
           user: {
             include: {
               choosenLunches: {
+                where: {
+                  groupLocationGroupId: id,
+                },
                 orderBy: {
                   date: "desc",
                 },
@@ -441,9 +442,7 @@ export async function deleteGroupMember({
     return { error: "Something went wrong" }
   }
 
-  const requestedByAdmin = group.members.some(
-    (x) => x.userId === requestedByUserId && x.role === "ADMIN"
-  )
+  const requestedByAdmin = group.members.some((x) => x.userId === requestedByUserId && x.role === "ADMIN")
   const requestedBySameUser = userId === requestedByUserId
 
   if (!requestedByAdmin && !requestedBySameUser) {
@@ -544,9 +543,7 @@ export async function updateGroupMembership({
     return { error: "Something went wrong" }
   }
 
-  const requestedByAdmin = group.members.some(
-    (x) => x.userId === requestedByUserId && x.role === "ADMIN"
-  )
+  const requestedByAdmin = group.members.some((x) => x.userId === requestedByUserId && x.role === "ADMIN")
   if (!requestedByAdmin) {
     return { error: "Something went wrong" }
   }
@@ -607,9 +604,7 @@ type StatsType = {
 const generateGroupStats = (
   group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>
 ): StatsType => {
-  const allLunches = group.groupLocations.flatMap((l) =>
-    l.lunches.map((x) => ({ ...x, groupLocation: l }))
-  )
+  const allLunches = group.groupLocations.flatMap((l) => l.lunches.map((x) => ({ ...x, groupLocation: l })))
   const allScores = allLunches.flatMap((l) => l.scores)
 
   const averageScore = getAverageNumber(allScores, "score")
@@ -699,9 +694,7 @@ const generateGroupStats = (
 
   const averages = memberStats
     .slice()
-    .sort(
-      (a, b) => Math.abs(a.avg - averageScore) - Math.abs(b.avg - averageScore)
-    )
+    .sort((a, b) => Math.abs(a.avg - averageScore) - Math.abs(b.avg - averageScore))
 
   const mostAverage = averages[0]
     ? {
@@ -722,35 +715,27 @@ const generateGroupStats = (
 }
 
 const generateUserStats = (
-  member: NonNullable<
-    Prisma.PromiseReturnType<typeof fetchGroupDetails>
-  >["members"][0]
+  member: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>["members"][0]
 ) => {
   const lunchCount = member.user.scores.length
   const choiceCount = member.user.choosenLunches.length
   const averageScore = getAverageNumber(member.user.scores, "score")
-  const sortedScores = member.user.scores
-    .slice()
-    .sort((a, b) => a.score - b.score)
+  const sortedScores = member.user.scores.slice().sort((a, b) => a.score - b.score)
   const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
-  const highestScore =
-    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "-"
+  const highestScore = sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name || "-"
 
-  const bestChoosenLunch = member.user.choosenLunches.reduce<
-    typeof member.user.choosenLunches[0] | null
-  >((acc, cur) => {
-    if (!acc) return cur
+  const bestChoosenLunch = member.user.choosenLunches.reduce<typeof member.user.choosenLunches[0] | null>(
+    (acc, cur) => {
+      if (!acc) return cur
 
-    if (
-      getAverageNumber(cur.scores, "score") >
-      getAverageNumber(acc.scores, "score")
-    ) {
-      return cur
-    }
+      if (getAverageNumber(cur.scores, "score") > getAverageNumber(acc.scores, "score")) {
+        return cur
+      }
 
-    return acc
-  }, null)
+      return acc
+    },
+    null
+  )
 
   return {
     lunchCount,
