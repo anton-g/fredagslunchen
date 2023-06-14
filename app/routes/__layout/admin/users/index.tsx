@@ -6,6 +6,7 @@ import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import { getAllAnonymousUsers, getAllUsers } from "~/models/user.server"
 import { requireUserId } from "~/session.server"
+import { format } from "date-fns"
 
 export const loader = async ({ request }: LoaderArgs) => {
   await requireUserId(request)
@@ -29,6 +30,7 @@ export default function AdminUsersPage() {
             <Table.Heading>Email</Table.Heading>
             <Table.Heading numeric>Clubs</Table.Heading>
             <Table.Heading numeric>Ratings</Table.Heading>
+            <Table.Heading>Last login</Table.Heading>
           </tr>
         </Table.Head>
         <tbody>
@@ -38,6 +40,7 @@ export default function AdminUsersPage() {
               <Table.Cell>{user.email?.email}</Table.Cell>
               <Table.Cell numeric>{user.groups.length}</Table.Cell>
               <Table.Cell numeric>{user.scores.length}</Table.Cell>
+              <Table.Cell>{user.lastLogin ? format(new Date(user.lastLogin), "yyyy-MM-dd") : "-"}</Table.Cell>
             </Table.LinkRow>
           ))}
         </tbody>
