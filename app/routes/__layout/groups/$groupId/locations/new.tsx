@@ -14,7 +14,7 @@ import { createGroupLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
 import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
 import { LocationAutocomplete } from "~/components/LocationAutocomplete"
-import type { ExternalLocation } from "~/services/google.server"
+import { LocationSuggestion } from "~/services/locationiq.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -38,11 +38,12 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 }
 
 const formSchema = zfd.formData({
-  id: zfd.numeric(z.number().optional()),
+  osmId: zfd.text(),
   name: zfd.text(),
   address: zfd.text(),
   zipCode: zfd.text(),
   city: zfd.text(),
+  countryCode: zfd.text(),
   lat: zfd.text(z.string().optional()),
   lon: zfd.text(z.string().optional()),
   "discoveredBy-key": zfd.text(),
@@ -71,13 +72,14 @@ export const action: ActionFunction = async ({ request, params }) => {
 
   const {
     redirectTo,
-    id,
+    osmId,
     name,
     address,
     lat,
     lon,
     city,
     zipCode,
+    countryCode,
     "discoveredBy-key": discoveredById,
   } = result.data
 
@@ -90,7 +92,8 @@ export const action: ActionFunction = async ({ request, params }) => {
     city,
     zipCode,
     discoveredById,
-    locationId: id,
+    osmId,
+    countryCode,
     global: false,
   })
 
@@ -115,6 +118,7 @@ export default function NewLocationPage() {
   const latRef = useRef<HTMLInputElement>(null)
   const lonRef = useRef<HTMLInputElement>(null)
   const idRef = useRef<HTMLInputElement>(null)
+  const countryRef = useRef<HTMLInputElement>(null)
   const discoveredByRef = useRef<HTMLInputElement>(null!)
   const [manualEdit, setManualEdit] = useState(false)
 
@@ -141,14 +145,15 @@ export default function NewLocationPage() {
     name: x.user.name,
   }))
 
-  const handleLocationSelect = (location: ExternalLocation) => {
+  const handleLocationSelect = (location: LocationSuggestion) => {
     nameRef.current!.value = location.name ?? ""
     addressRef.current!.value = location.address ?? ""
     zipCodeRef.current!.value = location.zipCode ?? ""
     cityRef.current!.value = location.city ?? ""
     latRef.current!.value = location.lat ?? ""
     lonRef.current!.value = location.lon ?? ""
-    idRef.current!.value = location.id?.toString() ?? ""
+    countryRef.current!.value = location.countryCode ?? ""
+    idRef.current!.value = location.osmId?.toString() ?? ""
   }
 
   const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
@@ -167,7 +172,6 @@ export default function NewLocationPage() {
   const setManualEditing = () => {
     setManualEdit(true)
     nameRef.current.focus()
-    idRef.current!.value = ""
   }
 
   return (
@@ -182,7 +186,8 @@ export default function NewLocationPage() {
           width: "100%",
         }}
       >
-        <input type="hidden" name="id" ref={idRef} />
+        <input type="hidden" name="osmId" ref={idRef} />
+        <input type="hidden" name="countryCode" ref={countryRef} />
         <Stack gap={16}>
           <div style={{ marginBottom: 16 }}>
             <LocationAutocomplete

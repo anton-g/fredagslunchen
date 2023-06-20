@@ -21,10 +21,11 @@ export const ComboBox = <T extends object>(
     hideButton?: true
   }
 ) => {
-  const { contains } = useFilter({ sensitivity: "base" })
+  // const { contains } = useFilter({ sensitivity: "base" })
   const state = useComboBoxState({
     ...props,
-    defaultFilter: contains,
+    allowsEmptyCollection: true,
+    defaultFilter: () => true,
   })
 
   const buttonRef = useRef(null)

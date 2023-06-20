@@ -98,14 +98,17 @@ model GroupLocation {
 }
 
 model Location {
-  id      Int     @id @default(autoincrement())
-  name    String
-  lon     String?
-  lat     String?
-  address String
-  city    String
-  zipCode String
-  global  Boolean @default(false)
+  id          Int     @id @default(autoincrement())
+  osmId       String? @unique
+  name        String
+  lon         String?
+  lat         String?
+  address     String
+  city        String
+  zipCode     String
+  countryCode String?
+
+  global Boolean @default(false)
 
   groupLocation GroupLocation[]
 }

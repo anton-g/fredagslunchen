@@ -46,45 +46,27 @@ export const action: ActionFunction = async ({ request, params }) => {
   const global = formData.get("global")
 
   if (typeof name !== "string" || name.length === 0) {
-    return json<ActionData>(
-      { errors: { name: "Name is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { name: "Name is required" } }, { status: 400 })
   }
 
   if (typeof address !== "string" || address.length === 0) {
-    return json<ActionData>(
-      { errors: { address: "Street address is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { address: "Street address is required" } }, { status: 400 })
   }
 
   if (typeof zipCode !== "string" || zipCode.length === 0) {
-    return json<ActionData>(
-      { errors: { zipCode: "Zip code is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { zipCode: "Zip code is required" } }, { status: 400 })
   }
 
   if (typeof city !== "string" || city.length === 0) {
-    return json<ActionData>(
-      { errors: { city: "City is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { city: "City is required" } }, { status: 400 })
   }
 
   if (typeof lat !== "string" || lat.length === 0) {
-    return json<ActionData>(
-      { errors: { lat: "Latitude is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { lat: "Latitude is required" } }, { status: 400 })
   }
 
   if (typeof lon !== "string" || lon.length === 0) {
-    return json<ActionData>(
-      { errors: { lon: "Longitude is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { lon: "Longitude is required" } }, { status: 400 })
   }
 
   const parsedId = parseInt(params.locationId)
@@ -165,14 +147,10 @@ export default function AdminLocationDetailsPage() {
                 name="name"
                 defaultValue={location.name}
                 aria-invalid={actionData?.errors?.address ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.address ? "address-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.address ? "address-error" : undefined}
               />
             </label>
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
-            )}
+            {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
           </div>
 
           <div>
@@ -183,14 +161,10 @@ export default function AdminLocationDetailsPage() {
                 name="address"
                 defaultValue={location.address}
                 aria-invalid={actionData?.errors?.address ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.address ? "address-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.address ? "address-error" : undefined}
               />
             </label>
-            {actionData?.errors?.address && (
-              <div id="address-error">{actionData.errors.address}</div>
-            )}
+            {actionData?.errors?.address && <div id="address-error">{actionData.errors.address}</div>}
           </div>
 
           <Stack axis="horizontal" gap={16}>
@@ -202,14 +176,10 @@ export default function AdminLocationDetailsPage() {
                   name="zipCode"
                   defaultValue={location.zipCode}
                   aria-invalid={actionData?.errors?.zipCode ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.zipCode ? "zip-code-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.zipCode ? "zip-code-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.zipCode && (
-                <div id="zip-code-error">{actionData.errors.zipCode}</div>
-              )}
+              {actionData?.errors?.zipCode && <div id="zip-code-error">{actionData.errors.zipCode}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
@@ -220,14 +190,10 @@ export default function AdminLocationDetailsPage() {
                   name="city"
                   defaultValue={location.city}
                   aria-invalid={actionData?.errors?.city ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.city ? "city-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.city ? "city-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.city && (
-                <div id="city-error">{actionData.errors.city}</div>
-              )}
+              {actionData?.errors?.city && <div id="city-error">{actionData.errors.city}</div>}
             </div>
           </Stack>
 
@@ -241,14 +207,10 @@ export default function AdminLocationDetailsPage() {
                   onPaste={handleCoordinatePaste}
                   defaultValue={location.lat || ""}
                   aria-invalid={actionData?.errors?.lat ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.lat ? "lat-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.lat ? "lat-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.lat && (
-                <div id="lat-error">{actionData.errors.lat}</div>
-              )}
+              {actionData?.errors?.lat && <div id="lat-error">{actionData.errors.lat}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
@@ -260,29 +222,19 @@ export default function AdminLocationDetailsPage() {
                   onPaste={handleCoordinatePaste}
                   defaultValue={location.lon || ""}
                   aria-invalid={actionData?.errors?.lon ? true : undefined}
-                  aria-errormessage={
-                    actionData?.errors?.lon ? "lon-error" : undefined
-                  }
+                  aria-errormessage={actionData?.errors?.lon ? "lon-error" : undefined}
                 />
               </label>
-              {actionData?.errors?.lon && (
-                <div id="lon-error">{actionData.errors.lon}</div>
-              )}
+              {actionData?.errors?.lon && <div id="lon-error">{actionData.errors.lon}</div>}
             </div>
           </Stack>
 
           <div>
             <Stack gap={8} axis="horizontal">
-              <Checkbox
-                id="global"
-                name="global"
-                defaultChecked={location.global}
-              />
+              <Checkbox id="global" name="global" defaultChecked={location.global} />
               <label htmlFor="global">Global</label>
             </Stack>
-            {actionData?.errors?.address && (
-              <div id="address-error">{actionData.errors.address}</div>
-            )}
+            {actionData?.errors?.address && <div id="address-error">{actionData.errors.address}</div>}
           </div>
 
           <div>

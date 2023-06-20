@@ -23,10 +23,7 @@ interface ListItemProps {
 
 const ListItem = styled.li<ListItemProps>`
   background: ${(props) => (props.isFocused ? props.theme.colors.primary : "")};
-  color: ${(props) =>
-    props.isFocused
-      ? props.theme.colors.secondary
-      : props.theme.colors.primary};
+  color: ${(props) => (props.isFocused ? props.theme.colors.secondary : props.theme.colors.primary)};
   font-size: 16px;
   font-weight: ${(props) => (props.isSelected ? "bold" : "normal")};
   padding: 8px;
@@ -47,14 +44,20 @@ export function ListBox(props: ListBoxProps) {
   let { listBoxRef = ref, state } = props
   let { listBoxProps } = useListBox(props, state, listBoxRef)
 
+  const collection = [...state.collection]
   return (
     <List {...listBoxProps} ref={listBoxRef}>
-      {[...state.collection].map((item) => (
+      {collection.length === 0 && <EmptyState>Type something to search</EmptyState>}
+      {collection.map((item) => (
         <Option key={item.key} item={item} state={state} />
       ))}
     </List>
   )
 }
+
+const EmptyState = styled.div`
+  padding: 8px;
+`
 
 const List = styled.ul`
   max-height: 300px;
@@ -77,30 +80,22 @@ const OptionContext = React.createContext<OptionContextValue>({
 
 function Option({ item, state }: OptionProps) {
   let ref = React.useRef<HTMLLIElement>(null)
-  let { optionProps, labelProps, descriptionProps, isSelected, isFocused } =
-    useOption(
-      {
-        key: item.key,
-      },
-      state,
-      ref
-    )
+  let { optionProps, labelProps, descriptionProps, isSelected, isFocused } = useOption(
+    {
+      key: item.key,
+    },
+    state,
+    ref
+  )
 
   return (
-    <ListItem
-      {...optionProps}
-      ref={ref}
-      isFocused={isFocused}
-      isSelected={isSelected}
-    >
+    <ListItem {...optionProps} ref={ref} isFocused={isFocused} isSelected={isSelected}>
       <ItemContent>
         <OptionContext.Provider value={{ labelProps, descriptionProps }}>
           {item.rendered}
         </OptionContext.Provider>
       </ItemContent>
-      {isSelected && (
-        <CheckIcon aria-hidden="true" style={{ width: 18, height: 18 }} />
-      )}
+      {isSelected && <CheckIcon aria-hidden="true" style={{ width: 18, height: 18 }} />}
     </ListItem>
   )
 }

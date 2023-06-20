@@ -34,14 +34,9 @@ export function safeRedirect(
  * @param {string} id The route id
  * @returns {JSON|undefined} The router data or undefined if not found
  */
-export function useMatchesData(
-  id: string
-): Record<string, unknown> | undefined {
+export function useMatchesData(id: string): Record<string, unknown> | undefined {
   const matchingRoutes = useMatches()
-  const route = useMemo(
-    () => matchingRoutes.find((route) => route.id === id),
-    [matchingRoutes, id]
-  )
+  const route = useMemo(() => matchingRoutes.find((route) => route.id === id), [matchingRoutes, id])
   return route?.data
 }
 
@@ -131,24 +126,18 @@ export const formatNumber = (num: number, max?: number) => {
 // TODO improve type
 export const getAverageNumber = <T, K extends keyof T>(array: T[], key: K) => {
   return array.length > 0
-    ? array.reduce((acc, cur) => acc + (cur[key] as unknown as number), 0) /
-        array.length
+    ? array.reduce((acc, cur) => acc + (cur[key] as unknown as number), 0) / array.length
     : -1
 }
 
 type ShortenOptions = { length?: number; ellipsis?: boolean }
-export const shorten = (
-  input?: string | null,
-  options: ShortenOptions = {}
-) => {
+export const shorten = (input?: string | null, options: ShortenOptions = {}) => {
   if (!input) return ""
 
   const { ellipsis, length } = { length: 18, ellipsis: true, ...options }
 
   const suffix = ellipsis ? "..." : ""
-  return input.length > length
-    ? input.substring(0, length).trim() + suffix
-    : input
+  return input.length > length ? input.substring(0, length).trim() + suffix : input
 }
 
 export function removeTrailingSlash(s: string) {
@@ -156,8 +145,7 @@ export function removeTrailingSlash(s: string) {
 }
 
 export function getDomainUrl(request: Request) {
-  const host =
-    request.headers.get("X-Forwarded-Host") ?? request.headers.get("host")
+  const host = request.headers.get("X-Forwarded-Host") ?? request.headers.get("host")
   if (!host) {
     throw new Error("Could not determine domain URL.")
   }
@@ -184,20 +172,19 @@ export const getRandomAvatarId = (input: string) => {
 }
 
 // if this doesn't someday break..
-export function mapToActualErrors<T extends z.ZodType<any, any, any>>(
-  result: z.SafeParseError<z.infer<T>>
-) {
+export function mapToActualErrors<T extends z.ZodType<any, any, any>>(result: z.SafeParseError<z.infer<T>>) {
   const errors = result.error.flatten()
 
   type FlattenedErrors = z.inferFlattenedErrors<T>
   type Keys = keyof FlattenedErrors["fieldErrors"]
 
-  const actualErrors = Object.entries(errors.fieldErrors).reduce<
-    Partial<Record<Keys, string>>
-  >((acc, [key, value]) => {
-    acc[key as Keys] = (value as string[])[0]
+  const actualErrors = Object.entries(errors.fieldErrors).reduce<Partial<Record<Keys, string>>>(
+    (acc, [key, value]) => {
+      acc[key as Keys] = (value as string[])[0]
 
-    return acc
-  }, {})
+      return acc
+    },
+    {}
+  )
   return actualErrors
 }
