@@ -30,13 +30,10 @@ const buttonPaddings: Record<ButtonSize, string> = {
 }
 
 const styles = css<{ variant?: ButtonVariant; size?: ButtonSize }>`
-  color: ${({ theme, variant }) =>
-    theme.colors[buttonColors[variant || "normal"]]};
-  background-color: ${({ theme, variant }) =>
-    theme.colors[buttonBackgroundColors[variant || "normal"]]};
+  color: ${({ theme, variant }) => theme.colors[buttonColors[variant || "normal"]]};
+  background-color: ${({ theme, variant }) => theme.colors[buttonBackgroundColors[variant || "normal"]]};
   border: ${({ variant }) => (variant === "inverted" ? "1px" : "2px")} solid
-    ${({ theme, variant }) =>
-      variant === "inverted" ? theme.colors.secondary : theme.colors.primary};
+    ${({ theme, variant }) => (variant === "inverted" ? theme.colors.secondary : theme.colors.primary)};
   border-radius: ${({ variant }) => (variant === "round" ? "50%" : "4px")};
   position: relative;
   transform: translate(0.15rem, -0.15em);
@@ -49,6 +46,8 @@ const styles = css<{ variant?: ButtonVariant; size?: ButtonSize }>`
   transition: transform 75ms ease-in-out;
   padding: ${({ size }) => buttonPaddings[size || "normal"]};
   height: fit-content;
+  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
 
   ${({ variant }) =>
     variant === "round" &&
@@ -160,11 +159,4 @@ const UnstyledButton = styled.button`
   cursor: pointer;
 `
 
-export {
-  Button,
-  LinkButton,
-  NavLink,
-  TextButton,
-  UnstyledButton,
-  ExternalLinkButton,
-}
+export { Button, LinkButton, NavLink, TextButton, UnstyledButton, ExternalLinkButton }
