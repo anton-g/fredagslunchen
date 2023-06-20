@@ -11,6 +11,7 @@ import { ChevronDownIcon } from "@radix-ui/react-icons"
 import { Wrapper, Label } from "./shared"
 import { Input } from "../Input"
 import { useRef } from "react"
+import { useFilter } from "@react-aria/i18n"
 
 export { Item, Section } from "@react-stately/collections"
 
@@ -18,12 +19,14 @@ export const ComboBox = <T extends object>(
   props: ComboBoxProps<T> & {
     inputRef?: React.MutableRefObject<HTMLInputElement>
     hideButton?: true
+    disableFilter?: true
   }
 ) => {
+  const { contains } = useFilter({ sensitivity: "base" })
   const state = useComboBoxState({
     ...props,
     allowsEmptyCollection: true,
-    defaultFilter: () => true,
+    defaultFilter: props.disableFilter ? () => true : contains,
   })
 
   const buttonRef = useRef(null)
