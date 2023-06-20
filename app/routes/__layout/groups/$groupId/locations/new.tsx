@@ -14,7 +14,7 @@ import { createGroupLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
 import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
 import { LocationAutocomplete } from "~/components/LocationAutocomplete"
-import { LocationSuggestion } from "~/services/locationiq.server"
+import type { LocationSuggestion } from "~/services/locationiq.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
