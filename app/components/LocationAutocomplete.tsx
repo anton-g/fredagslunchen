@@ -1,5 +1,6 @@
 import { useAsyncList } from "@react-stately/data"
 import { useEffect, useState } from "react"
+import styled from "styled-components"
 import { useDebounce } from "~/hooks/useDebounce"
 import type { LocationSuggestion } from "~/services/locationiq.server"
 import { ComboBox, Item, Label } from "./ComboBox"
@@ -67,10 +68,16 @@ export const LocationAutocomplete = ({
         <Item textValue={item.name} key={item.externalId}>
           <div>
             <Label>{item.name}</Label>
-            <span>{item.city}</span>
+            <Subtitle>
+              {item.address}, {item.city}
+            </Subtitle>
           </div>
         </Item>
       )}
     </ComboBox>
   )
 }
+
+const Subtitle = styled.span`
+  opacity: 0.5;
+`
