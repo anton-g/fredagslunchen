@@ -32,7 +32,7 @@ export const getUserPermissions = async ({
   return {
     view: isUser || isAdmin || sharesGroup,
     settings: isUser || isAdmin,
-    claim: isUser && sharesGroup,
+    claim: user.role === "ANONYMOUS" && sharesGroup,
   }
 }
 
