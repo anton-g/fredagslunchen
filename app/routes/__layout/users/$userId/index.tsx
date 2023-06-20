@@ -5,11 +5,7 @@ import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
-import {
-  createEmailVerificationToken,
-  getFullUserById,
-  getUserPermissions,
-} from "~/models/user.server"
+import { createEmailVerificationToken, getFullUserById, getUserPermissions } from "~/models/user.server"
 import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
 import { UserAvatar } from "~/components/Avatar"
@@ -33,8 +29,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
   const permissions = await getUserPermissions({ user, currentUserId: userId })
 
-  const noPublicData =
-    !user.groups.some((x) => x.group.public) && !permissions.view
+  const noPublicData = !user.groups.some((x) => x.group.public) && !permissions.view
 
   return json({
     user,
@@ -60,13 +55,11 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function Index() {
-  const { user, isYou, permissions, noPublicData } =
-    useLoaderData<typeof loader>()
+  const { user, isYou, permissions, noPublicData } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
-    (a, b) =>
-      new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
+    (a, b) => new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
   )
 
   return (
@@ -78,14 +71,12 @@ export default function Index() {
         </TitleRow>
         <Spacer size={24} />
         <Stack gap={16} axis="horizontal">
-          {permissions.settings && (
-            <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>
-          )}
+          {permissions.settings && <LinkButton to={`/users/${user.id}/settings`}>Settings</LinkButton>}
           {isYou && !user.email?.verified && (
             <Form method="post">
               <Stack gap={8} axis="horizontal">
                 <Button disabled={actionData?.ok}>Verify your email</Button>
-                {actionData?.ok && <span>Check your email (and spam)</span>}
+                {actionData?.ok && <span>Check your email (and spam folder)</span>}
               </Stack>
             </Form>
           )}
@@ -96,15 +87,10 @@ export default function Index() {
         ) : (
           <StatsGrid>
             <Stat label="Number of lunches" value={user.stats.lunchCount} />
-            <Stat
-              label="Average rating"
-              value={formatNumber(user.stats.averageScore)}
-            />
+            <Stat label="Average rating" value={formatNumber(user.stats.averageScore)} />
             <Stat
               label="Most popular choice"
-              value={
-                user.stats.bestChoosenLunch?.groupLocation.location.name || "-"
-              }
+              value={user.stats.bestChoosenLunch?.groupLocation.location.name || "-"}
             />
             <Stat label="Lowest rating" value={user.stats.lowestScore} />
             <Stat label="Highest rating" value={user.stats.highestScore} />
@@ -133,25 +119,15 @@ export default function Index() {
                   key={score.id}
                 >
                   <Table.Cell>
-                    <Link
-                      to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
-                    >
+                    <Link to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}>
                       {formatTimeAgo(new Date(score.lunch.date))}
                     </Link>
                   </Table.Cell>
-                  <Table.Cell>
-                    {score.lunch.groupLocation.location.name}
-                  </Table.Cell>
+                  <Table.Cell>{score.lunch.groupLocation.location.name}</Table.Cell>
                   <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell>
-                    {score.lunch.groupLocation.group.name}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}
-                  </Table.Cell>
-                  <Table.Cell>
-                    {shorten(score.comment, { length: 30 })}
-                  </Table.Cell>
+                  <Table.Cell>{score.lunch.groupLocation.group.name}</Table.Cell>
+                  <Table.Cell>{score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}</Table.Cell>
+                  <Table.Cell>{shorten(score.comment, { length: 30 })}</Table.Cell>
                 </Table.LinkRow>
               ))}
             </tbody>
@@ -164,8 +140,7 @@ export default function Index() {
           <Footer>
             <p>This is a user without an account.</p>
             <p>
-              If this is you, you can{" "}
-              <Link to={`/users/${user.id}/claim`}>claim its data</Link>.
+              If this is you, you can <Link to={`/users/${user.id}/claim`}>claim its data</Link>.
             </p>
           </Footer>
         </>

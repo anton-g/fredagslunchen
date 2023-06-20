@@ -6,18 +6,11 @@ import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
 import type { Theme } from "~/styles/theme"
-import {
-  cleanEmail,
-  getAverageNumber,
-  getRandomAvatarId,
-  hashStr,
-} from "~/utils"
+import { cleanEmail, getAverageNumber, getRandomAvatarId, hashStr } from "~/utils"
 
 export type { User, Email } from "@prisma/client"
 
-export type FullUser = NonNullable<
-  Prisma.PromiseReturnType<typeof fetchUserDetails>
->
+export type FullUser = NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>
 
 export type UserPermissions = {
   view: boolean
@@ -34,9 +27,7 @@ export const getUserPermissions = async ({
   const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
   const isUser = currentUserId === user.id
 
-  const sharesGroup = user.groups.some((x) =>
-    x.group.members.some((m) => m.userId === currentUserId)
-  )
+  const sharesGroup = user.groups.some((x) => x.group.members.some((m) => m.userId === currentUserId))
 
   return {
     view: isUser || isAdmin || sharesGroup,
@@ -150,13 +141,7 @@ export async function getUserForAdmin({ id }: { id: User["id"] }) {
   })
 }
 
-export async function getFullUserById({
-  id,
-  requestUserId,
-}: {
-  id: User["id"]
-  requestUserId?: User["id"]
-}) {
+export async function getFullUserById({ id, requestUserId }: { id: User["id"]; requestUserId?: User["id"] }) {
   const user = await fetchUserDetails({ id })
 
   if (!user) return null
@@ -167,8 +152,7 @@ export async function getFullUserById({
       if (score.lunch.groupLocation.group.public) return true
 
       return score.lunch.groupLocation.group.members.some(
-        (x) =>
-          x.userId === requestUserId || score.lunch.groupLocation.group.public
+        (x) => x.userId === requestUserId || score.lunch.groupLocation.group.public
       )
     }),
   }
@@ -351,9 +335,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
 
   // Anonymous users should only ever have one group
   if (fromUser.groups.length !== 1) {
-    throw Error(
-      "Something went wrong. Tried to merge user with more than 1 group."
-    )
+    throw Error("Something went wrong. Tried to merge user with more than 1 group.")
   }
 
   const toUser = await prisma.user.findUnique({
@@ -374,9 +356,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
   }
 
   // Make sure users share group
-  const sharesGroup = fromUser.groups.some((group) =>
-    toUser.groups.find((g) => g.groupId === group.groupId)
-  )
+  const sharesGroup = fromUser.groups.some((group) => toUser.groups.find((g) => g.groupId === group.groupId))
 
   if (!sharesGroup) {
     throw Error("Can't merge users that don't share a group")
@@ -437,10 +417,7 @@ export async function mergeUsers(fromUserId: User["id"], toUserId: User["id"]) {
   })
 }
 
-export async function verifyLogin(
-  email: Email["email"],
-  password: Password["hash"]
-) {
+export async function verifyLogin(email: Email["email"], password: Password["hash"]) {
   const userWithPassword = await prisma.user.findFirst({
     where: { email: { email } },
     include: {
@@ -459,6 +436,15 @@ export async function verifyLogin(
   }
 
   const { password: _password, ...userWithoutPassword } = userWithPassword
+
+  await prisma.user.update({
+    where: {
+      id: userWithoutPassword.id,
+    },
+    data: {
+      lastLogin: new Date(),
+    },
+  })
 
   return userWithoutPassword
 }
@@ -531,10 +517,7 @@ export async function changeUserPassword({
     },
   })
 
-  const isValid = await bcrypt.compare(
-    oldPassword,
-    userWithPassword.password?.hash || ""
-  )
+  const isValid = await bcrypt.compare(oldPassword, userWithPassword.password?.hash || "")
 
   if (!isValid) {
     return {
@@ -576,10 +559,7 @@ export async function changeUserPasswordWithToken({
     },
   })
 
-  if (
-    !userWithPasswordResetToken ||
-    !userWithPasswordResetToken.passwordResetToken
-  ) {
+  if (!userWithPasswordResetToken || !userWithPasswordResetToken.passwordResetToken) {
     return null
   }
 
@@ -635,11 +615,7 @@ export async function createEmailVerificationToken({ id }: { id: User["id"] }) {
   return { token, email: user.email.email }
 }
 
-export async function verifyUserEmail({
-  token,
-}: {
-  token: NonNullable<Email["verificationToken"]>
-}) {
+export async function verifyUserEmail({ token }: { token: NonNullable<Email["verificationToken"]> }) {
   const email = await prisma.email.update({
     where: {
       verificationToken: token,
@@ -701,26 +677,17 @@ export async function setAllUserAvatars() {
 }
 
 // TODO stats generation duplicated in group.server.ts
-function generateUserStats(
-  user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>
-) {
+function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fetchUserDetails>>) {
   const lunchCount = user.scores.length
   const averageScore = getAverageNumber(user.scores, "score")
   const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score)
   const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
-  const highestScore =
-    sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name ||
-    "-"
+  const highestScore = sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name || "-"
 
-  const bestChoosenLunch = user.choosenLunches.reduce<
-    typeof user.choosenLunches[0] | null
-  >((acc, cur) => {
+  const bestChoosenLunch = user.choosenLunches.reduce<typeof user.choosenLunches[0] | null>((acc, cur) => {
     if (!acc) return cur
 
-    if (
-      getAverageNumber(cur.scores, "score") >
-      getAverageNumber(acc.scores, "score")
-    ) {
+    if (getAverageNumber(cur.scores, "score") > getAverageNumber(acc.scores, "score")) {
       return cur
     }
 

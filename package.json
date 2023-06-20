@@ -30,7 +30,6 @@
   ],
   "dependencies": {
     "@faker-js/faker": "^6.3.1",
-    "@googlemaps/google-maps-services-js": "^3.3.27",
     "@nivo/core": "^0.80.0",
     "@nivo/line": "^0.80.0",
     "@prisma/client": "^4.11.0",
@@ -60,6 +59,7 @@
     "@remix-run/serve": "^1.14.0",
     "@remix-run/server-runtime": "^1.14.0",
     "@sendgrid/mail": "^7.7.0",
+    "@turf/turf": "^6.5.0",
     "@types/mapbox-gl": "^2.7.3",
     "bcryptjs": "^2.4.3",
     "date-fns": "^2.29.1",

@@ -4,7 +4,6 @@ import type { ComboBoxProps } from "@react-types/combobox"
 
 import { ListBox } from "./ListBox"
 import { Popover } from "./Popover"
-import { useFilter } from "@react-aria/i18n"
 import { useComboBoxState } from "@react-stately/combobox"
 import { useComboBox } from "@react-aria/combobox"
 import { useButton } from "@react-aria/button"
@@ -21,10 +20,10 @@ export const ComboBox = <T extends object>(
     hideButton?: true
   }
 ) => {
-  const { contains } = useFilter({ sensitivity: "base" })
   const state = useComboBoxState({
     ...props,
-    defaultFilter: contains,
+    allowsEmptyCollection: true,
+    defaultFilter: () => true,
   })
 
   const buttonRef = useRef(null)
@@ -68,11 +67,9 @@ export const ComboBox = <T extends object>(
           fullBorder={props.hideButton}
         />
         {props.name && <input type="hidden" name={props.name + "-key"} value={state.selectedItem?.key} />}
-        {!props.hideButton && (
-          <Button {...buttonProps} ref={buttonRef}>
-            <ChevronDownIcon style={{ width: 18, height: 18 }} aria-hidden="true" />
-          </Button>
-        )}
+        <Button {...buttonProps} ref={buttonRef} style={{ display: props.hideButton ? "none" : undefined }}>
+          <ChevronDownIcon style={{ width: 18, height: 18 }} aria-hidden="true" />
+        </Button>
       </InputGroup>
       {state.isOpen && (
         <Popover popoverRef={popoverRef} isOpen={state.isOpen} onClose={state.close}>

@@ -7,6 +7,7 @@ function getEnv() {
     MAPBOX_ACCESS_TOKEN: process.env.MAPBOX_ACCESS_TOKEN,
     SENDGRID_API_KEY: process.env.SENDGRID_API_KEY,
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
+    LOCATIONIQ_API_KEY: process.env.LOCATIONIQ_API_KEY,
   }
 }
 

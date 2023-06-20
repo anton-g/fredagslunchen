@@ -1,8 +1,4 @@
-import {
-  GlobeIcon,
-  MagnifyingGlassIcon,
-  MixerHorizontalIcon,
-} from "@radix-ui/react-icons"
+import { GlobeIcon, MagnifyingGlassIcon, MixerHorizontalIcon } from "@radix-ui/react-icons"
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
@@ -34,6 +30,7 @@ export default function AdminLocationsPage() {
             <Table.Heading>Address</Table.Heading>
             <Table.Heading>Zip</Table.Heading>
             <Table.Heading>City</Table.Heading>
+            <Table.Heading>Country</Table.Heading>
             <Table.Heading>Clubs</Table.Heading>
             <Table.Heading>Lunches</Table.Heading>
             <Table.Heading></Table.Heading>
@@ -48,12 +45,10 @@ export default function AdminLocationsPage() {
               <Table.Cell>{location.address}</Table.Cell>
               <Table.Cell>{location.zipCode}</Table.Cell>
               <Table.Cell>{location.city}</Table.Cell>
+              <Table.Cell>{location.countryCode}</Table.Cell>
               <Table.Cell numeric>{location.groupLocation.length}</Table.Cell>
               <Table.Cell numeric>
-                {location.groupLocation.reduce(
-                  (tot, cur) => tot + cur.lunches.length,
-                  0
-                )}
+                {location.groupLocation.reduce((tot, cur) => tot + cur.lunches.length, 0)}
               </Table.Cell>
               <Table.Cell>
                 <LinkButton to={`/admin/locations/${location.id}`}>

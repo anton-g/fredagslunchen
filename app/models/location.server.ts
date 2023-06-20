@@ -70,7 +70,7 @@ export function getGroupLocation({
 type CreateGroupLocationInput = Omit<Location, "id"> & {
   groupId: Group["id"]
   discoveredById: NonNullable<GroupLocation["discoveredById"]>
-  locationId?: Location["id"]
+  osmId?: Location["osmId"]
 }
 
 export async function createGroupLocation({
@@ -82,13 +82,20 @@ export async function createGroupLocation({
   city,
   zipCode,
   discoveredById,
-  locationId,
+  countryCode,
+  osmId,
 }: CreateGroupLocationInput) {
+  const existingLocation = await prisma.location.findUnique({
+    where: {
+      osmId: osmId || "NOT_FOUND",
+    },
+  })
+
   return prisma.groupLocation.upsert({
     where: {
       locationId_groupId: {
         groupId,
-        locationId: locationId || -1,
+        locationId: existingLocation?.id || -1,
       },
     },
     create: {
@@ -105,7 +112,7 @@ export async function createGroupLocation({
       location: {
         connectOrCreate: {
           where: {
-            id: locationId || -1,
+            osmId: osmId || "NOT_FOUND",
           },
           create: {
             address,
@@ -114,6 +121,8 @@ export async function createGroupLocation({
             name,
             city,
             zipCode,
+            osmId,
+            countryCode,
           },
         },
       },
@@ -197,7 +206,7 @@ export async function getAllLocationsStats() {
   return locationsWithStats
 }
 
-export async function updateLocation(update: Location) {
+export async function updateLocation(update: Partial<Location>) {
   return prisma.location.update({
     where: {
       id: update.id,

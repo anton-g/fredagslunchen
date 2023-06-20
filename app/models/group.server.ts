@@ -449,6 +449,7 @@ export async function deleteGroupMember({
     return { error: "Something went wrong" }
   }
 
+  // TODO transaction
   const groupMember = await prisma.groupMember.delete({
     where: {
       userId_groupId: {

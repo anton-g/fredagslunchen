@@ -1,5 +1,8 @@
 import { useAsyncList } from "@react-stately/data"
-import type { ExternalLocation, LocationSuggestion } from "~/services/google.server"
+import { useEffect, useState } from "react"
+import styled from "styled-components"
+import { useDebounce } from "~/hooks/useDebounce"
+import type { LocationSuggestion } from "~/services/locationiq.server"
 import { ComboBox, Item, Label } from "./ComboBox"
 
 export const LocationAutocomplete = ({
@@ -8,14 +11,17 @@ export const LocationAutocomplete = ({
   origin,
 }: {
   label: string
-  onSelect: (location: ExternalLocation) => void
+  onSelect: (location: LocationSuggestion) => void
   origin?: {
     lat: number
     lng: number
   }
 }) => {
-  const list = useAsyncList<LocationSuggestion>({
-    async load({ signal, filterText }) {
+  const [inputValue, setInputValue] = useState("")
+  const debouncedInputValue = useDebounce(inputValue, 350)
+
+  const { items, setFilterText } = useAsyncList<LocationSuggestion>({
+    load: async ({ signal, filterText }) => {
       const searchParams = new URLSearchParams({
         query: filterText || "",
       })
@@ -33,21 +39,27 @@ export const LocationAutocomplete = ({
     },
   })
 
+  useEffect(() => {
+    setFilterText(debouncedInputValue)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedInputValue])
+
   const handleSelect = async (key: React.Key) => {
     if (!key) return
 
-    const res = await fetch(`/api/location-details?id=${key}`)
-    const json = (await res.json()) as ExternalLocation
+    const location = items.find((x) => x.externalId === key)
 
-    onSelect(json)
+    if (!location) return
+
+    onSelect(location)
   }
 
   return (
     <ComboBox
       label={label}
-      items={list.items}
-      inputValue={list.filterText}
-      onInputChange={list.setFilterText}
+      items={items}
+      inputValue={inputValue}
+      onInputChange={setInputValue}
       onSelectionChange={handleSelect}
       allowsCustomValue={false}
       hideButton
@@ -56,9 +68,16 @@ export const LocationAutocomplete = ({
         <Item textValue={item.name} key={item.externalId}>
           <div>
             <Label>{item.name}</Label>
+            <Subtitle>
+              {item.address}, {item.city}
+            </Subtitle>
           </div>
         </Item>
       )}
     </ComboBox>
   )
 }
+
+const Subtitle = styled.span`
+  opacity: 0.5;
+`
