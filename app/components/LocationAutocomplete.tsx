@@ -63,6 +63,7 @@ export const LocationAutocomplete = ({
       onSelectionChange={handleSelect}
       allowsCustomValue={false}
       hideButton
+      disableFilter
     >
       {(item) => (
         <Item textValue={item.name} key={item.externalId}>
