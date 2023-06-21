@@ -61,7 +61,7 @@ export const LocationAutocomplete = ({
       inputValue={inputValue}
       onInputChange={setInputValue}
       onSelectionChange={handleSelect}
-      allowsCustomValue={false}
+      emptyState={<EmptyState>Type something to search</EmptyState>}
       hideButton
       disableFilter
     >
@@ -81,4 +81,8 @@ export const LocationAutocomplete = ({
 
 const Subtitle = styled.span`
   opacity: 0.5;
+`
+
+const EmptyState = styled.div`
+  padding: 8px;
 `

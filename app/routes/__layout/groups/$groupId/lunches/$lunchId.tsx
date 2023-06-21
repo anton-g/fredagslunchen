@@ -6,7 +6,7 @@ import type { Group } from "~/models/group.server"
 import type { ReactNode } from "react"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { getGroupPermissions } from "~/models/group.server"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef } from "react"
 import styled from "styled-components"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useCatch, useFetcher, useLoaderData } from "@remix-run/react"
@@ -277,7 +277,7 @@ const ScoreDeleteAction = ({ description, scoreId }: { description: ReactNode; s
         <Dialog.Close />
         <Dialog.Title>Are you sure you want to delete this rating?</Dialog.Title>
         <Dialog.Description>{description}</Dialog.Description>
-        <fetcher.Form method="post" action="/scores/delete">
+        <fetcher.Form method="post" action="/api/scores/delete">
           <Button size="large">I am sure</Button>
           <input type="hidden" name="scoreId" value={scoreId} />
         </fetcher.Form>
@@ -290,7 +290,7 @@ const ScoreRequestDeleteAction = ({ requestId }: { requestId: ScoreRequest["id"]
   const fetcher = useFetcher()
 
   return (
-    <fetcher.Form method="post" action="/scores/request/delete">
+    <fetcher.Form method="post" action="/api/scores/request/delete">
       <input type="hidden" name="requestId" value={requestId} />
       <DeleteButton aria-label="Delete request for rating">
         <Cross2Icon></Cross2Icon>
@@ -331,8 +331,6 @@ type NewScoreFormProps = {
 }
 const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) => {
   const scoreFetcher = useFetcher()
-  const [selectedFrom, setSelectedFrom] = useState<string | null>(null)
-  const [fromInputValue, setFromInputValue] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const userRef = useRef<HTMLInputElement>(null!)
   const scoreRef = useRef<HTMLInputElement>(null)
@@ -350,14 +348,10 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
     }
   }, [scoreFetcher])
 
-  const isFromNewAnonymousUser = Boolean(
-    fromInputValue && !users.some((x) => x.name === fromInputValue) && !selectedFrom
-  )
-
   return (
     <scoreFetcher.Form
       method="post"
-      action="/scores/new"
+      action="/api/scores/new"
       ref={formRef}
       style={{
         width: "100%",
@@ -367,7 +361,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
         alignItems: "flex-end",
       }}
     >
-      {isFromNewAnonymousUser && <input type="hidden" name="anonymous" value="true" />}
+      <input type="hidden" name="groupId" value={groupId} />
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
@@ -378,9 +372,6 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
               defaultItems={users}
               menuTrigger="focus"
               inputRef={userRef}
-              onSelectionChange={(key) => setSelectedFrom(key?.toString())}
-              onBlur={(e: any) => setFromInputValue(e.target.value)}
-              allowsCustomValue
               defaultSelectedKey={userId}
             >
               {(item) => (
@@ -417,24 +408,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
           </CommentLabel>
         </div>
       </Stack>
-      <Stack axis="horizontal" gap={16} style={{ width: "100%", justifyContent: "flex-end" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          {isFromNewAnonymousUser && (
-            <>
-              You're creating a new anonymous user.
-              <Help>
-                <p>
-                  Anonymous users are users without an account. Use these for people that haven't yet created
-                  their account or the occational guest that you don't really want in your club.
-                </p>
-                <p>You can transfer the anonymous users data to their account later.</p>
-              </Help>
-            </>
-          )}
-        </div>
-        <Button>Save rating</Button>
-      </Stack>
-      <input type="hidden" name="groupId" value={groupId} />
+      <Button>Save rating</Button>
     </scoreFetcher.Form>
   )
 }
@@ -474,7 +448,7 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
   return (
     <requestFetcher.Form
       method="post"
-      action="/scores/request"
+      action="/api/scores/request"
       ref={formRef}
       style={{
         width: "100%",
@@ -489,14 +463,7 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
           <Stack gap={4}>
-            <ComboBox
-              label="From"
-              name="user"
-              defaultItems={users}
-              menuTrigger="focus"
-              inputRef={userRef}
-              allowsCustomValue
-            >
+            <ComboBox label="From" name="user" defaultItems={users} menuTrigger="focus" inputRef={userRef}>
               {(item) => (
                 <Item textValue={item.name}>
                   <div>

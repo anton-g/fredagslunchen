@@ -25,6 +25,7 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
 import { useFeatureFlags } from "~/FeatureFlagContext"
 import { Popover } from "~/components/Popover"
+import { CreateAnonymousUserButton } from "~/components/CreateAnonymousUserButton"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -106,11 +107,12 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
-        {permissions.invite && (
-          <ActionBar>
+        <ActionBar>
+          {permissions.invite && (
             <LinkButton to={`/groups/${details.group.id}/invite`}>Invite members</LinkButton>
-          </ActionBar>
-        )}
+          )}
+          <CreateAnonymousUserButton groupId={details.group.id} />
+        </ActionBar>
       </SectionHeader>
       <Spacer size={8} />
       <Table>

@@ -20,12 +20,13 @@ export const ComboBox = <T extends object>(
     inputRef?: React.MutableRefObject<HTMLInputElement>
     hideButton?: true
     disableFilter?: true
+    emptyState?: React.ReactNode
   }
 ) => {
   const { contains } = useFilter({ sensitivity: "base" })
   const state = useComboBoxState({
     ...props,
-    allowsEmptyCollection: true,
+    allowsEmptyCollection: Boolean(props.emptyState),
     defaultFilter: props.disableFilter ? () => true : contains,
   })
 
@@ -76,7 +77,7 @@ export const ComboBox = <T extends object>(
       </InputGroup>
       {state.isOpen && (
         <Popover popoverRef={popoverRef} isOpen={state.isOpen} onClose={state.close}>
-          <ListBox {...listBoxProps} listBoxRef={listBoxRef} state={state} />
+          <ListBox {...listBoxProps} listBoxRef={listBoxRef} state={state} emptyState={props.emptyState} />
         </Popover>
       )}
     </Wrapper>

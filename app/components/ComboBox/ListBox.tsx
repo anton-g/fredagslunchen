@@ -9,6 +9,7 @@ import type { ListState } from "@react-stately/list"
 interface ListBoxProps extends AriaListBoxOptions<unknown> {
   listBoxRef?: React.RefObject<HTMLUListElement>
   state: ListState<unknown>
+  emptyState?: React.ReactNode
 }
 
 interface OptionProps {
@@ -47,17 +48,13 @@ export function ListBox(props: ListBoxProps) {
   const collection = [...state.collection]
   return (
     <List {...listBoxProps} ref={listBoxRef}>
-      {collection.length === 0 && <EmptyState>Type something to search</EmptyState>}
+      {collection.length === 0 && Boolean(props.emptyState) && props.emptyState}
       {collection.map((item) => (
         <Option key={item.key} item={item} state={state} />
       ))}
     </List>
   )
 }
-
-const EmptyState = styled.div`
-  padding: 8px;
-`
 
 const List = styled.ul`
   max-height: 300px;

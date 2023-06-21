@@ -1,9 +1,6 @@
 # Next
 - Add public setting
   - User
-- Fix bug when adding a location by selecting global location and then changing details.
-  - Should create new location instead of save predefined data.
-- OG images for public groups
 - Use zod (+ zod-form-data?) for validating inputs
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
@@ -57,4 +54,3 @@
   - Claiming anonymous user
 - Show map image before loading interactive map
 - Fix issues when JS is disabled
-- Remove anonymous users or make them more discoverable
