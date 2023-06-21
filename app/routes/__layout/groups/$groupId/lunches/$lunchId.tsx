@@ -3,19 +3,13 @@ import type { Lunch } from "~/models/lunch.server"
 import type { Score, ScoreRequest } from "~/models/score.server"
 import type { User } from "~/models/user.server"
 import type { Group } from "~/models/group.server"
-import type { MouseEventHandler, ReactNode } from "react"
+import type { ReactNode } from "react"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { getGroupPermissions } from "~/models/group.server"
 import { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  Link,
-  useCatch,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react"
+import { Form, Link, useCatch, useFetcher, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
 import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons"
@@ -99,32 +93,21 @@ export default function LunchDetailsPage() {
 
   const scores = groupLunch.scores
 
-  const sortedScores = groupLunch.scores
-    .slice()
-    .sort((a, b) => a.score - b.score)
+  const sortedScores = groupLunch.scores.slice().sort((a, b) => a.score - b.score)
   const lowestScore = sortedScores[0]?.score
   const highestScore = sortedScores[sortedScores.length - 1]?.score
 
-  const averageScore =
-    scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-"
+  const averageScore = scores.length > 0 ? formatNumber(getAverageNumber(scores, "score")) : "-"
 
   const usersWithoutScoresOrRequests = groupLunch.groupLocation.group.members
     .filter((x) => !groupLunch.scores.find((s) => s.userId === x.userId))
-    .filter(
-      (x) =>
-        !groupLunch.scoreRequests.find(
-          (r) => r.userId !== userId && r.userId === x.userId
-        )
-    )
+    .filter((x) => !groupLunch.scoreRequests.find((r) => r.userId !== userId && r.userId === x.userId))
     .map((x) => x.user)
 
   return (
     <div>
       <Title>
-        <span title={groupLunch.date.split("T")[0]}>
-          {formatTimeAgo(new Date(groupLunch.date))}
-        </span>{" "}
-        at{" "}
+        <span title={groupLunch.date.split("T")[0]}>{formatTimeAgo(new Date(groupLunch.date))}</span> at{" "}
         <Link
           to={`/groups/${groupLunch.groupLocationGroupId}/locations/${groupLunch.groupLocationLocationId}`}
         >
@@ -139,11 +122,7 @@ export default function LunchDetailsPage() {
         <Stat
           label="Choosen by"
           value={groupLunch.choosenBy?.name || "-"}
-          to={
-            groupLunch.choosenByUserId
-              ? `/users/${groupLunch.choosenByUserId}`
-              : undefined
-          }
+          to={groupLunch.choosenByUserId ? `/users/${groupLunch.choosenByUserId}` : undefined}
         />
       </StatsGrid>
       <Spacer size={24} />
@@ -170,24 +149,18 @@ export default function LunchDetailsPage() {
                   <Table.Cell wide>
                     <Popover>
                       <Popover.Trigger asChild>
-                        <UnstyledButton>
-                          {shorten(score.comment, { length: 45 })}
-                        </UnstyledButton>
+                        <UnstyledButton>{shorten(score.comment, { length: 45 })}</UnstyledButton>
                       </Popover.Trigger>
                       <Popover.Content>{score.comment}</Popover.Content>
                     </Popover>
                   </Table.Cell>
-                  <Table.Cell
-                    style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
-                  >
-                    {(permissions.deleteAllScores ||
-                      score.userId === userId) && (
+                  <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+                    {(permissions.deleteAllScores || score.userId === userId) && (
                       <ScoreDeleteAction
                         scoreId={score.id}
                         description={
                           <>
-                            {score.user.name} gave{" "}
-                            {groupLunch.groupLocation.location.name} a rating of{" "}
+                            {score.user.name} gave {groupLunch.groupLocation.location.name} a rating of{" "}
                             {score.score}.<br />
                             This action is <strong>cannot be undone.</strong>
                           </>
@@ -200,18 +173,12 @@ export default function LunchDetailsPage() {
               {groupLunch.scoreRequests.map((request) => (
                 <ScoreRow key={request.userId}>
                   <Table.Cell>
-                    <Link to={`/users/${request.userId}`}>
-                      {request.user.name}
-                    </Link>
+                    <Link to={`/users/${request.userId}`}>{request.user.name}</Link>
                   </Table.Cell>
                   <Table.Cell numeric>Requested</Table.Cell>
                   <Table.Cell></Table.Cell>
-                  <Table.Cell
-                    style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}
-                  >
-                    {permissions.deleteScoreRequest && (
-                      <ScoreRequestDeleteAction requestId={request.id} />
-                    )}
+                  <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+                    {permissions.deleteScoreRequest && <ScoreRequestDeleteAction requestId={request.id} />}
                   </Table.Cell>
                 </ScoreRow>
               ))}
@@ -219,21 +186,34 @@ export default function LunchDetailsPage() {
           </Table>
         </>
       )}
-      <Spacer size={24} />
-      {usersWithoutScoresOrRequests.length > 0 &&
-        permissions.addScore &&
-        userId && (
-          <>
-            <Subtitle>New rating</Subtitle>
-            <Spacer size={8} />
-            <NewScoreForm
-              users={usersWithoutScoresOrRequests}
-              lunchId={groupLunch.id}
-              groupId={groupLunch.groupLocationGroupId}
-              userId={userId}
-            />
-          </>
-        )}
+      <Spacer size={32} />
+      {usersWithoutScoresOrRequests.length > 0 && permissions.addScore && userId && (
+        <>
+          <Subtitle>New rating</Subtitle>
+          <Spacer size={8} />
+          <NewScoreForm
+            users={usersWithoutScoresOrRequests}
+            lunchId={groupLunch.id}
+            groupId={groupLunch.groupLocationGroupId}
+            userId={userId}
+          />
+          <Spacer size={12} />
+          <Stack axis="horizontal" gap={8}>
+            <Subtitle>Request rating</Subtitle>
+            <Help>
+              By sending a rating request the user will get a notification that they should submit their
+              rating. This will ignore any rating and comment set above.
+            </Help>
+          </Stack>
+          <Spacer size={8} />
+          <RequestScoreForm
+            users={usersWithoutScoresOrRequests}
+            lunchId={groupLunch.id}
+            groupId={groupLunch.groupLocationGroupId}
+            userId={userId}
+          />
+        </>
+      )}
       {permissions.deleteLunch && (
         <>
           <Spacer size={48} />
@@ -278,13 +258,7 @@ const Subtitle = styled.h3`
   margin: 0;
 `
 
-const ScoreDeleteAction = ({
-  description,
-  scoreId,
-}: {
-  description: ReactNode
-  scoreId: Score["id"]
-}) => {
+const ScoreDeleteAction = ({ description, scoreId }: { description: ReactNode; scoreId: Score["id"] }) => {
   const fetcher = useFetcher()
 
   return (
@@ -301,9 +275,7 @@ const ScoreDeleteAction = ({
       </Tooltip>
       <Dialog.Content>
         <Dialog.Close />
-        <Dialog.Title>
-          Are you sure you want to delete this rating?
-        </Dialog.Title>
+        <Dialog.Title>Are you sure you want to delete this rating?</Dialog.Title>
         <Dialog.Description>{description}</Dialog.Description>
         <fetcher.Form method="post" action="/scores/delete">
           <Button size="large">I am sure</Button>
@@ -314,11 +286,7 @@ const ScoreDeleteAction = ({
   )
 }
 
-const ScoreRequestDeleteAction = ({
-  requestId,
-}: {
-  requestId: ScoreRequest["id"]
-}) => {
+const ScoreRequestDeleteAction = ({ requestId }: { requestId: ScoreRequest["id"] }) => {
   const fetcher = useFetcher()
 
   return (
@@ -361,15 +329,8 @@ type NewScoreFormProps = {
   groupId: Group["id"]
   userId: User["id"]
 }
-
-const NewScoreForm = ({
-  users,
-  lunchId,
-  groupId,
-  userId,
-}: NewScoreFormProps) => {
+const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) => {
   const scoreFetcher = useFetcher()
-  const requestFetcher = useFetcher()
   const [selectedFrom, setSelectedFrom] = useState<string | null>(null)
   const [fromInputValue, setFromInputValue] = useState<string | null>(null)
   const formRef = useRef<HTMLFormElement>(null)
@@ -389,29 +350,8 @@ const NewScoreForm = ({
     }
   }, [scoreFetcher])
 
-  useEffect(() => {
-    if (requestFetcher.type === "done" && requestFetcher.data.ok) {
-      formRef.current?.reset()
-    }
-
-    const errors = requestFetcher.data?.errors
-    if (errors?.user) {
-      userRef.current?.focus()
-    }
-  }, [requestFetcher])
-
-  const handleRequestScore: MouseEventHandler<HTMLButtonElement> = (e) => {
-    e.preventDefault()
-    requestFetcher.submit(
-      { userId: selectedFrom || "", lunchId: `${lunchId}` },
-      { method: "post", action: "/scores/request" }
-    )
-  }
-
   const isFromNewAnonymousUser = Boolean(
-    fromInputValue &&
-      !users.some((x) => x.name === fromInputValue) &&
-      !selectedFrom
+    fromInputValue && !users.some((x) => x.name === fromInputValue) && !selectedFrom
   )
 
   return (
@@ -427,9 +367,7 @@ const NewScoreForm = ({
         alignItems: "flex-end",
       }}
     >
-      {isFromNewAnonymousUser && (
-        <input type="hidden" name="anonymous" value="true" />
-      )}
+      {isFromNewAnonymousUser && <input type="hidden" name="anonymous" value="true" />}
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
@@ -453,12 +391,7 @@ const NewScoreForm = ({
                 </Item>
               )}
             </ComboBox>
-            {scoreFetcher.data?.errors?.user && (
-              <div id="user-error">{scoreFetcher.data.errors.user}</div>
-            )}
-            {requestFetcher.data?.errors?.userId && (
-              <div id="user-error">{requestFetcher.data.errors.userId}</div>
-            )}
+            {scoreFetcher.data?.errors?.user && <div id="user-error">{scoreFetcher.data.errors.user}</div>}
           </Stack>
           <label>
             <span>Rating</span>
@@ -472,14 +405,10 @@ const NewScoreForm = ({
               required
               ref={scoreRef}
               aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
-              aria-errormessage={
-                scoreFetcher.data?.errors?.score ? "score-error" : undefined
-              }
+              aria-errormessage={scoreFetcher.data?.errors?.score ? "score-error" : undefined}
             />
           </label>
-          {scoreFetcher.data?.errors?.score && (
-            <div id="score-error">{scoreFetcher.data.errors.score}</div>
-          )}
+          {scoreFetcher.data?.errors?.score && <div id="score-error">{scoreFetcher.data.errors.score}</div>}
         </Stack>
         <div style={{ width: "100%" }}>
           <CommentLabel>
@@ -488,35 +417,17 @@ const NewScoreForm = ({
           </CommentLabel>
         </div>
       </Stack>
-      <Stack
-        axis="horizontal"
-        gap={16}
-        style={{ width: "100%", justifyContent: "flex-end" }}
-      >
-        <Stack axis="horizontal" gap={8} style={{ marginRight: "auto" }}>
-          <Button form="request-form" onClick={handleRequestScore}>
-            Request rating
-          </Button>
-          <Help>
-            By sending a rating request the user will get a notification that
-            they should submit their rating. This will ignore any rating and
-            comment set above.
-          </Help>
-        </Stack>
+      <Stack axis="horizontal" gap={16} style={{ width: "100%", justifyContent: "flex-end" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
           {isFromNewAnonymousUser && (
             <>
               You're creating a new anonymous user.
               <Help>
                 <p>
-                  Anonymous users are users without an account. Use these for
-                  people that haven't yet created their account or the
-                  occational guest that you don't really want in your club.
+                  Anonymous users are users without an account. Use these for people that haven't yet created
+                  their account or the occational guest that you don't really want in your club.
                 </p>
-                <p>
-                  You can transfer the anonymous users data to their account
-                  later.
-                </p>
+                <p>You can transfer the anonymous users data to their account later.</p>
               </Help>
             </>
           )}
@@ -538,6 +449,76 @@ const CommentLabel = styled.label`
   }
 `
 
+type RequestScoreFormProps = {
+  users: RecursivelyConvertDatesToStrings<User>[]
+  lunchId: Lunch["id"]
+  groupId: Group["id"]
+  userId: User["id"]
+}
+const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormProps) => {
+  const requestFetcher = useFetcher()
+  const formRef = useRef<HTMLFormElement>(null)
+  const userRef = useRef<HTMLInputElement>(null!)
+
+  useEffect(() => {
+    if (requestFetcher.type === "done" && requestFetcher.data.ok) {
+      formRef.current?.reset()
+    }
+
+    const errors = requestFetcher.data?.errors
+    if (errors?.user) {
+      userRef.current?.focus()
+    }
+  }, [requestFetcher])
+
+  return (
+    <requestFetcher.Form
+      method="post"
+      action="/scores/request"
+      ref={formRef}
+      style={{
+        width: "100%",
+        display: "flex",
+        flexDirection: "column",
+        gap: 16,
+        alignItems: "flex-end",
+      }}
+    >
+      <input type="hidden" name="lunchId" value={lunchId} />
+      <input type="hidden" name="groupId" value={groupId} />
+      <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
+        <Stack gap={16} style={{ width: "100%" }}>
+          <Stack gap={4}>
+            <ComboBox
+              label="From"
+              name="user"
+              defaultItems={users}
+              menuTrigger="focus"
+              inputRef={userRef}
+              allowsCustomValue
+              defaultSelectedKey={userId}
+            >
+              {(item) => (
+                <Item textValue={item.name}>
+                  <div>
+                    <Label>{item.name}</Label>
+                  </div>
+                </Item>
+              )}
+            </ComboBox>
+            {requestFetcher.data?.errors?.userId && (
+              <div id="user-error">{requestFetcher.data.errors.userId}</div>
+            )}
+          </Stack>
+        </Stack>
+      </Stack>
+      <Stack axis="horizontal" gap={16} style={{ width: "100%", justifyContent: "flex-end" }}>
+        <Button>Request rating</Button>
+      </Stack>
+    </requestFetcher.Form>
+  )
+}
+
 const AdminActions = () => {
   return (
     <Wrapper axis="horizontal" gap={16}>
@@ -554,12 +535,9 @@ const AdminActions = () => {
         </Tooltip>
         <Dialog.Content>
           <Dialog.Close />
-          <Dialog.Title>
-            Are you sure you want to delete this lunch?
-          </Dialog.Title>
+          <Dialog.Title>Are you sure you want to delete this lunch?</Dialog.Title>
           <DialogDescription>
-            This will delete this lunch including all scores. This action{" "}
-            <strong>cannot be undone</strong>!
+            This will delete this lunch including all scores. This action <strong>cannot be undone</strong>!
           </DialogDescription>
           <Form method="post">
             <input type="hidden" name="action" value="delete" />
