@@ -1,7 +1,7 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons"
 import type { LoaderArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import type { FC, ReactNode } from "react"
+import type { ReactNode } from "react"
 import { Link, useLoaderData } from "@remix-run/react"
 import { Button, LinkButton } from "~/components/Button"
 import { Card } from "~/components/Card"
@@ -25,6 +25,7 @@ import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
 import { RadioGroup } from "~/components/RadioGroup"
 import { useAsyncList } from "@react-stately/data"
+import { SortableTable } from "~/components/SortableTable"
 
 export const meta: MetaFunction = () => {
   return {
@@ -171,7 +172,9 @@ export default function Kitchensink() {
         <Component title="Table">
           <TableExample />
         </Component>
-        <Component title="SortableTable">todo</Component>
+        <Component title="SortableTable">
+          <SortableTableExample />
+        </Component>
         <Component title="Card">
           <Stack gap={24} axis="horizontal" style={{ alignItems: "flex-start" }}>
             <Card>
@@ -413,46 +416,23 @@ const TableExample = () => {
 
 const SortableTableExample = () => {
   return (
-    <Table>
-      <Table.Head>
-        <tr>
-          <Table.Heading>Date</Table.Heading>
-          <Table.Heading>Location</Table.Heading>
-          <Table.Heading numeric>Rating</Table.Heading>
-          <Table.Heading>Comment</Table.Heading>
+    <SortableTable
+      data={people}
+      defaultSort={{ label: "Id", key: "id" }}
+      columns={[
+        { label: "Id", key: "id", props: { numeric: true } },
+        { label: "Name", key: "name" },
+        { label: "Username", key: (row) => row.username },
+      ]}
+    >
+      {(row) => (
+        <tr key={row.id}>
+          <SortableTable.Cell numeric>{row.id}</SortableTable.Cell>
+          <SortableTable.Cell>{row.name}</SortableTable.Cell>
+          <SortableTable.Cell>{row.username}</SortableTable.Cell>
         </tr>
-      </Table.Head>
-      <tbody>
-        <Table.ClickableRow onClick={() => alert("click")}>
-          <Table.Cell>Last Friday</Table.Cell>
-          <Table.Cell>Franzén</Table.Cell>
-          <Table.Cell numeric>3</Table.Cell>
-          <Table.Cell>This row is clickable</Table.Cell>
-        </Table.ClickableRow>
-        <Table.LinkRow to="/">
-          <Table.Cell>Last monday</Table.Cell>
-          <Table.Cell>Franzén</Table.Cell>
-          <Table.Cell numeric>3</Table.Cell>
-          <Table.Cell>This row is a link</Table.Cell>
-        </Table.LinkRow>
-        <tr>
-          <Table.Cell>2022-04-02</Table.Cell>
-          <Table.Cell>
-            <Link to="/kitchensink">WokHouse</Link>
-          </Table.Cell>
-          <Table.Cell numeric>3</Table.Cell>
-          <Table.Cell>The best restaurant in town</Table.Cell>
-        </tr>
-        <tr>
-          <Table.Cell>2021-06-23</Table.Cell>
-          <Table.Cell>
-            <Link to="/kitchensink">Franzén</Link>
-          </Table.Cell>
-          <Table.Cell numeric>3</Table.Cell>
-          <Table.Cell>Meh :/</Table.Cell>
-        </tr>
-      </tbody>
-    </Table>
+      )}
+    </SortableTable>
   )
 }
 
