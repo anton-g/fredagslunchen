@@ -27,6 +27,7 @@ import { Dialog } from "~/components/Dialog"
 import { useFeatureFlags } from "~/FeatureFlagContext"
 import { Popover } from "~/components/Popover"
 import { CreateAnonymousUserButton } from "~/components/CreateAnonymousUserButton"
+import { SortableTable } from "~/components/SortableTable"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -116,30 +117,29 @@ export default function GroupDetailsPage() {
         </ActionBar>
       </SectionHeader>
       <Spacer size={8} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Name</Table.Heading>
-            <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-            <Table.Heading>Favorite lunch</Table.Heading>
-            <Table.Heading>Worst lunch</Table.Heading>
+      <SortableTable
+        data={details.group.members}
+        columns={[
+          { label: "Name", key: (row) => row.user.name },
+          { label: "Lunches", key: (row) => row.stats.lunchCount, props: { numeric: true } },
+          { label: "Avg rating", key: (row) => row.stats.averageScore, props: { numeric: true } },
+          { label: "Favorite lunch", key: (row) => row.stats.highestScore },
+          { label: "Worst lunch", key: (row) => row.stats.lowestScore },
+        ]}
+        defaultSort={{ label: "Name", key: (row) => row.user.name }}
+      >
+        {(member) => (
+          <tr key={member.userId}>
+            <Table.Cell>
+              <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
+            </Table.Cell>
+            <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(member.stats.averageScore)}</Table.Cell>
+            <Table.Cell>{member.stats.highestScore}</Table.Cell>
+            <Table.Cell>{member.stats.lowestScore}</Table.Cell>
           </tr>
-        </Table.Head>
-        <tbody>
-          {details.group.members.map((member) => (
-            <tr key={member.userId}>
-              <Table.Cell>
-                <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
-              </Table.Cell>
-              <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
-              <Table.Cell numeric>{formatNumber(member.stats.averageScore)}</Table.Cell>
-              <Table.Cell>{member.stats.highestScore}</Table.Cell>
-              <Table.Cell>{member.stats.lowestScore}</Table.Cell>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+        )}
+      </SortableTable>
       {permissions.recommendations && (
         <>
           <Spacer size={48} />
@@ -177,30 +177,34 @@ export default function GroupDetailsPage() {
         )}
       </SectionHeader>
       <Spacer size={8} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Location</Table.Heading>
-            <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {allLunches.map((lunch) => (
-            <Table.LinkRow to={`/groups/${details.group.id}/lunches/${lunch.id}`} key={lunch.id}>
-              <Table.Cell>
-                <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
-                  {formatTimeAgo(new Date(lunch.date))}
-                </Link>
-              </Table.Cell>
-              <Table.Cell>{lunch.loc.location.name}</Table.Cell>
-              <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
-              <Table.Cell numeric>{formatNumber(getAverageNumber(lunch.scores, "score"))}</Table.Cell>
-            </Table.LinkRow>
-          ))}
-        </tbody>
-      </Table>
+      <SortableTable
+        data={allLunches}
+        defaultSort={{ label: "Date", key: (row) => row.date }}
+        defaultDirection="desc"
+        columns={[
+          { label: "Date", key: (row) => row.date },
+          { label: "Location", key: (row) => row.loc.location.name },
+          { label: "Choosen by", key: (row) => (row.choosenBy ? row.choosenBy.name : "-") },
+          {
+            label: "Avg rating",
+            key: (row) => getAverageNumber(row.scores, "score"),
+            props: { numeric: true },
+          },
+        ]}
+      >
+        {(lunch) => (
+          <Table.LinkRow to={`/groups/${details.group.id}/lunches/${lunch.id}`} key={lunch.id}>
+            <Table.Cell>
+              <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
+                {formatTimeAgo(new Date(lunch.date))}
+              </Link>
+            </Table.Cell>
+            <Table.Cell>{lunch.loc.location.name}</Table.Cell>
+            <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(getAverageNumber(lunch.scores, "score"))}</Table.Cell>
+          </Table.LinkRow>
+        )}
+      </SortableTable>
       <Spacer size={48} />
       <GroupLocations details={details} showMap={maps} permissions={permissions} />
       <Spacer size={64} />
@@ -372,8 +376,19 @@ const GroupLocations = ({
         )}
       </SectionHeader>
       <Spacer size={8} />
-      <Table>
-        <Table.Head>
+      <SortableTable
+        data={locations}
+        defaultSort={{ label: "Location", key: (row) => row.name }}
+        columns={[
+          { label: "Location", key: (row) => row.name },
+          { label: "Lunches", key: (row) => row.lunchCount, props: { numeric: true } },
+          { label: "Avg rating", key: (row) => row.averageScore, props: { numeric: true } },
+          { label: "Lowest rating", key: (row) => row.lowestScore, props: { numeric: true } },
+          { label: "Highest rating", key: (row) => row.highestScore, props: { numeric: true } },
+          { label: "Last visit", key: (row) => row.lastVisit },
+        ]}
+      >
+        {/* <Table.Head>
           <tr>
             <Table.Heading>Location</Table.Heading>
             <Table.Heading numeric>Lunches</Table.Heading>
@@ -382,26 +397,20 @@ const GroupLocations = ({
             <Table.Heading numeric>Highest rating</Table.Heading>
             <Table.Heading>Last visit</Table.Heading>
           </tr>
-        </Table.Head>
-        <tbody>
-          {locations.map((location) => (
-            <Table.LinkRow to={`/groups/${details.group.id}/locations/${location.id}`} key={location.id}>
-              <Table.Cell>{location.name}</Table.Cell>
-              <Table.Cell numeric>{location.lunchCount}</Table.Cell>
-              <Table.Cell numeric>{formatNumber(location.averageScore)}</Table.Cell>
-              <Table.Cell numeric>
-                {location.lowestScore ? formatNumber(location.lowestScore) : "-"}
-              </Table.Cell>
-              <Table.Cell numeric>
-                {location.highestScore ? formatNumber(location.highestScore) : "-"}
-              </Table.Cell>
-              <Table.Cell>
-                {location.lastVisit ? formatTimeAgo(new Date(location.lastVisit)) : "-"}
-              </Table.Cell>
-            </Table.LinkRow>
-          ))}
-        </tbody>
-      </Table>
+        </Table.Head> */}
+        {(location) => (
+          <Table.LinkRow to={`/groups/${details.group.id}/locations/${location.id}`} key={location.id}>
+            <Table.Cell>{location.name}</Table.Cell>
+            <Table.Cell numeric>{location.lunchCount}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(location.averageScore)}</Table.Cell>
+            <Table.Cell numeric>{location.lowestScore ? formatNumber(location.lowestScore) : "-"}</Table.Cell>
+            <Table.Cell numeric>
+              {location.highestScore ? formatNumber(location.highestScore) : "-"}
+            </Table.Cell>
+            <Table.Cell>{location.lastVisit ? formatTimeAgo(new Date(location.lastVisit)) : "-"}</Table.Cell>
+          </Table.LinkRow>
+        )}
+      </SortableTable>
       <Spacer size={16} />
       {showMap && (
         <LazyCard>

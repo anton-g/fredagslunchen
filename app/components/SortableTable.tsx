@@ -12,14 +12,16 @@ function SortableTable<T>({
   children,
   columns,
   defaultSort,
+  defaultDirection = "asc",
   data,
 }: {
   children: (row: T) => ReactNode
   columns: SortableColumn<T>[]
   defaultSort: SortableColumn<T>
+  defaultDirection?: SortDirection
   data: T[]
 }) {
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
+  const [sortDirection, setSortDirection] = useState<SortDirection>(defaultDirection)
   const [sortedColumn, setSortedColumn] = useState<SortableColumn<T> | undefined>(defaultSort)
 
   const sortedData = data.sort((a, b) => {
@@ -54,17 +56,28 @@ function SortableTable<T>({
     <Table>
       <Table.Head>
         <tr>
-          {columns.map((column) => (
-            <TableHeading key={column.label} onClick={() => updateSort(column)}>
-              <Stack axis="horizontal" gap={4}>
+          {columns.map((column, i) => (
+            <TableHeading key={column.label} onClick={() => updateSort(column)} {...column.props}>
+              <Stack
+                axis="horizontal"
+                gap={4}
+                style={{ justifyContent: column.props?.numeric ? "flex-end" : undefined }}
+              >
                 {column.label}
-                {sortedColumn?.label === column.label ? (
-                  <span style={sortDirection === "desc" ? { transform: "rotateZ(90deg)" } : undefined}>
-                    ↗
-                  </span>
-                ) : (
-                  <span> </span>
-                )}
+                <span
+                  style={{
+                    transform: sortDirection === "desc" ? "rotateZ(90deg)" : undefined,
+                    visibility: sortedColumn?.label === column.label ? "visible" : "hidden",
+                    display:
+                      sortedColumn?.label !== column.label &&
+                      i === columns.length - 1 &&
+                      column.props?.numeric
+                        ? "none"
+                        : "inline",
+                  }}
+                >
+                  ↗
+                </span>
               </Stack>
             </TableHeading>
           ))}

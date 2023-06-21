@@ -135,15 +135,10 @@ export default function Index() {
               key: (row) => row.lunch.date,
               label: "Date",
             }}
+            defaultDirection="desc"
             columns={[
-              {
-                label: "Date",
-                key: (row) => row.lunch.date,
-              },
-              {
-                label: "Location",
-                key: (row) => row.lunch.groupLocation.location.name,
-              },
+              { label: "Date", key: (row) => row.lunch.date },
+              { label: "Location", key: (row) => row.lunch.groupLocation.location.name },
               {
                 label: "Rating",
                 key: (row) => row.score,
@@ -151,18 +146,9 @@ export default function Index() {
                   numeric: true,
                 },
               },
-              {
-                label: "Club",
-                key: (row) => row.lunch.groupLocation.group.name,
-              },
-              {
-                label: "Choosen by",
-                key: (row) => (row.lunch.choosenBy ? row.lunch.choosenBy.name : "-"),
-              },
-              {
-                label: "Comment",
-                key: (row) => row.comment,
-              },
+              { label: "Club", key: (row) => row.lunch.groupLocation.group.name },
+              { label: "Choosen by", key: (row) => (row.lunch.choosenBy ? row.lunch.choosenBy.name : "-") },
+              { label: "Comment", key: (row) => row.comment },
             ]}
           >
             {(score) => (
