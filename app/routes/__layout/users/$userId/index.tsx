@@ -4,7 +4,7 @@ import { useLoaderData, Link, Form, useActionData } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
-import { Table } from "~/components/Table"
+import { SortableTable } from "~/components/SortableTable"
 import { createEmailVerificationToken, getFullUserById, getUserPermissions } from "~/models/user.server"
 import { getUserId, requireUserId } from "~/session.server"
 import invariant from "tiny-invariant"
@@ -93,7 +93,7 @@ export default function Index() {
               value={user.stats.bestChoosenLunch?.groupLocation.location.name || "-"}
               detail={
                 user.stats.bestChoosenLunch
-                  ? getAverageNumber(user.stats.bestChoosenLunch.scores, "score")
+                  ? formatNumber(getAverageNumber(user.stats.bestChoosenLunch.scores, "score"))
                   : undefined
               }
               to={
@@ -129,37 +129,62 @@ export default function Index() {
       {sortedScores.length > 0 && (
         <Section>
           <Subtitle>Lunches</Subtitle>
-          <Table>
-            <Table.Head>
-              <tr>
-                <Table.Heading>Date</Table.Heading>
-                <Table.Heading>Location</Table.Heading>
-                <Table.Heading numeric>Rating</Table.Heading>
-                <Table.Heading>Club</Table.Heading>
-                <Table.Heading>Choosen by</Table.Heading>
-                <Table.Heading>Comment</Table.Heading>
-              </tr>
-            </Table.Head>
-            <tbody>
-              {sortedScores.map((score) => (
-                <Table.LinkRow
-                  to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
-                  key={score.id}
-                >
-                  <Table.Cell>
-                    <Link to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}>
-                      {formatTimeAgo(new Date(score.lunch.date))}
-                    </Link>
-                  </Table.Cell>
-                  <Table.Cell>{score.lunch.groupLocation.location.name}</Table.Cell>
-                  <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell>{score.lunch.groupLocation.group.name}</Table.Cell>
-                  <Table.Cell>{score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}</Table.Cell>
-                  <Table.Cell>{shorten(score.comment, { length: 30 })}</Table.Cell>
-                </Table.LinkRow>
-              ))}
-            </tbody>
-          </Table>
+          <SortableTable
+            data={sortedScores}
+            defaultSort={{
+              key: (row) => row.lunch.date,
+              label: "Date",
+            }}
+            columns={[
+              {
+                label: "Date",
+                key: (row) => row.lunch.date,
+              },
+              {
+                label: "Location",
+                key: (row) => row.lunch.groupLocation.location.name,
+              },
+              {
+                label: "Rating",
+                key: (row) => row.score,
+                props: {
+                  numeric: true,
+                },
+              },
+              {
+                label: "Club",
+                key: (row) => row.lunch.groupLocation.group.name,
+              },
+              {
+                label: "Choosen by",
+                key: (row) => (row.lunch.choosenBy ? row.lunch.choosenBy.name : "-"),
+              },
+              {
+                label: "Comment",
+                key: (row) => row.comment,
+              },
+            ]}
+          >
+            {(score) => (
+              <SortableTable.LinkRow
+                to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
+                key={score.id}
+              >
+                <SortableTable.Cell>
+                  <Link to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}>
+                    {formatTimeAgo(new Date(score.lunch.date))}
+                  </Link>
+                </SortableTable.Cell>
+                <SortableTable.Cell>{score.lunch.groupLocation.location.name}</SortableTable.Cell>
+                <SortableTable.Cell numeric>{score.score}</SortableTable.Cell>
+                <SortableTable.Cell>{score.lunch.groupLocation.group.name}</SortableTable.Cell>
+                <SortableTable.Cell>
+                  {score.lunch.choosenBy ? score.lunch.choosenBy.name : "-"}
+                </SortableTable.Cell>
+                <SortableTable.Cell>{shorten(score.comment, { length: 30 })}</SortableTable.Cell>
+              </SortableTable.LinkRow>
+            )}
+          </SortableTable>
         </Section>
       )}
       {user.role === "ANONYMOUS" && permissions.claim && (
