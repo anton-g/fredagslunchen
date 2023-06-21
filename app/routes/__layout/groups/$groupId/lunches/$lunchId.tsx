@@ -17,7 +17,6 @@ import { getUserId, requireUserId } from "~/session.server"
 import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
 import { Stat } from "~/components/Stat"
-import { Table } from "~/components/Table"
 import { Input } from "~/components/Input"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
@@ -213,14 +212,14 @@ function LunchScoreRequestedRow({
 }) {
   return (
     <ScoreRow key={request.userId}>
-      <Table.Cell>
+      <SortableTable.Cell>
         <Link to={`/users/${request.userId}`}>{request.user.name}</Link>
-      </Table.Cell>
-      <Table.Cell numeric>Requested</Table.Cell>
-      <Table.Cell></Table.Cell>
-      <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+      </SortableTable.Cell>
+      <SortableTable.Cell numeric>Requested</SortableTable.Cell>
+      <SortableTable.Cell></SortableTable.Cell>
+      <SortableTable.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
         {allowDelete && <ScoreRequestDeleteAction requestId={request.id} />}
-      </Table.Cell>
+      </SortableTable.Cell>
     </ScoreRow>
   )
 }
@@ -240,19 +239,19 @@ function LunchScoreRow({
 }) {
   return (
     <ScoreRow key={score.id}>
-      <Table.Cell>
+      <SortableTable.Cell>
         <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
-      </Table.Cell>
-      <Table.Cell numeric>{score.score}</Table.Cell>
-      <Table.Cell wide>
+      </SortableTable.Cell>
+      <SortableTable.Cell numeric>{score.score}</SortableTable.Cell>
+      <SortableTable.Cell wide>
         <Popover>
           <Popover.Trigger asChild>
             <UnstyledButton>{shorten(score.comment, { length: 45 })}</UnstyledButton>
           </Popover.Trigger>
           <Popover.Content>{score.comment}</Popover.Content>
         </Popover>
-      </Table.Cell>
-      <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+      </SortableTable.Cell>
+      <SortableTable.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
         {allowDelete && (
           <ScoreDeleteAction
             scoreId={score.id}
@@ -265,7 +264,7 @@ function LunchScoreRow({
             }
           />
         )}
-      </Table.Cell>
+      </SortableTable.Cell>
     </ScoreRow>
   )
 }

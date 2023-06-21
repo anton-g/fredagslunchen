@@ -722,8 +722,8 @@ const generateUserStats = (
   const choiceCount = member.user.choosenLunches.length
   const averageScore = getAverageNumber(member.user.scores, "score")
   const sortedScores = member.user.scores.slice().sort((a, b) => a.score - b.score)
-  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
-  const highestScore = sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name || "-"
+  const lowestScore = sortedScores.at(0)
+  const highestScore = sortedScores.at(-1)
 
   const bestChoosenLunch = member.user.choosenLunches.reduce<typeof member.user.choosenLunches[0] | null>(
     (acc, cur) => {
@@ -742,8 +742,20 @@ const generateUserStats = (
     lunchCount,
     choiceCount,
     averageScore,
-    lowestScore,
-    highestScore,
+    lowestScore: lowestScore
+      ? {
+          id: lowestScore.lunchId,
+          name: lowestScore.lunch.groupLocation.location.name || "-",
+          score: lowestScore.score,
+        }
+      : null,
+    highestScore: highestScore
+      ? {
+          id: highestScore.lunchId,
+          name: highestScore.lunch.groupLocation.location.name || "-",
+          score: highestScore.score,
+        }
+      : null,
     bestChoosenLunch,
   }
 }

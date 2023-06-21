@@ -39,7 +39,11 @@ const Cell = styled.td<{ numeric?: boolean; wide?: boolean }>`
   width: ${({ wide }) => (wide ? "100%" : "auto")};
 
   a {
-    text-decoration: underline;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 `
 
@@ -53,7 +57,7 @@ const ClickableRow = ({
   children: ReactNode
   onClick: React.MouseEventHandler<HTMLTableRowElement>
 }) => {
-  return <Row onClick={onClick}>{children}</Row>
+  return <ClickRow onClick={onClick}>{children}</ClickRow>
 }
 
 const Row = styled.tr`
@@ -72,6 +76,14 @@ const Row = styled.tr`
     background-color: ${({ theme }) => theme.colors.primary};
     color: ${({ theme }) => theme.colors.secondary};
     cursor: pointer;
+  }
+`
+
+const ClickRow = styled(Row)`
+  ${Cell} {
+    a:hover {
+      text-decoration: none;
+    }
   }
 `
 
