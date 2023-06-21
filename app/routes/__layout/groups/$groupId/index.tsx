@@ -378,7 +378,8 @@ const GroupLocations = ({
       <Spacer size={8} />
       <SortableTable
         data={locations}
-        defaultSort={{ label: "Location", key: (row) => row.name }}
+        defaultSort={{ label: "Last visit", key: (row) => row.lastVisit }}
+        defaultDirection="desc"
         columns={[
           { label: "Location", key: (row) => row.name },
           { label: "Lunches", key: (row) => row.lunchCount, props: { numeric: true } },
@@ -388,16 +389,6 @@ const GroupLocations = ({
           { label: "Last visit", key: (row) => row.lastVisit },
         ]}
       >
-        {/* <Table.Head>
-          <tr>
-            <Table.Heading>Location</Table.Heading>
-            <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-            <Table.Heading numeric>Lowest rating</Table.Heading>
-            <Table.Heading numeric>Highest rating</Table.Heading>
-            <Table.Heading>Last visit</Table.Heading>
-          </tr>
-        </Table.Head> */}
         {(location) => (
           <Table.LinkRow to={`/groups/${details.group.id}/locations/${location.id}`} key={location.id}>
             <Table.Cell>{location.name}</Table.Cell>
