@@ -28,6 +28,7 @@ import { Dialog } from "~/components/Dialog"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
+import { SortableTable } from "~/components/SortableTable"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -130,60 +131,33 @@ export default function LunchDetailsPage() {
         <>
           <Subtitle>Ratings</Subtitle>
           <Spacer size={16} />
-          <Table>
-            <Table.Head>
-              <tr>
-                <Table.Heading>By</Table.Heading>
-                <Table.Heading numeric>Rating</Table.Heading>
-                <Table.Heading wide>Comment</Table.Heading>
-                <Table.Heading></Table.Heading>
-              </tr>
-            </Table.Head>
-            <tbody>
-              {scores.map((score) => (
-                <ScoreRow key={score.id}>
-                  <Table.Cell>
-                    <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
-                  </Table.Cell>
-                  <Table.Cell numeric>{score.score}</Table.Cell>
-                  <Table.Cell wide>
-                    <Popover>
-                      <Popover.Trigger asChild>
-                        <UnstyledButton>{shorten(score.comment, { length: 45 })}</UnstyledButton>
-                      </Popover.Trigger>
-                      <Popover.Content>{score.comment}</Popover.Content>
-                    </Popover>
-                  </Table.Cell>
-                  <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
-                    {(permissions.deleteAllScores || score.userId === userId) && (
-                      <ScoreDeleteAction
-                        scoreId={score.id}
-                        description={
-                          <>
-                            {score.user.name} gave {groupLunch.groupLocation.location.name} a rating of{" "}
-                            {score.score}.<br />
-                            This action is <strong>cannot be undone.</strong>
-                          </>
-                        }
-                      />
-                    )}
-                  </Table.Cell>
-                </ScoreRow>
-              ))}
-              {groupLunch.scoreRequests.map((request) => (
-                <ScoreRow key={request.userId}>
-                  <Table.Cell>
-                    <Link to={`/users/${request.userId}`}>{request.user.name}</Link>
-                  </Table.Cell>
-                  <Table.Cell numeric>Requested</Table.Cell>
-                  <Table.Cell></Table.Cell>
-                  <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
-                    {permissions.deleteScoreRequest && <ScoreRequestDeleteAction requestId={request.id} />}
-                  </Table.Cell>
-                </ScoreRow>
-              ))}
-            </tbody>
-          </Table>
+          <SortableTable
+            data={[...scores, ...groupLunch.scoreRequests]}
+            defaultSort={{ label: "By", key: (row) => row.user.name }}
+            columns={[
+              { label: "By", key: (row) => row.user.name },
+              { label: "Rating", key: (row) => ("score" in row ? row.score : "Requested") },
+              { label: "Comment", key: (row) => ("comment" in row ? row.score : "") },
+              { label: "" },
+            ]}
+          >
+            {(score) =>
+              "score" in score ? (
+                <LunchScoreRow
+                  key={score.id}
+                  score={score}
+                  allowDelete={permissions.deleteAllScores || score.userId === userId}
+                  locationName={groupLunch.groupLocation.location.name}
+                />
+              ) : (
+                <LunchScoreRequestedRow
+                  key={score.id}
+                  request={score}
+                  allowDelete={permissions.deleteScoreRequest}
+                />
+              )
+            }
+          </SortableTable>
         </>
       )}
       <Spacer size={32} />
@@ -222,6 +196,77 @@ export default function LunchDetailsPage() {
       )}
       <Spacer size={128} />
     </div>
+  )
+}
+
+function LunchScoreRequestedRow({
+  request,
+  allowDelete,
+}: {
+  request: ScoreRequest & {
+    user: {
+      id: string
+      name: string
+    }
+  }
+  allowDelete: boolean
+}) {
+  return (
+    <ScoreRow key={request.userId}>
+      <Table.Cell>
+        <Link to={`/users/${request.userId}`}>{request.user.name}</Link>
+      </Table.Cell>
+      <Table.Cell numeric>Requested</Table.Cell>
+      <Table.Cell></Table.Cell>
+      <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+        {allowDelete && <ScoreRequestDeleteAction requestId={request.id} />}
+      </Table.Cell>
+    </ScoreRow>
+  )
+}
+
+function LunchScoreRow({
+  score,
+  locationName,
+  allowDelete,
+}: {
+  score: RecursivelyConvertDatesToStrings<
+    Score & {
+      user: User
+    }
+  >
+  locationName: string
+  allowDelete: boolean
+}) {
+  return (
+    <ScoreRow key={score.id}>
+      <Table.Cell>
+        <Link to={`/users/${score.userId}`}>{score.user.name}</Link>
+      </Table.Cell>
+      <Table.Cell numeric>{score.score}</Table.Cell>
+      <Table.Cell wide>
+        <Popover>
+          <Popover.Trigger asChild>
+            <UnstyledButton>{shorten(score.comment, { length: 45 })}</UnstyledButton>
+          </Popover.Trigger>
+          <Popover.Content>{score.comment}</Popover.Content>
+        </Popover>
+      </Table.Cell>
+      <Table.Cell style={{ maxWidth: 130, textAlign: "end", paddingRight: 0 }}>
+        {allowDelete && (
+          <ScoreDeleteAction
+            scoreId={score.id}
+            description={
+              <>
+                {score.user.name} gave {locationName} a rating of {score.score}.
+                <br />
+                This action is <strong>cannot be undone.</strong>
+              </>
+            }
+          />
+        )}
+      </Table.Cell>
+    </ScoreRow>
   )
 }
 

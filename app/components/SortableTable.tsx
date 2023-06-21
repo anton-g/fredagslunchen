@@ -6,7 +6,7 @@ import { Table } from "./Table"
 
 type SortKey<T> = Extract<keyof T, string> | ((row: T) => any)
 type SortDirection = "asc" | "desc"
-type SortableColumn<T> = { key: SortKey<T>; label: string; props?: ComponentProps<typeof Table.Heading> }
+type SortableColumn<T> = { key?: SortKey<T>; label: string; props?: ComponentProps<typeof Table.Heading> }
 
 function SortableTable<T>({
   children,
@@ -30,6 +30,8 @@ function SortableTable<T>({
     }
 
     const sortKey = sortedColumn.key
+
+    if (!sortKey) return 0
 
     const aKey = (typeof sortKey === "function" ? sortKey(a) : a[sortKey]) ?? ""
     const bKey = (typeof sortKey === "function" ? sortKey(b) : b[sortKey]) ?? ""
@@ -57,7 +59,11 @@ function SortableTable<T>({
       <Table.Head>
         <tr>
           {columns.map((column, i) => (
-            <TableHeading key={column.label} onClick={() => updateSort(column)} {...column.props}>
+            <TableHeading
+              key={column.label}
+              onClick={() => column.key && updateSort(column)}
+              {...column.props}
+            >
               <Stack
                 axis="horizontal"
                 gap={4}
