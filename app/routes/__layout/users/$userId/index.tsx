@@ -1,5 +1,5 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
-import { formatNumber, formatTimeAgo, shorten } from "~/utils"
+import { formatNumber, formatTimeAgo, getAverageNumber, shorten } from "~/utils"
 import { useLoaderData, Link, Form, useActionData } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
@@ -91,9 +91,37 @@ export default function Index() {
             <Stat
               label="Most popular choice"
               value={user.stats.bestChoosenLunch?.groupLocation.location.name || "-"}
+              detail={
+                user.stats.bestChoosenLunch
+                  ? getAverageNumber(user.stats.bestChoosenLunch.scores, "score")
+                  : undefined
+              }
+              to={
+                user.stats.bestChoosenLunch
+                  ? `/groups/${user.stats.bestChoosenLunch.groupLocationGroupId}/lunches/${user.stats.bestChoosenLunch.id}`
+                  : undefined
+              }
             />
-            <Stat label="Lowest rating" value={user.stats.lowestScore} />
-            <Stat label="Highest rating" value={user.stats.highestScore} />
+            <Stat
+              label="Lowest rating"
+              value={user.stats.lowestScore?.name || "-"}
+              detail={user.stats.lowestScore?.score}
+              to={
+                user.stats.lowestScore
+                  ? `/groups/${user.stats.lowestScore.groupId}/lunches/${user.stats.lowestScore.id}`
+                  : undefined
+              }
+            />
+            <Stat
+              label="Highest rating"
+              value={user.stats.highestScore?.name || "-"}
+              detail={user.stats.highestScore?.score}
+              to={
+                user.stats.highestScore
+                  ? `/groups/${user.stats.highestScore.groupId}/lunches/${user.stats.highestScore.id}`
+                  : undefined
+              }
+            />
           </StatsGrid>
         )}
       </Section>
