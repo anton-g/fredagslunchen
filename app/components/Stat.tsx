@@ -8,7 +8,7 @@ type StatProps = {
   label: string
   value: number | string
   to?: string
-  detail?: string
+  detail?: string | number
   size?: StatSize
 }
 

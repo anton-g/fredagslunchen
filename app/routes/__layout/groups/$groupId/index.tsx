@@ -1,4 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
 import { useCatch, useFetcher, useLoaderData } from "@remix-run/react"
@@ -169,14 +170,9 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
-        {(permissions.addLocation || permissions.addLunch) && (
+        {permissions.addLunch && (
           <ActionBar>
-            {permissions.addLunch && (
-              <LinkButton to={`/groups/${details.group.id}/lunches/new`}>New lunch</LinkButton>
-            )}
-            {permissions.addLocation && (
-              <LinkButton to={`/groups/${details.group.id}/locations/new`}>New location</LinkButton>
-            )}
+            <LinkButton to={`/groups/${details.group.id}/lunches/new`}>New lunch</LinkButton>
           </ActionBar>
         )}
       </SectionHeader>
@@ -206,35 +202,7 @@ export default function GroupDetailsPage() {
         </tbody>
       </Table>
       <Spacer size={48} />
-      {maps && (
-        <>
-          <Subtitle>Map</Subtitle>
-          <Spacer size={8} />
-          <LazyCard>
-            <Map
-              groupId={details.group.id}
-              lat={details.group.lat}
-              lon={details.group.lon}
-              locations={details.group.groupLocations
-                .filter((x) => x.lunches.length > 0 && x.location.lat && x.location.lon)
-                .map((x) => ({
-                  address: x.location.address,
-                  averageScore: getAverageNumber(
-                    x.lunches.flatMap((y) => y.scores),
-                    "score"
-                  ),
-                  highestScore: 0,
-                  id: x.locationId,
-                  lat: x.location.lat,
-                  lon: x.location.lon,
-                  lowestScore: 0,
-                  lunchCount: x.lunches.length,
-                  name: x.location.name,
-                }))}
-            />
-          </LazyCard>
-        </>
-      )}
+      <GroupLocations details={details} showMap={maps} permissions={permissions} />
       <Spacer size={64} />
       <GroupActionBar groupId={details.group.id} groupName={details.group.name} permissions={permissions} />
     </div>
@@ -353,3 +321,98 @@ const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps
 const Wrapper = styled(Stack)`
   justify-content: center;
 `
+
+const GroupLocations = ({
+  details,
+  showMap,
+  permissions,
+}: {
+  // TODO better type
+  details: RecursivelyConvertDatesToStrings<Awaited<ReturnType<typeof getGroupDetails>>>
+  showMap: boolean
+  permissions: GroupPermissions
+}) => {
+  if (!details) return null
+
+  const locations = details.group.groupLocations.map((x) => {
+    const lunches = x.lunches.map((x) => ({ ...x, avgScore: getAverageNumber(x.scores, "score") }))
+
+    const worstLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(0)
+    const bestLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(-1)
+    const lastLunch = lunches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).at(0)
+
+    return {
+      address: x.location.address,
+      averageScore: getAverageNumber(lunches, "avgScore"),
+      highestScore: bestLunch?.avgScore,
+      lowestScore: worstLunch?.avgScore,
+      id: x.locationId,
+      lat: x.location.lat,
+      lon: x.location.lon,
+      lunchCount: x.lunches.length,
+      name: x.location.name,
+      lastVisit: lastLunch?.date,
+      location: {
+        lat: x.location.lat,
+        lon: x.location.lon,
+      },
+    }
+  })
+
+  const mapLocations = locations.filter((x) => x.lunchCount > 0 && x.location.lat && x.location.lon)
+
+  return (
+    <>
+      <SectionHeader>
+        <Subtitle>Locations</Subtitle>
+        {permissions.addLocation && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/locations/new`}>New location</LinkButton>
+          </ActionBar>
+        )}
+      </SectionHeader>
+      <Spacer size={8} />
+      <Table>
+        <Table.Head>
+          <tr>
+            <Table.Heading>Location</Table.Heading>
+            <Table.Heading numeric>Lunches</Table.Heading>
+            <Table.Heading numeric>Avg rating</Table.Heading>
+            <Table.Heading numeric>Lowest rating</Table.Heading>
+            <Table.Heading numeric>Highest rating</Table.Heading>
+            <Table.Heading>Last visit</Table.Heading>
+          </tr>
+        </Table.Head>
+        <tbody>
+          {locations.map((location) => (
+            <Table.LinkRow to={`/groups/${details.group.id}/locations/${location.id}`} key={location.id}>
+              <Table.Cell>{location.name}</Table.Cell>
+              <Table.Cell numeric>{location.lunchCount}</Table.Cell>
+              <Table.Cell numeric>{formatNumber(location.averageScore)}</Table.Cell>
+              <Table.Cell numeric>
+                {location.lowestScore ? formatNumber(location.lowestScore) : "-"}
+              </Table.Cell>
+              <Table.Cell numeric>
+                {location.highestScore ? formatNumber(location.highestScore) : "-"}
+              </Table.Cell>
+              <Table.Cell>
+                {location.lastVisit ? formatTimeAgo(new Date(location.lastVisit)) : "-"}
+              </Table.Cell>
+            </Table.LinkRow>
+          ))}
+        </tbody>
+      </Table>
+      <Spacer size={16} />
+      {showMap && (
+        <LazyCard>
+          <Map
+            groupId={details.group.id}
+            lat={details.group.lat}
+            lon={details.group.lon}
+            locations={mapLocations}
+          />
+        </LazyCard>
+      )}
+    </>
+  )
+}
