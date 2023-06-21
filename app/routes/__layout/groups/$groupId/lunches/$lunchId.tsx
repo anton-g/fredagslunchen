@@ -496,7 +496,6 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
               menuTrigger="focus"
               inputRef={userRef}
               allowsCustomValue
-              defaultSelectedKey={userId}
             >
               {(item) => (
                 <Item textValue={item.name}>

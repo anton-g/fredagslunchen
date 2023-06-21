@@ -57,10 +57,7 @@ export default function GroupDetailsPage() {
       if (a.stats.lunchCount === 0) return 1
       if (b.stats.lunchCount === 0) return -1
 
-      return (
-        a.stats.choiceCount / a.stats.lunchCount -
-        b.stats.choiceCount / b.stats.lunchCount
-      )
+      return a.stats.choiceCount / a.stats.lunchCount - b.stats.choiceCount / b.stats.lunchCount
     })
   const suggestedPicker = orderedPickers[0]
   const alternativePickers = orderedPickers.slice(1)
@@ -76,53 +73,34 @@ export default function GroupDetailsPage() {
         <Stat
           label="Best lunch"
           value={`${details.stats.bestLunch.name || "-"}`}
-          detail={
-            details.stats.bestLunch.name
-              ? formatNumber(details.stats.bestLunch.score, 10)
-              : undefined
-          }
+          detail={details.stats.bestLunch.name ? formatNumber(details.stats.bestLunch.score, 10) : undefined}
+          to={details.stats.bestLunch ? `lunches/${details.stats.bestLunch.id}` : undefined}
         />
         <Stat
           label="Worst lunch"
           value={`${details.stats.worstLunch.name || "-"}`}
           detail={
-            details.stats.worstLunch.name
-              ? formatNumber(details.stats.worstLunch.score, 10)
-              : undefined
+            details.stats.worstLunch.name ? formatNumber(details.stats.worstLunch.score, 10) : undefined
           }
+          to={details.stats.worstLunch ? `lunches/${details.stats.worstLunch.id}` : undefined}
         />
         <Stat
           label="Most positive"
-          value={`${
-            details.stats.mostPositive ? details.stats.mostPositive.name : "-"
-          }`}
-          detail={
-            details.stats.mostPositive
-              ? formatNumber(details.stats.mostPositive.score)
-              : undefined
-          }
+          value={`${details.stats.mostPositive ? details.stats.mostPositive.name : "-"}`}
+          detail={details.stats.mostPositive ? formatNumber(details.stats.mostPositive.score) : undefined}
+          to={details.stats.mostPositive ? `/users/${details.stats.mostPositive.id}` : undefined}
         />
         <Stat
           label="Most negative"
-          value={`${
-            details.stats.mostNegative ? details.stats.mostNegative.name : "-"
-          }`}
-          detail={
-            details.stats.mostNegative
-              ? formatNumber(details.stats.mostNegative.score)
-              : undefined
-          }
+          value={`${details.stats.mostNegative ? details.stats.mostNegative.name : "-"}`}
+          detail={details.stats.mostNegative ? formatNumber(details.stats.mostNegative.score) : undefined}
+          to={details.stats.mostNegative ? `/users/${details.stats.mostNegative.id}` : undefined}
         />
         <Stat
           label="Most average"
-          value={`${
-            details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"
-          }`}
-          detail={
-            details.stats.mostAvarage
-              ? formatNumber(details.stats.mostAvarage.score)
-              : undefined
-          }
+          value={`${details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"}`}
+          detail={details.stats.mostAvarage ? formatNumber(details.stats.mostAvarage.score) : undefined}
+          to={details.stats.mostAvarage ? `/users/${details.stats.mostAvarage.id}` : undefined}
         />
       </StatsGrid>
       <Spacer size={48} />
@@ -130,9 +108,7 @@ export default function GroupDetailsPage() {
         <Subtitle>Members</Subtitle>
         {permissions.invite && (
           <ActionBar>
-            <LinkButton to={`/groups/${details.group.id}/invite`}>
-              Invite user
-            </LinkButton>
+            <LinkButton to={`/groups/${details.group.id}/invite`}>Invite members</LinkButton>
           </ActionBar>
         )}
       </SectionHeader>
@@ -154,9 +130,7 @@ export default function GroupDetailsPage() {
                 <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
               </Table.Cell>
               <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
-              <Table.Cell numeric>
-                {formatNumber(member.stats.averageScore)}
-              </Table.Cell>
+              <Table.Cell numeric>{formatNumber(member.stats.averageScore)}</Table.Cell>
               <Table.Cell>{member.stats.highestScore}</Table.Cell>
               <Table.Cell>{member.stats.lowestScore}</Table.Cell>
             </tr>
@@ -172,10 +146,7 @@ export default function GroupDetailsPage() {
             <Popover>
               <Popover.Trigger asChild>
                 <UnstyledButton>
-                  <Stat
-                    label="Location picker"
-                    value={suggestedPicker.user.name}
-                  />
+                  <Stat label="Location picker" value={suggestedPicker.user.name} />
                 </UnstyledButton>
               </Popover.Trigger>
               {alternativePickers.length > 0 && (
@@ -199,14 +170,10 @@ export default function GroupDetailsPage() {
         {(permissions.addLocation || permissions.addLunch) && (
           <ActionBar>
             {permissions.addLunch && (
-              <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-                New lunch
-              </LinkButton>
+              <LinkButton to={`/groups/${details.group.id}/lunches/new`}>New lunch</LinkButton>
             )}
             {permissions.addLocation && (
-              <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-                New location
-              </LinkButton>
+              <LinkButton to={`/groups/${details.group.id}/locations/new`}>New location</LinkButton>
             )}
           </ActionBar>
         )}
@@ -223,22 +190,15 @@ export default function GroupDetailsPage() {
         </Table.Head>
         <tbody>
           {allLunches.map((lunch) => (
-            <Table.LinkRow
-              to={`/groups/${details.group.id}/lunches/${lunch.id}`}
-              key={lunch.id}
-            >
+            <Table.LinkRow to={`/groups/${details.group.id}/lunches/${lunch.id}`} key={lunch.id}>
               <Table.Cell>
                 <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
                   {formatTimeAgo(new Date(lunch.date))}
                 </Link>
               </Table.Cell>
               <Table.Cell>{lunch.loc.location.name}</Table.Cell>
-              <Table.Cell>
-                {lunch.choosenBy ? lunch.choosenBy.name : "-"}
-              </Table.Cell>
-              <Table.Cell numeric>
-                {formatNumber(getAverageNumber(lunch.scores, "score"))}
-              </Table.Cell>
+              <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
+              <Table.Cell numeric>{formatNumber(getAverageNumber(lunch.scores, "score"))}</Table.Cell>
             </Table.LinkRow>
           ))}
         </tbody>
@@ -254,10 +214,7 @@ export default function GroupDetailsPage() {
               lat={details.group.lat}
               lon={details.group.lon}
               locations={details.group.groupLocations
-                .filter(
-                  (x) =>
-                    x.lunches.length > 0 && x.location.lat && x.location.lon
-                )
+                .filter((x) => x.lunches.length > 0 && x.location.lat && x.location.lon)
                 .map((x) => ({
                   address: x.location.address,
                   averageScore: getAverageNumber(
@@ -277,11 +234,7 @@ export default function GroupDetailsPage() {
         </>
       )}
       <Spacer size={64} />
-      <GroupActionBar
-        groupId={details.group.id}
-        groupName={details.group.name}
-        permissions={permissions}
-      />
+      <GroupActionBar groupId={details.group.id} groupName={details.group.name} permissions={permissions} />
     </div>
   )
 }
@@ -349,11 +302,7 @@ type GroupActionBarProps = {
   permissions: GroupPermissions
 }
 
-const GroupActionBar = ({
-  groupId,
-  groupName,
-  permissions,
-}: GroupActionBarProps) => {
+const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps) => {
   const fetcher = useFetcher()
 
   return (
@@ -361,11 +310,7 @@ const GroupActionBar = ({
       {permissions.settings && (
         <Tooltip>
           <Tooltip.Trigger asChild>
-            <LinkButton
-              to={`/groups/${groupId}/settings`}
-              variant="round"
-              aria-label="Club settings"
-            >
+            <LinkButton to={`/groups/${groupId}/settings`} variant="round" aria-label="Club settings">
               <GearIcon />
             </LinkButton>
           </Tooltip.Trigger>
@@ -386,12 +331,9 @@ const GroupActionBar = ({
           </Tooltip>
           <Dialog.Content>
             <Dialog.Close />
-            <Dialog.Title>
-              Are you sure you want to leave the club {groupName}?
-            </Dialog.Title>
+            <Dialog.Title>Are you sure you want to leave the club {groupName}?</Dialog.Title>
             <Spacer size={16} />
-            This will delete all your scores and comments. This action{" "}
-            <strong>cannot be undone.</strong>
+            This will delete all your scores and comments. This action <strong>cannot be undone.</strong>
             <Spacer size={16} />
             <fetcher.Form method="post" action="/groups/api/leave">
               <input type="hidden" name="groupId" value={groupId} />
