@@ -177,6 +177,7 @@ export async function getAllUsers() {
       email: {
         select: {
           email: true,
+          verified: true,
         },
       },
       groups: {

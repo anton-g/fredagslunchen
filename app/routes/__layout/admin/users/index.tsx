@@ -37,7 +37,9 @@ export default function AdminUsersPage() {
           {users.map((user) => (
             <Table.LinkRow key={user.id} to={`/admin/users/${user.id}`}>
               <Table.Cell>{user.name}</Table.Cell>
-              <Table.Cell>{user.email?.email}</Table.Cell>
+              <Table.Cell>
+                {user.email?.email} {user.email?.verified ? "☑️" : ""}
+              </Table.Cell>
               <Table.Cell numeric>{user.groups.length}</Table.Cell>
               <Table.Cell numeric>{user.scores.length}</Table.Cell>
               <Table.Cell>{user.lastLogin ? format(new Date(user.lastLogin), "yyyy-MM-dd") : "-"}</Table.Cell>
