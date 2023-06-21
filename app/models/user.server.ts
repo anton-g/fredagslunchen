@@ -177,6 +177,7 @@ export async function getAllUsers() {
       email: {
         select: {
           email: true,
+          verified: true,
         },
       },
       groups: {
@@ -681,8 +682,8 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
   const lunchCount = user.scores.length
   const averageScore = getAverageNumber(user.scores, "score")
   const sortedScores = user.scores.slice().sort((a, b) => a.score - b.score)
-  const lowestScore = sortedScores[0]?.lunch.groupLocation.location.name || "-"
-  const highestScore = sortedScores[sortedScores.length - 1]?.lunch.groupLocation.location.name || "-"
+  const lowestScore = sortedScores.at(0)
+  const highestScore = sortedScores.at(-1)
 
   const bestChoosenLunch = user.choosenLunches.reduce<typeof user.choosenLunches[0] | null>((acc, cur) => {
     if (!acc) return cur
@@ -696,8 +697,22 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
   return {
     lunchCount,
     averageScore,
-    lowestScore,
-    highestScore,
+    lowestScore: lowestScore
+      ? {
+          groupId: lowestScore.lunch.groupLocationGroupId,
+          name: lowestScore.lunch.groupLocation.location.name || "-",
+          score: lowestScore.score,
+          id: lowestScore.lunchId,
+        }
+      : null,
+    highestScore: highestScore
+      ? {
+          groupId: highestScore.lunch.groupLocationGroupId,
+          name: highestScore.lunch.groupLocation.location.name || "-",
+          score: highestScore.score,
+          id: highestScore.lunchId,
+        }
+      : null,
     bestChoosenLunch,
   }
 }

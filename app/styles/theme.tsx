@@ -25,6 +25,17 @@ const dark: DefaultTheme = {
   },
 }
 
+const dimmed: DefaultTheme = {
+  name: "Dimmed",
+  premium: true,
+  colors: {
+    primary: "snow",
+    secondary: "#222",
+    avatarBackground: "snow",
+    avatarForeground: "#222",
+  },
+}
+
 const smorgasbord: DefaultTheme = {
   name: "Smörgåsbord",
   premium: true,
@@ -61,6 +72,7 @@ const purpleRain: DefaultTheme = {
 const availableThemes = {
   light,
   dark,
+  dimmed,
   smorgasbord,
   purpleRain,
   fire,
@@ -72,6 +84,7 @@ const availableThemes = {
 export const themeToMapStyle: Record<Theme, string> = {
   light: "mapbox://styles/mapbox/light-v10",
   dark: "mapbox://styles/mapbox/dark-v10",
+  dimmed: "mapbox://styles/mapbox/dark-v10",
   purpleRain: "mapbox://styles/mapbox/dark-v10",
   fire: "mapbox://styles/mapbox/dark-v10",
   fire2: "mapbox://styles/mapbox/dark-v10",
@@ -87,20 +100,10 @@ const ThemeContext = createContext<{
   setTheme: (theme: Theme) => void
 }>(null!)
 
-function InternalThemeProvider({
-  defaultTheme,
-  children,
-}: {
-  defaultTheme: Theme
-  children: ReactNode
-}) {
+function InternalThemeProvider({ defaultTheme, children }: { defaultTheme: Theme; children: ReactNode }) {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
 
-  return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  return <ThemeContext.Provider value={{ theme, setTheme }}>{children}</ThemeContext.Provider>
 }
 
 const useThemeContext = () => useContext(ThemeContext)

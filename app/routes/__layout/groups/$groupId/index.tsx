@@ -1,4 +1,5 @@
 import type { LoaderArgs } from "@remix-run/node"
+import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
 import { json } from "@remix-run/node"
 import { useCatch, useFetcher, useLoaderData } from "@remix-run/react"
@@ -25,6 +26,8 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Dialog } from "~/components/Dialog"
 import { useFeatureFlags } from "~/FeatureFlagContext"
 import { Popover } from "~/components/Popover"
+import { CreateAnonymousUserButton } from "~/components/CreateAnonymousUserButton"
+import { SortableTable } from "~/components/SortableTable"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   let userId = await getUserId(request)
@@ -57,10 +60,7 @@ export default function GroupDetailsPage() {
       if (a.stats.lunchCount === 0) return 1
       if (b.stats.lunchCount === 0) return -1
 
-      return (
-        a.stats.choiceCount / a.stats.lunchCount -
-        b.stats.choiceCount / b.stats.lunchCount
-      )
+      return a.stats.choiceCount / a.stats.lunchCount - b.stats.choiceCount / b.stats.lunchCount
     })
   const suggestedPicker = orderedPickers[0]
   const alternativePickers = orderedPickers.slice(1)
@@ -76,93 +76,70 @@ export default function GroupDetailsPage() {
         <Stat
           label="Best lunch"
           value={`${details.stats.bestLunch.name || "-"}`}
-          detail={
-            details.stats.bestLunch.name
-              ? formatNumber(details.stats.bestLunch.score, 10)
-              : undefined
-          }
+          detail={details.stats.bestLunch.name ? formatNumber(details.stats.bestLunch.score, 10) : undefined}
+          to={details.stats.bestLunch ? `lunches/${details.stats.bestLunch.id}` : undefined}
         />
         <Stat
           label="Worst lunch"
           value={`${details.stats.worstLunch.name || "-"}`}
           detail={
-            details.stats.worstLunch.name
-              ? formatNumber(details.stats.worstLunch.score, 10)
-              : undefined
+            details.stats.worstLunch.name ? formatNumber(details.stats.worstLunch.score, 10) : undefined
           }
+          to={details.stats.worstLunch ? `lunches/${details.stats.worstLunch.id}` : undefined}
         />
         <Stat
           label="Most positive"
-          value={`${
-            details.stats.mostPositive ? details.stats.mostPositive.name : "-"
-          }`}
-          detail={
-            details.stats.mostPositive
-              ? formatNumber(details.stats.mostPositive.score)
-              : undefined
-          }
+          value={`${details.stats.mostPositive ? details.stats.mostPositive.name : "-"}`}
+          detail={details.stats.mostPositive ? formatNumber(details.stats.mostPositive.score) : undefined}
+          to={details.stats.mostPositive ? `/users/${details.stats.mostPositive.id}` : undefined}
         />
         <Stat
           label="Most negative"
-          value={`${
-            details.stats.mostNegative ? details.stats.mostNegative.name : "-"
-          }`}
-          detail={
-            details.stats.mostNegative
-              ? formatNumber(details.stats.mostNegative.score)
-              : undefined
-          }
+          value={`${details.stats.mostNegative ? details.stats.mostNegative.name : "-"}`}
+          detail={details.stats.mostNegative ? formatNumber(details.stats.mostNegative.score) : undefined}
+          to={details.stats.mostNegative ? `/users/${details.stats.mostNegative.id}` : undefined}
         />
         <Stat
           label="Most average"
-          value={`${
-            details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"
-          }`}
-          detail={
-            details.stats.mostAvarage
-              ? formatNumber(details.stats.mostAvarage.score)
-              : undefined
-          }
+          value={`${details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"}`}
+          detail={details.stats.mostAvarage ? formatNumber(details.stats.mostAvarage.score) : undefined}
+          to={details.stats.mostAvarage ? `/users/${details.stats.mostAvarage.id}` : undefined}
         />
       </StatsGrid>
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Members</Subtitle>
-        {permissions.invite && (
-          <ActionBar>
-            <LinkButton to={`/groups/${details.group.id}/invite`}>
-              Invite user
-            </LinkButton>
-          </ActionBar>
-        )}
+        <ActionBar>
+          {permissions.invite && (
+            <LinkButton to={`/groups/${details.group.id}/invite`}>Invite members</LinkButton>
+          )}
+          <CreateAnonymousUserButton groupId={details.group.id} />
+        </ActionBar>
       </SectionHeader>
       <Spacer size={8} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Name</Table.Heading>
-            <Table.Heading numeric>Lunches</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-            <Table.Heading>Favorite lunch</Table.Heading>
-            <Table.Heading>Worst lunch</Table.Heading>
+      <SortableTable
+        data={details.group.members}
+        columns={[
+          { label: "Name", key: (row) => row.user.name },
+          { label: "Lunches", key: (row) => row.stats.lunchCount, props: { numeric: true } },
+          { label: "Avg rating", key: (row) => row.stats.averageScore, props: { numeric: true } },
+          { label: "Favorite lunch", key: (row) => row.stats.highestScore },
+          { label: "Worst lunch", key: (row) => row.stats.lowestScore },
+        ]}
+        defaultSort={{ label: "Name", key: (row) => row.user.name }}
+      >
+        {(member) => (
+          <tr key={member.userId}>
+            <Table.Cell>
+              <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
+            </Table.Cell>
+            <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(member.stats.averageScore)}</Table.Cell>
+            <Table.Cell>{member.stats.highestScore}</Table.Cell>
+            <Table.Cell>{member.stats.lowestScore}</Table.Cell>
           </tr>
-        </Table.Head>
-        <tbody>
-          {details.group.members.map((member) => (
-            <tr key={member.userId}>
-              <Table.Cell>
-                <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
-              </Table.Cell>
-              <Table.Cell numeric>{member.stats.lunchCount}</Table.Cell>
-              <Table.Cell numeric>
-                {formatNumber(member.stats.averageScore)}
-              </Table.Cell>
-              <Table.Cell>{member.stats.highestScore}</Table.Cell>
-              <Table.Cell>{member.stats.lowestScore}</Table.Cell>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+        )}
+      </SortableTable>
       {permissions.recommendations && (
         <>
           <Spacer size={48} />
@@ -172,10 +149,7 @@ export default function GroupDetailsPage() {
             <Popover>
               <Popover.Trigger asChild>
                 <UnstyledButton>
-                  <Stat
-                    label="Location picker"
-                    value={suggestedPicker.user.name}
-                  />
+                  <Stat label="Location picker" value={suggestedPicker.user.name} />
                 </UnstyledButton>
               </Popover.Trigger>
               {alternativePickers.length > 0 && (
@@ -196,92 +170,45 @@ export default function GroupDetailsPage() {
       <Spacer size={48} />
       <SectionHeader>
         <Subtitle>Lunches</Subtitle>
-        {(permissions.addLocation || permissions.addLunch) && (
+        {permissions.addLunch && (
           <ActionBar>
-            {permissions.addLunch && (
-              <LinkButton to={`/groups/${details.group.id}/lunches/new`}>
-                New lunch
-              </LinkButton>
-            )}
-            {permissions.addLocation && (
-              <LinkButton to={`/groups/${details.group.id}/locations/new`}>
-                New location
-              </LinkButton>
-            )}
+            <LinkButton to={`/groups/${details.group.id}/lunches/new`}>New lunch</LinkButton>
           </ActionBar>
         )}
       </SectionHeader>
       <Spacer size={8} />
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Location</Table.Heading>
-            <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {allLunches.map((lunch) => (
-            <Table.LinkRow
-              to={`/groups/${details.group.id}/lunches/${lunch.id}`}
-              key={lunch.id}
-            >
-              <Table.Cell>
-                <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
-                  {formatTimeAgo(new Date(lunch.date))}
-                </Link>
-              </Table.Cell>
-              <Table.Cell>{lunch.loc.location.name}</Table.Cell>
-              <Table.Cell>
-                {lunch.choosenBy ? lunch.choosenBy.name : "-"}
-              </Table.Cell>
-              <Table.Cell numeric>
-                {formatNumber(getAverageNumber(lunch.scores, "score"))}
-              </Table.Cell>
-            </Table.LinkRow>
-          ))}
-        </tbody>
-      </Table>
+      <SortableTable
+        data={allLunches}
+        defaultSort={{ label: "Date", key: (row) => row.date }}
+        defaultDirection="desc"
+        columns={[
+          { label: "Date", key: (row) => row.date },
+          { label: "Location", key: (row) => row.loc.location.name },
+          { label: "Choosen by", key: (row) => (row.choosenBy ? row.choosenBy.name : "-") },
+          {
+            label: "Avg rating",
+            key: (row) => getAverageNumber(row.scores, "score"),
+            props: { numeric: true },
+          },
+        ]}
+      >
+        {(lunch) => (
+          <Table.LinkRow to={`/groups/${details.group.id}/lunches/${lunch.id}`} key={lunch.id}>
+            <Table.Cell>
+              <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
+                {formatTimeAgo(new Date(lunch.date))}
+              </Link>
+            </Table.Cell>
+            <Table.Cell>{lunch.loc.location.name}</Table.Cell>
+            <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(getAverageNumber(lunch.scores, "score"))}</Table.Cell>
+          </Table.LinkRow>
+        )}
+      </SortableTable>
       <Spacer size={48} />
-      {maps && (
-        <>
-          <Subtitle>Map</Subtitle>
-          <Spacer size={8} />
-          <LazyCard>
-            <Map
-              groupId={details.group.id}
-              lat={details.group.lat}
-              lon={details.group.lon}
-              locations={details.group.groupLocations
-                .filter(
-                  (x) =>
-                    x.lunches.length > 0 && x.location.lat && x.location.lon
-                )
-                .map((x) => ({
-                  address: x.location.address,
-                  averageScore: getAverageNumber(
-                    x.lunches.flatMap((y) => y.scores),
-                    "score"
-                  ),
-                  highestScore: 0,
-                  id: x.locationId,
-                  lat: x.location.lat,
-                  lon: x.location.lon,
-                  lowestScore: 0,
-                  lunchCount: x.lunches.length,
-                  name: x.location.name,
-                }))}
-            />
-          </LazyCard>
-        </>
-      )}
+      <GroupLocations details={details} showMap={maps} permissions={permissions} />
       <Spacer size={64} />
-      <GroupActionBar
-        groupId={details.group.id}
-        groupName={details.group.name}
-        permissions={permissions}
-      />
+      <GroupActionBar groupId={details.group.id} groupName={details.group.name} permissions={permissions} />
     </div>
   )
 }
@@ -349,11 +276,7 @@ type GroupActionBarProps = {
   permissions: GroupPermissions
 }
 
-const GroupActionBar = ({
-  groupId,
-  groupName,
-  permissions,
-}: GroupActionBarProps) => {
+const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps) => {
   const fetcher = useFetcher()
 
   return (
@@ -361,11 +284,7 @@ const GroupActionBar = ({
       {permissions.settings && (
         <Tooltip>
           <Tooltip.Trigger asChild>
-            <LinkButton
-              to={`/groups/${groupId}/settings`}
-              variant="round"
-              aria-label="Club settings"
-            >
+            <LinkButton to={`/groups/${groupId}/settings`} variant="round" aria-label="Club settings">
               <GearIcon />
             </LinkButton>
           </Tooltip.Trigger>
@@ -386,12 +305,9 @@ const GroupActionBar = ({
           </Tooltip>
           <Dialog.Content>
             <Dialog.Close />
-            <Dialog.Title>
-              Are you sure you want to leave the club {groupName}?
-            </Dialog.Title>
+            <Dialog.Title>Are you sure you want to leave the club {groupName}?</Dialog.Title>
             <Spacer size={16} />
-            This will delete all your scores and comments. This action{" "}
-            <strong>cannot be undone.</strong>
+            This will delete all your scores and comments. This action <strong>cannot be undone.</strong>
             <Spacer size={16} />
             <fetcher.Form method="post" action="/groups/api/leave">
               <input type="hidden" name="groupId" value={groupId} />
@@ -409,3 +325,94 @@ const GroupActionBar = ({
 const Wrapper = styled(Stack)`
   justify-content: center;
 `
+
+const GroupLocations = ({
+  details,
+  showMap,
+  permissions,
+}: {
+  // TODO better type
+  details: RecursivelyConvertDatesToStrings<Awaited<ReturnType<typeof getGroupDetails>>>
+  showMap: boolean
+  permissions: GroupPermissions
+}) => {
+  if (!details) return null
+
+  const locations = details.group.groupLocations.map((x) => {
+    const lunches = x.lunches.map((x) => ({ ...x, avgScore: getAverageNumber(x.scores, "score") }))
+
+    const worstLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(0)
+    const bestLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(-1)
+    const lastLunch = lunches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).at(0)
+
+    return {
+      address: x.location.address,
+      averageScore: getAverageNumber(lunches, "avgScore"),
+      highestScore: bestLunch?.avgScore,
+      lowestScore: worstLunch?.avgScore,
+      id: x.locationId,
+      lat: x.location.lat,
+      lon: x.location.lon,
+      lunchCount: x.lunches.length,
+      name: x.location.name,
+      lastVisit: lastLunch?.date,
+      location: {
+        lat: x.location.lat,
+        lon: x.location.lon,
+      },
+    }
+  })
+
+  const mapLocations = locations.filter((x) => x.lunchCount > 0 && x.location.lat && x.location.lon)
+
+  return (
+    <>
+      <SectionHeader>
+        <Subtitle>Locations</Subtitle>
+        {permissions.addLocation && (
+          <ActionBar>
+            <LinkButton to={`/groups/${details.group.id}/locations/new`}>New location</LinkButton>
+          </ActionBar>
+        )}
+      </SectionHeader>
+      <Spacer size={8} />
+      <SortableTable
+        data={locations}
+        defaultSort={{ label: "Last visit", key: (row) => row.lastVisit }}
+        defaultDirection="desc"
+        columns={[
+          { label: "Location", key: (row) => row.name },
+          { label: "Lunches", key: (row) => row.lunchCount, props: { numeric: true } },
+          { label: "Avg rating", key: (row) => row.averageScore, props: { numeric: true } },
+          { label: "Lowest rating", key: (row) => row.lowestScore, props: { numeric: true } },
+          { label: "Highest rating", key: (row) => row.highestScore, props: { numeric: true } },
+          { label: "Last visit", key: (row) => row.lastVisit },
+        ]}
+      >
+        {(location) => (
+          <Table.LinkRow to={`/groups/${details.group.id}/locations/${location.id}`} key={location.id}>
+            <Table.Cell>{location.name}</Table.Cell>
+            <Table.Cell numeric>{location.lunchCount}</Table.Cell>
+            <Table.Cell numeric>{formatNumber(location.averageScore)}</Table.Cell>
+            <Table.Cell numeric>{location.lowestScore ? formatNumber(location.lowestScore) : "-"}</Table.Cell>
+            <Table.Cell numeric>
+              {location.highestScore ? formatNumber(location.highestScore) : "-"}
+            </Table.Cell>
+            <Table.Cell>{location.lastVisit ? formatTimeAgo(new Date(location.lastVisit)) : "-"}</Table.Cell>
+          </Table.LinkRow>
+        )}
+      </SortableTable>
+      <Spacer size={16} />
+      {showMap && (
+        <LazyCard>
+          <Map
+            groupId={details.group.id}
+            lat={details.group.lat}
+            lon={details.group.lon}
+            locations={mapLocations}
+          />
+        </LazyCard>
+      )}
+    </>
+  )
+}

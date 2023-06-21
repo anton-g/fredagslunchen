@@ -44,24 +44,20 @@ export default function GroupsPage() {
                     >
                       <GroupTitle>{group.name}</GroupTitle>
                       <div
-                        style={{ display: "flex", gap: 8, flexWrap: "wrap" }}
+                        style={{ display: "flex", gap: group.members.length > 10 ? 4 : 8, flexWrap: "wrap" }}
                       >
                         {group.members.map((m) => (
                           <UserAvatar
                             key={m.userId}
                             user={m.user}
-                            size="small"
+                            size={group.members.length > 10 ? "tiny" : "small"}
                           />
                         ))}
                       </div>
                     </div>
                     <Spacer size={8} />
-                    {group.groupLocations.reduce(
-                      (total, gl) => total + gl._count.lunches,
-                      0
-                    )}{" "}
-                    lunches in {group.groupLocations.length} locations since{" "}
-                    {formatTimeAgo(new Date(group.createdAt))}
+                    {group.groupLocations.reduce((total, gl) => total + gl._count.lunches, 0)} lunches in{" "}
+                    {group.groupLocations.length} locations since {formatTimeAgo(new Date(group.createdAt))}
                   </Card>
                 </NavLink>
               </li>

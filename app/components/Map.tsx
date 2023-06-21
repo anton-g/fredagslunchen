@@ -8,7 +8,7 @@ import { formatNumber } from "~/utils"
 import { Spacer } from "./Spacer"
 import { Stat } from "./Stat"
 
-type Location = {
+type MapLocation = {
   id: number
   lon: string | null
   lat: string | null
@@ -21,7 +21,7 @@ type Location = {
 }
 
 type MapProps = {
-  locations: Location[]
+  locations: MapLocation[]
   lat?: number | null
   lon?: number | null
   groupId?: Group["id"]
@@ -31,9 +31,7 @@ type MapProps = {
 export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
   const { theme } = useThemeContext()
   const [cursor, setCursor] = useState<"auto" | "pointer">("auto")
-  const [selectedLocation, setSelectedLocation] = useState<Location | null>(
-    null
-  )
+  const [selectedLocation, setSelectedLocation] = useState<MapLocation | null>(null)
 
   const geojson = {
     type: "FeatureCollection" as const,
@@ -46,12 +44,8 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
       properties: {
         ...loc,
         averageScore: formatNumber(loc.averageScore),
-        highestScore: loc.highestScore
-          ? formatNumber(loc.highestScore)
-          : undefined,
-        lowestScore: loc.lowestScore
-          ? formatNumber(loc.lowestScore)
-          : undefined,
+        highestScore: loc.highestScore ? formatNumber(loc.highestScore) : undefined,
+        lowestScore: loc.lowestScore ? formatNumber(loc.lowestScore) : undefined,
       },
     })),
   }
@@ -69,7 +63,7 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
       interactiveLayerIds={["places"]}
       onClick={(e) => {
         if (!e.features?.length) return
-        setSelectedLocation(e.features[0].properties as Location)
+        setSelectedLocation(e.features[0].properties as MapLocation)
       }}
       onMouseEnter={() => setCursor("pointer")}
       onMouseLeave={() => setCursor("auto")}
@@ -139,13 +133,7 @@ const StyledPopup = styled(Popup)`
   }
 `
 
-const LocationPopupContent = ({
-  location,
-  groupId,
-}: {
-  location: Location
-  groupId?: Group["id"]
-}) => {
+const LocationPopupContent = ({ location, groupId }: { location: MapLocation; groupId?: Group["id"] }) => {
   return (
     <div>
       <Link to={`/groups/${groupId}/locations/${location.id}`}>
@@ -155,25 +143,9 @@ const LocationPopupContent = ({
       <Spacer size={4} />
       <Stats>
         <Stat size="small" label="Lunches" value={location.lunchCount} />
-        <Stat
-          size="small"
-          label="Average rating"
-          value={location.averageScore}
-        />
-        {location.highestScore && (
-          <Stat
-            size="small"
-            label="Highest rating"
-            value={location.highestScore}
-          />
-        )}
-        {location.lowestScore && (
-          <Stat
-            size="small"
-            label="Lowest rating"
-            value={location.lowestScore}
-          />
-        )}
+        <Stat size="small" label="Average rating" value={location.averageScore} />
+        {location.highestScore && <Stat size="small" label="Highest rating" value={location.highestScore} />}
+        {location.lowestScore && <Stat size="small" label="Lowest rating" value={location.lowestScore} />}
       </Stats>
     </div>
   )

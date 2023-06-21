@@ -10,8 +10,9 @@ import { Table } from "~/components/Table"
 import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
-import { formatNumber } from "~/utils"
+import { formatNumber, formatTimeAgo } from "~/utils"
 import { getGroupPermissions } from "~/models/group.server"
+import { SortableTable } from "~/components/SortableTable"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -46,40 +47,34 @@ export default function LocationDetailsPage() {
     <div>
       <Title>at {groupLocation.location.name}</Title>
       <h3>Lunches</h3>
-      <Table>
-        <Table.Head>
-          <tr>
-            <Table.Heading>Date</Table.Heading>
-            <Table.Heading>Choosen by</Table.Heading>
-            <Table.Heading numeric>Avg rating</Table.Heading>
-          </tr>
-        </Table.Head>
-        <tbody>
-          {groupLocation.lunches.map((lunch) => (
-            <Table.LinkRow
-              to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
-              key={lunch.id}
-            >
-              <Table.Cell>
-                <Link
-                  to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
-                >
-                  {new Date(lunch.date).toLocaleDateString()}
-                </Link>
-              </Table.Cell>
-              <Table.Cell>
-                {lunch.choosenBy ? lunch.choosenBy.name : "-"}
-              </Table.Cell>
-              <Table.Cell numeric>
-                {formatNumber(
-                  lunch.scores.reduce((acc, cur) => acc + cur.score, 0) /
-                    lunch.scores.length
-                )}
-              </Table.Cell>
-            </Table.LinkRow>
-          ))}
-        </tbody>
-      </Table>
+      <SortableTable
+        data={groupLocation.lunches}
+        defaultSort={{ label: "Date", key: (row) => row.date }}
+        defaultDirection="desc"
+        columns={[
+          { label: "Date", key: (row) => row.date },
+          { label: "Choosen by", key: (row) => row.choosenBy?.name || "-" },
+          {
+            label: "Avg rating",
+            key: (row) => row.scores.reduce((acc, cur) => acc + cur.score, 0) / row.scores.length,
+            props: { numeric: true },
+          },
+        ]}
+      >
+        {(lunch) => (
+          <Table.LinkRow to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`} key={lunch.id}>
+            <Table.Cell>
+              <Link to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}>
+                {formatTimeAgo(new Date(lunch.date))}
+              </Link>
+            </Table.Cell>
+            <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
+            <Table.Cell numeric>
+              {formatNumber(lunch.scores.reduce((acc, cur) => acc + cur.score, 0) / lunch.scores.length)}
+            </Table.Cell>
+          </Table.LinkRow>
+        )}
+      </SortableTable>
       {permissions.addLunch && (
         <>
           <Spacer size={16} />

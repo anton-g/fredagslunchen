@@ -66,14 +66,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const name = formData.get("name")
 
   if (typeof name !== "string" || name.length === 0) {
-    return json<ActionData>(
-      { errors: { name: "Name is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { name: "Name is required" } }, { status: 400 })
   }
 
   const user = await updateUser({
-    id: userId,
+    id: params.userId,
     name,
   })
 
@@ -110,9 +107,7 @@ export default function AdminUserSettingsPage() {
                 aria-invalid={actionData?.errors?.name ? true : undefined}
                 aria-describedby="name-error"
               />
-              {actionData?.errors?.name && (
-                <div id="name-error">{actionData.errors.name}</div>
-              )}
+              {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
             </div>
           </div>
           <div>

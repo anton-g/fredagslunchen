@@ -19,16 +19,12 @@ import { IceCream } from "~/illustrations/IceCream"
 import { useThemeContext } from "~/styles/theme"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof getFullUserById>>>
-type ScoreRequest = RecursivelyConvertDatesToStrings<
-  FullUser["scoreRequests"][0]
->
+type ScoreRequest = RecursivelyConvertDatesToStrings<FullUser["scoreRequests"][0]>
 
 export const loader = async ({ request }: LoaderArgs) => {
   const userId = await getUserId(request)
 
-  const user = userId
-    ? await getFullUserById({ id: userId, requestUserId: userId })
-    : null
+  const user = userId ? await getFullUserById({ id: userId, requestUserId: userId }) : null
 
   return json({
     user,
@@ -56,17 +52,12 @@ export default function Index() {
         <Wrapper>
           <Title style={{ textAlign: "center" }}>Welcome {user.name}!</Title>
           <p>
-            <Link to="/groups/new">Create a new club</Link> to get started! You
-            can create a club for whatever constellation of people you want. How
-            about your team at work, that group of friends you always meet with
-            over a bowl of ramen, or maybe a club just for you?
+            <Link to="/groups/new">Create a new club</Link> to get started! You can create a club for whatever
+            constellation of people you want. How about your team at work, that group of friends you always
+            meet with over a bowl of ramen, or maybe a club just for you?
           </p>
           <Spacer size={24} />
-          <LinkButton
-            to="/groups/new"
-            size="large"
-            style={{ margin: "0 auto" }}
-          >
+          <LinkButton to="/groups/new" size="large" style={{ margin: "0 auto" }}>
             Create your first club
           </LinkButton>
         </Wrapper>
@@ -88,8 +79,7 @@ export default function Index() {
           </Stack>
         ) : (
           <Stack gap={64}>
-            You've got no waiting requests. When someone requests a rating from
-            you it will show up here.
+            You've got no waiting requests. When someone requests a rating from you it will show up here.
             <Illustration />
           </Stack>
         )}
@@ -146,17 +136,14 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
     <Card key={request.id}>
       <CardDescription>
         {request.requestedBy.name} requested your rating for the{" "}
-        <Link
-          to={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
-        >
+        <Link to={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}>
           lunch at <strong>{request.lunch.groupLocation.location.name}</strong>
         </Link>{" "}
-        with {request.lunch.groupLocation.group.name}{" "}
-        {formatTimeAgo(new Date(request.lunch.date))}:
+        with {request.lunch.groupLocation.group.name} {formatTimeAgo(new Date(request.lunch.date))}:
       </CardDescription>
       <scoreFetcher.Form
         method="post"
-        action="/scores/new"
+        action="/api/scores/new"
         ref={formRef}
         style={{
           width: "100%",
@@ -177,14 +164,10 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
             type="number"
             ref={scoreRef}
             aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
-            aria-errormessage={
-              scoreFetcher.data?.errors?.score ? "score-error" : undefined
-            }
+            aria-errormessage={scoreFetcher.data?.errors?.score ? "score-error" : undefined}
           />
         </label>
-        {scoreFetcher.data?.errors?.score && (
-          <div id="score-error">{scoreFetcher.data.errors.score}</div>
-        )}
+        {scoreFetcher.data?.errors?.score && <div id="score-error">{scoreFetcher.data.errors.score}</div>}
         <div style={{ width: "100%" }}>
           <CommentLabel>
             <span>Comment</span>
@@ -194,11 +177,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
         <input type="hidden" name="user" value={request.userId} />
         <input type="hidden" name="user-key" value={request.userId} />
         <input type="hidden" name="lunchId" value={request.lunchId} />
-        <input
-          type="hidden"
-          name="groupId"
-          value={request.lunch.groupLocation.group.id}
-        />
+        <input type="hidden" name="groupId" value={request.lunch.groupLocation.group.id} />
         <input
           type="hidden"
           name="redirectTo"

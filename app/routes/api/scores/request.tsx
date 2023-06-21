@@ -14,14 +14,11 @@ export const action: ActionFunction = async ({ request, params }) => {
   const currentUserId = await requireUserId(request, "/")
 
   const formData = await request.formData()
-  const userId = formData.get("userId")
+  const userId = formData.get("user-key")
   const lunchId = formData.get("lunchId")
 
   if (typeof userId !== "string" || userId.length === 0) {
-    return json<ActionData>(
-      { errors: { userId: "User is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { userId: "User is required" } }, { status: 400 })
   }
 
   if (currentUserId === userId) {
@@ -34,10 +31,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 
   if (typeof lunchId !== "string" || lunchId.length === 0) {
-    return json<ActionData>(
-      { errors: { lunchId: "Lunch is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { lunchId: "Lunch is required" } }, { status: 400 })
   }
 
   const result = await createScoreRequest({

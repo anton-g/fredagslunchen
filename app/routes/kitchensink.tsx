@@ -123,6 +123,7 @@ export default function Kitchensink() {
             <Avatar variant={1} />
             <Avatar variant={2} size="medium" />
             <Avatar variant={3} size="small" />
+            <Avatar variant={4} size="tiny" />
             <RandomAvatar />
             <SeedAvatar seed={"BassLabb"} />
             <SeedAvatar seed={"Tessan"} />
@@ -170,6 +171,7 @@ export default function Kitchensink() {
         <Component title="Table">
           <TableExample />
         </Component>
+        <Component title="SortableTable">todo</Component>
         <Component title="Card">
           <Stack gap={24} axis="horizontal" style={{ alignItems: "flex-start" }}>
             <Card>
@@ -365,6 +367,51 @@ const SelectExample = () => {
 }
 
 const TableExample = () => {
+  return (
+    <Table>
+      <Table.Head>
+        <tr>
+          <Table.Heading>Date</Table.Heading>
+          <Table.Heading>Location</Table.Heading>
+          <Table.Heading numeric>Rating</Table.Heading>
+          <Table.Heading>Comment</Table.Heading>
+        </tr>
+      </Table.Head>
+      <tbody>
+        <Table.ClickableRow onClick={() => alert("click")}>
+          <Table.Cell>Last Friday</Table.Cell>
+          <Table.Cell>Franzén</Table.Cell>
+          <Table.Cell numeric>3</Table.Cell>
+          <Table.Cell>This row is clickable</Table.Cell>
+        </Table.ClickableRow>
+        <Table.LinkRow to="/">
+          <Table.Cell>Last monday</Table.Cell>
+          <Table.Cell>Franzén</Table.Cell>
+          <Table.Cell numeric>3</Table.Cell>
+          <Table.Cell>This row is a link</Table.Cell>
+        </Table.LinkRow>
+        <tr>
+          <Table.Cell>2022-04-02</Table.Cell>
+          <Table.Cell>
+            <Link to="/kitchensink">WokHouse</Link>
+          </Table.Cell>
+          <Table.Cell numeric>3</Table.Cell>
+          <Table.Cell>The best restaurant in town</Table.Cell>
+        </tr>
+        <tr>
+          <Table.Cell>2021-06-23</Table.Cell>
+          <Table.Cell>
+            <Link to="/kitchensink">Franzén</Link>
+          </Table.Cell>
+          <Table.Cell numeric>3</Table.Cell>
+          <Table.Cell>Meh :/</Table.Cell>
+        </tr>
+      </tbody>
+    </Table>
+  )
+}
+
+const SortableTableExample = () => {
   return (
     <Table>
       <Table.Head>
