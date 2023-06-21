@@ -123,6 +123,7 @@ export default function Kitchensink() {
             <Avatar variant={1} />
             <Avatar variant={2} size="medium" />
             <Avatar variant={3} size="small" />
+            <Avatar variant={4} size="tiny" />
             <RandomAvatar />
             <SeedAvatar seed={"BassLabb"} />
             <SeedAvatar seed={"Tessan"} />

@@ -1,10 +1,10 @@
-import styled from "styled-components"
+import styled, { css } from "styled-components"
 import type { User } from "~/models/user.server"
 import { hashStr } from "~/utils"
 import { Card } from "../Card"
 import { faces } from "./faces"
 
-type AvatarSize = "small" | "medium" | "large"
+type AvatarSize = "tiny" | "small" | "medium" | "large"
 
 type AvatarProps = {
   variant: number
@@ -25,6 +25,7 @@ const sizes: Record<AvatarSize, number> = {
   large: 100,
   medium: 60,
   small: 40,
+  tiny: 30,
 }
 
 const Wrapper = styled(Card)<{ size: AvatarSize }>`
@@ -34,6 +35,11 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   min-height: ${({ size }) => sizes[size]}px;
   max-width: ${({ size }) => sizes[size]}px;
   max-height: ${({ size }) => sizes[size]}px;
+  ${({ size, theme }) =>
+    size === "tiny" &&
+    css`
+      box-shadow: -2px 2px 0px 0px ${theme.colors.primary};
+    `}
   padding: 0;
   border-color: ${({ theme }) => theme.colors.avatarForeground};
 
@@ -45,19 +51,14 @@ const Wrapper = styled(Card)<{ size: AvatarSize }>`
   }
 `
 
-export const RandomAvatar = ({
-  size = "large",
-}: Omit<AvatarProps, "variant">) => {
+export const RandomAvatar = ({ size = "large" }: Omit<AvatarProps, "variant">) => {
   const variant = Math.floor(Math.random() * 12) + 1
 
   return <Avatar size={size} variant={variant}></Avatar>
 }
 
 const availableFaces = 30
-export const SeedAvatar = ({
-  size = "medium",
-  seed,
-}: Omit<AvatarProps, "variant"> & { seed: string }) => {
+export const SeedAvatar = ({ size = "medium", seed }: Omit<AvatarProps, "variant"> & { seed: string }) => {
   const hash = hashStr(seed)
   const variant = (hash % availableFaces) + 1
 
