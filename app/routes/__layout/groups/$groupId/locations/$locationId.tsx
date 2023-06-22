@@ -6,7 +6,6 @@ import invariant from "tiny-invariant"
 import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import { getGroupLocation } from "~/models/location.server"
-import { Table } from "~/components/Table"
 import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
@@ -62,17 +61,20 @@ export default function LocationDetailsPage() {
         ]}
       >
         {(lunch) => (
-          <Table.LinkRow to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`} key={lunch.id}>
-            <Table.Cell>
+          <SortableTable.LinkRow
+            to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
+            key={lunch.id}
+          >
+            <SortableTable.Cell>
               <Link to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}>
                 {formatTimeAgo(new Date(lunch.date))}
               </Link>
-            </Table.Cell>
-            <Table.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</Table.Cell>
-            <Table.Cell numeric>
+            </SortableTable.Cell>
+            <SortableTable.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</SortableTable.Cell>
+            <SortableTable.Cell numeric>
               {formatNumber(lunch.scores.reduce((acc, cur) => acc + cur.score, 0) / lunch.scores.length)}
-            </Table.Cell>
-          </Table.LinkRow>
+            </SortableTable.Cell>
+          </SortableTable.LinkRow>
         )}
       </SortableTable>
       {permissions.addLunch && (

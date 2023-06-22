@@ -25,6 +25,7 @@ const Icon = styled.button`
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  color: ${({ theme }) => theme.colors.primary};
 
   svg {
     width: 20px;
