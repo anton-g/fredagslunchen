@@ -360,7 +360,7 @@ const GroupLocations = ({
 
     const worstLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(0)
     const bestLunch = lunches.sort((a, b) => a.avgScore - b.avgScore).at(-1)
-    const lastLunch = lunches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).at(0)
+    const lastLunch = lunches.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).at(-1)
 
     return {
       address: x.location.address,
