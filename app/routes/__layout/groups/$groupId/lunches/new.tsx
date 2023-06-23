@@ -1,16 +1,10 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  Link,
-  useActionData,
-  useLoaderData,
-  useLocation,
-} from "@remix-run/react"
+import { Form, Link, useActionData, useLoaderData, useLocation } from "@remix-run/react"
 import isSameDay from "date-fns/isSameDay"
 import { useEffect, useRef, useState } from "react"
 import invariant from "tiny-invariant"
-import { Button, LinkButton } from "~/components/Button"
+import { LinkButton, LoadingButton } from "~/components/Button"
 import { Card } from "~/components/Card"
 import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
@@ -21,6 +15,7 @@ import type z from "zod"
 import { createLunch } from "~/models/lunch.server"
 import { requireUserId } from "~/session.server"
 import { mapToActualErrors, useUser } from "~/utils"
+import { useNavigation } from "@remix-run/react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -75,11 +70,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     )
   }
 
-  const {
-    "choosenBy-key": choosenById,
-    date,
-    "location-key": locationId,
-  } = result.data
+  const { "choosenBy-key": choosenById, date, "location-key": locationId } = result.data
 
   const lunch = await createLunch({
     choosenByUserId: choosenById,
@@ -93,6 +84,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function NewLunchPage() {
   const location = useLocation()
+  const navigation = useNavigation()
   const user = useUser()
   const actionData = useActionData() as ActionData
   const { group, preSelectedLocationId } = useLoaderData<typeof loader>()
@@ -130,9 +122,7 @@ export default function NewLunchPage() {
     selectedLocation && selectedDate
       ? group.groupLocations
           .find((x) => x.locationId === selectedLocation)
-          ?.lunches.find((x) =>
-            isSameDay(new Date(x.date), new Date(selectedDate))
-          )
+          ?.lunches.find((x) => isSameDay(new Date(x.date), new Date(selectedDate)))
       : null
 
   return (
@@ -159,14 +149,10 @@ export default function NewLunchPage() {
                 // required
                 onChange={(e) => setSelectedDate(e.target.value)}
                 aria-invalid={actionData?.errors?.date ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.date ? "date-error" : undefined
-                }
+                aria-errormessage={actionData?.errors?.date ? "date-error" : undefined}
               />
             </label>
-            {actionData?.errors?.date && (
-              <div id="date-error">{actionData.errors.date}</div>
-            )}
+            {actionData?.errors?.date && <div id="date-error">{actionData.errors.date}</div>}
           </div>
 
           <div>
@@ -187,9 +173,7 @@ export default function NewLunchPage() {
               )}
             </ComboBox>
             {actionData?.errors?.["choosenBy-key"] && (
-              <div id="choosenBy-error">
-                {actionData.errors?.["choosenBy-key"]}
-              </div>
+              <div id="choosenBy-error">{actionData.errors?.["choosenBy-key"]}</div>
             )}
           </div>
 
@@ -205,11 +189,7 @@ export default function NewLunchPage() {
 
                 setSelectedLocation(parseInt(key.toString()))
               }}
-              defaultSelectedKey={
-                preSelectedLocationId
-                  ? parseInt(preSelectedLocationId)
-                  : undefined
-              }
+              defaultSelectedKey={preSelectedLocationId ? parseInt(preSelectedLocationId) : undefined}
             >
               {(item) => (
                 <Item textValue={item.name}>
@@ -221,17 +201,14 @@ export default function NewLunchPage() {
               )}
             </ComboBox>
             {actionData?.errors?.["location-key"] && (
-              <div id="location-error">
-                {actionData.errors?.["location-key"]}
-              </div>
+              <div id="location-error">{actionData.errors?.["location-key"]}</div>
             )}
           </div>
 
           {existingLunch && (
             <Card>
               There already exists a lunch for this day at{" "}
-              {locations.find((x) => x.id === selectedLocation)?.name}, do you
-              want to{" "}
+              {locations.find((x) => x.id === selectedLocation)?.name}, do you want to{" "}
               <Link
                 to={`/groups/${group.id}/lunches/${existingLunch.id}`}
                 style={{ textDecoration: "underline" }}
@@ -242,14 +219,16 @@ export default function NewLunchPage() {
           )}
 
           <Stack gap={16} axis="horizontal">
-            <LinkButton
-              to={`/groups/${group.id}/locations/new?redirectTo=${location.pathname}`}
-            >
+            <LinkButton to={`/groups/${group.id}/locations/new?redirectTo=${location.pathname}`}>
               New location
             </LinkButton>
-            <Button style={{ marginLeft: "auto" }} type="submit">
-              Save
-            </Button>
+            <LoadingButton
+              loading={navigation.state !== "idle" && navigation.formMethod === "post"}
+              style={{ marginLeft: "auto" }}
+              type="submit"
+            >
+              Save lunch
+            </LoadingButton>
           </Stack>
         </Stack>
       </Form>

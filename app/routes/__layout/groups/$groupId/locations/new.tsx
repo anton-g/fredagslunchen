@@ -1,9 +1,9 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData, useSearchParams } from "@remix-run/react"
+import { Form, useActionData, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react"
 import { useEffect, useRef, useState } from "react"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, LoadingButton } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
@@ -109,6 +109,7 @@ export default function NewLocationPage() {
   const user = useUser()
   const actionData = useActionData() as ActionData
   const { group } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
   const nameRef = useRef<HTMLInputElement>(null!)
@@ -137,6 +138,10 @@ export default function NewLocationPage() {
       lonRef.current?.focus()
     } else if (actionData?.errors?.["discoveredBy-key"]) {
       discoveredByRef.current?.focus()
+    }
+
+    if (actionData?.errors) {
+      setManualEdit(true)
     }
   }, [actionData])
 
@@ -327,9 +332,9 @@ export default function NewLocationPage() {
 
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <div>
-            <Button style={{ marginLeft: "auto" }} type="submit">
-              Save
-            </Button>
+            <LoadingButton loading={navigation.state !== "idle"} style={{ marginLeft: "auto" }} type="submit">
+              Save location
+            </LoadingButton>
           </div>
         </Stack>
       </Form>

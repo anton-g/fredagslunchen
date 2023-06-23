@@ -1,4 +1,6 @@
 import { Link as RemixLink, NavLink as RemixNavLink } from "@remix-run/react"
+import type { ComponentProps } from "react"
+import { useEffect, useState } from "react"
 import styled, { css } from "styled-components"
 import type { CustomColors } from "~/styles/styled"
 
@@ -101,6 +103,26 @@ const Button = styled.button<{ variant?: ButtonVariant; size?: ButtonSize }>`
 
 Button.defaultProps = {
   variant: "normal",
+}
+
+export const LoadingButton = ({
+  loading,
+  ...props
+}: { loading: boolean } & ComponentProps<typeof Button>) => {
+  const [delayedLoading, setDelayedLoading] = useState(loading)
+
+  useEffect(() => {
+    let timeout: ReturnType<typeof setTimeout>
+    if (loading === true) {
+      timeout = setTimeout(() => setDelayedLoading(true), 200)
+    } else {
+      setDelayedLoading(false)
+    }
+
+    return () => timeout && clearTimeout(timeout)
+  }, [loading])
+
+  return <Button {...props} disabled={delayedLoading} />
 }
 
 const LinkButton = styled(RemixLink)<{
