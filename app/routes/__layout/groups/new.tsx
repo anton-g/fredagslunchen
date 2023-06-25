@@ -1,40 +1,29 @@
-import type { ActionFunction } from "@remix-run/node"
+import type { ActionArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData } from "@remix-run/react"
-import * as React from "react"
-import { zfd } from "zod-form-data"
-import type z from "zod"
+import z from "zod"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
-
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
 import { createGroup } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
-import { mapToActualErrors } from "~/utils"
 
-const formSchema = zfd.formData({
-  name: zfd.text(),
+const schema = z.object({
+  name: z.string().min(1, "Name is required"),
 })
 
-type ActionData = {
-  errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
-}
-
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionArgs) => {
   const userId = await requireUserId(request)
 
-  const result = formSchema.safeParse(await request.formData())
-
-  if (!result.success) {
-    return json<ActionData>(
-      {
-        errors: mapToActualErrors<typeof formSchema>(result),
-      },
-      { status: 400 }
-    )
+  const formData = await request.formData()
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
-  const name = result.data.name
+  const name = submission.value.name
 
   const group = await createGroup({ name, userId })
 
@@ -42,25 +31,24 @@ export const action: ActionFunction = async ({ request }) => {
 }
 
 export default function NewGroupPage() {
-  const actionData = useActionData() as ActionData
-  const nameRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus()
-    }
-  }, [actionData])
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { name }] = useForm({
+    id: "new-group-form",
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+  })
 
   return (
     <>
       <h2>Create a new club</h2>
       <p>
-        Create a new club to get started. When the club is created you can
-        invite other users to join you on your lunch adventures!
+        Create a new club to get started. When the club is created you can invite other users to join you on
+        your lunch adventures!
       </p>
       <p>If you're looking to join a club, tell them to invite you instead!</p>
       <Form
         method="post"
+        {...form.props}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -72,19 +60,9 @@ export default function NewGroupPage() {
           <div>
             <label>
               <span>Name</span>
-              <Input
-                ref={nameRef}
-                name="name"
-                required
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.name ? "name-error" : undefined
-                }
-              />
+              <Input {...conform.input(name, { ariaAttributes: true })} />
             </label>
-            {actionData?.errors?.name && (
-              <div id="name-error">{actionData.errors.name}</div>
-            )}
+            {name.error && <div id="name-error">{name.error}</div>}
           </div>
 
           <div>
