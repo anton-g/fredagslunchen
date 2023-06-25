@@ -1,20 +1,16 @@
-import { useEffect, useRef } from "react"
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useNavigation } from "@remix-run/react"
-
+import { useForm, conform } from "@conform-to/react"
+import { parse } from "@conform-to/zod"
 import { getUserId } from "~/session.server"
 import { createResetPasswordToken } from "~/models/user.server"
-import { validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
 import { sendPasswordResetEmail } from "~/services/mail.server"
+import { z } from "zod"
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request)
@@ -22,29 +18,22 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({})
 }
 
-interface ActionData {
-  errors?: {
-    email?: string
-  }
-}
+const schema = z.object({
+  email: z.string().min(1, "Email is required").email("Email is invalid"),
+})
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
-  const email = formData.get("email")
 
-  if (!validateEmail(email)) {
-    return json<ActionData>(
-      { errors: { email: "Email is invalid" } },
-      { status: 400 }
-    )
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json({ submission, success: false }, { status: 400 })
   }
 
-  const token = await createResetPasswordToken(email)
-  if (token) await sendPasswordResetEmail(email, token)
+  const token = await createResetPasswordToken(submission.value.email)
+  if (token) await sendPasswordResetEmail(submission.value.email, token)
 
-  return json({
-    ok: true,
-  })
+  return json({ submission, success: true })
 }
 
 export const meta: MetaFunction = () => {
@@ -54,44 +43,34 @@ export const meta: MetaFunction = () => {
 }
 
 export default function ForgotPasswordPage() {
-  const actionData = useActionData() as ActionData
-  const emailRef = useRef<HTMLInputElement>(null)
+  const actionData = useActionData<typeof action>()
   const navigation = useNavigation()
-
-  useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus()
-    }
-  }, [actionData])
+  const [form, { email }] = useForm({
+    id: "reset-password-form",
+    lastSubmission: actionData?.submission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+  })
 
   return (
     <>
       <h2>Reset password</h2>
-      {actionData && !actionData.errors ? (
+      {actionData && actionData.success ? (
         <p>
-          We've sent an email with instructions on how to reset your password!
-          (If you don't receive it, check your junk folder.)
+          We've sent an email with instructions on how to reset your password! (If you don't receive it, check
+          your junk folder.)
         </p>
       ) : (
-        <Form method="post">
+        <Form method="post" {...form.props}>
           <Stack gap={16}>
             <div>
-              <label htmlFor="email">Email address</label>
+              <label htmlFor={email.id}>Email address</label>
               <div>
                 <Input
-                  ref={emailRef}
-                  id="email"
-                  required
+                  {...conform.input(email, { type: "email", ariaAttributes: true })}
                   autoFocus={true}
-                  name="email"
-                  type="email"
                   autoComplete="email"
-                  aria-invalid={actionData?.errors?.email ? true : undefined}
-                  aria-describedby="email-error"
                 />
-                {actionData?.errors?.email && (
-                  <div id="email-error">{actionData.errors.email}</div>
-                )}
+                {email.error && <div id={`${email.id}-error`}>{email.error}</div>}
               </div>
             </div>
             <SubmitButton type="submit" disabled={navigation.state !== "idle"}>

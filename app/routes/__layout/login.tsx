@@ -1,7 +1,7 @@
-import type { ActionFunction, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react"
-import { useForm } from "@conform-to/react"
+import { useForm, conform } from "@conform-to/react"
 import { parse } from "@conform-to/zod"
 import { createUserSession, getUserId } from "~/session.server"
 import { verifyLogin } from "~/models/user.server"
@@ -26,7 +26,7 @@ const schema = z.object({
   redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
 })
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
 
   const submission = parse(formData, { schema })
@@ -61,6 +61,7 @@ export default function LoginPage() {
   const redirectToParam = searchParams.get("redirectTo") || "/"
   const lastSubmission = useActionData<typeof action>()
   const [form, { email, password, redirectTo, remember }] = useForm({
+    id: "login-form",
     lastSubmission,
     onValidate: ({ formData }) => parse(formData, { schema }),
   })
@@ -71,35 +72,25 @@ export default function LoginPage() {
       <Form method="post" {...form.props}>
         <Stack gap={16}>
           <div>
-            <label htmlFor="email">Email address</label>
+            <label htmlFor={email.id}>Email address</label>
             <div>
               <Input
-                id="email"
-                required
+                {...conform.input(email, { type: "email", ariaAttributes: true })}
                 autoFocus={true}
-                name={email.name}
-                type="email"
                 autoComplete="email"
-                aria-invalid={email.error ? true : undefined}
-                aria-describedby="email-error"
               />
-              {email.error && <div id="email-error">{email.error}</div>}
+              {email.error && <div id={`${email.id}-error`}>{email.error}</div>}
             </div>
           </div>
 
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor={password.id}>Password</label>
             <div>
               <Input
-                id="password"
-                name={password.name}
-                type="password"
-                minLength={8}
+                {...conform.input(password, { type: "password", ariaAttributes: true })}
                 autoComplete="current-password"
-                aria-invalid={password.error ? true : undefined}
-                aria-describedby="password-error"
               />
-              {password.error && <div id="password-error">{password.error}</div>}
+              {password.error && <div id={`${password.id}-error`}>{password.error}</div>}
             </div>
           </div>
 
