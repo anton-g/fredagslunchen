@@ -1,6 +1,6 @@
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
-import z from "zod"
+import z, { ZodSchema } from "zod"
 
 import type { Email, User } from "~/models/user.server"
 
@@ -167,23 +167,5 @@ export const getRandomAvatarId = (input: string) => {
   return (hash % 30) + 1
 }
 
-// if this doesn't someday break..
-export function mapToActualErrors<T extends z.ZodType<any, any, any>>(result: z.SafeParseError<z.infer<T>>) {
-  const errors = result.error.flatten()
-
-  type FlattenedErrors = z.inferFlattenedErrors<T>
-  type Keys = keyof FlattenedErrors["fieldErrors"]
-
-  const actualErrors = Object.entries(errors.fieldErrors).reduce<Partial<Record<Keys, string>>>(
-    (acc, [key, value]) => {
-      acc[key as Keys] = (value as string[])[0]
-
-      return acc
-    },
-    {}
-  )
-  return actualErrors
-}
-
-export const numeric = (schema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
+export const numeric = (schema: ZodSchema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
   z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)

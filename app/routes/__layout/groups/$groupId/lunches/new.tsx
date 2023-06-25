@@ -13,9 +13,8 @@ import { getGroup, getGroupPermissions } from "~/models/group.server"
 import z from "zod"
 import { createLunch } from "~/models/lunch.server"
 import { requireUserId } from "~/session.server"
-import { useUser } from "~/utils"
+import { numeric, useUser } from "~/utils"
 import { useNavigation } from "@remix-run/react"
-import { numeric } from "zod-form-data"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 
@@ -51,7 +50,7 @@ const schema = z.object({
   choosenBy: z.string().min(1, "Choosen by is required"),
   "choosenBy-key": z.string().min(1, "Choosen by is required"),
   location: z.string().min(1, "Location is required"),
-  "location-key": numeric(),
+  "location-key": numeric(z.coerce.number({ invalid_type_error: "Invalid" })),
 })
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -70,7 +69,7 @@ export const action = async ({ request, params }: ActionArgs) => {
   const lunch = await createLunch({
     choosenByUserId: choosenById,
     date,
-    locationId,
+    locationId: locationId.toString(),
     groupId,
   })
 
