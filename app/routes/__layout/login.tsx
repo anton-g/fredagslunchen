@@ -22,7 +22,7 @@ export const loader: LoaderFunction = async ({ request }) => {
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
   password: z.string().min(8, "Password is too short"),
-  remember: z.coerce.boolean(),
+  remember: z.preprocess((x) => x === "on", z.boolean()),
   redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
 })
 

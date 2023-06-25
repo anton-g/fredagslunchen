@@ -1,4 +1,4 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionArgs, LoaderArgs } from "@remix-run/node"
 import type { Group, GroupMember } from "~/models/group.server"
 import { getGroupPermissions } from "~/models/group.server"
 import type { User } from "~/models/user.server"
@@ -12,15 +12,15 @@ import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
-import { zfd } from "zod-form-data"
 import z from "zod"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
-import { mapToActualErrors } from "~/utils"
 import { Checkbox } from "~/components/Checkbox"
 import { Help } from "~/components/Help"
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -44,28 +44,38 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   })
 }
 
-type ActionData = {
-  errors?: {
-    action?: string
-    name?: string
-    lat?: string
-    lon?: string
-    public?: string
-  }
-}
+const numeric = (schema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
+  z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
 
-export const action: ActionFunction = async ({ request, params }) => {
+const updateSchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  lat: numeric(),
+  lon: numeric(),
+  public: z.preprocess((x) => x === "on", z.boolean()),
+  action: z.literal("update", {
+    required_error: "Action is required",
+  }),
+})
+
+const deleteSchema = z.object({
+  action: z.literal("delete", {
+    required_error: "Action is required",
+  }),
+})
+
+const schema = z.discriminatedUnion("action", [updateSchema, deleteSchema])
+
+export const action = async ({ request, params }: ActionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const formData = await request.formData()
-  const action = formData.get("action")
-
-  if (typeof action !== "string" || action.length === 0) {
-    return json<ActionData>({ errors: { action: "Action is required" } }, { status: 400 })
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
-  switch (action) {
+  switch (submission.value.action) {
     case "delete":
       return deleteGroupAction(userId, params.groupId)
     default:
@@ -73,26 +83,13 @@ export const action: ActionFunction = async ({ request, params }) => {
   }
 }
 
-const updateGroupSchema = zfd.formData({
-  name: zfd.text(),
-  lat: zfd.numeric(z.number().nullish()),
-  lon: zfd.numeric(z.number().nullish()),
-  public: zfd.checkbox(),
-})
-
 const updateGroupAction = async (formData: FormData, groupId: Group["id"]) => {
-  const result = updateGroupSchema.safeParse(formData)
-
-  if (!result.success) {
-    return json<ActionData>(
-      {
-        errors: mapToActualErrors<typeof updateGroupSchema>(result),
-      },
-      { status: 400 }
-    )
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit" || submission.value.action === "delete") {
+    return json(submission, { status: 400 })
   }
 
-  const { name, lat, lon, public: isGroupPublic } = result.data
+  const { name, lat, lon, public: isGroupPublic } = submission.value
 
   const group = await updateGroup({
     id: groupId,
@@ -116,16 +113,20 @@ const deleteGroupAction = async (userId: User["id"], groupId: Group["id"]) => {
 
 export default function GroupSettingsPage() {
   const { group, userId } = useLoaderData<typeof loader>()
-  const actionData = useActionData() as ActionData
-  const nameRef = useRef<HTMLInputElement>(null)
   const latRef = useRef<HTMLInputElement>(null)
   const lonRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus()
-    }
-  }, [actionData])
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { name, lat, lon, public: publicSetting }] = useForm({
+    id: "group-settings-form",
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+    defaultValue: {
+      name: group.name,
+      lat: group.lat,
+      lon: group.lon,
+    },
+  })
 
   const handleCoordinatePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
     const value = e.clipboardData.getData("Text")
@@ -142,23 +143,13 @@ export default function GroupSettingsPage() {
 
   return (
     <div>
-      <Form method="post">
+      <Form method="post" {...form.props}>
         <Subtitle>Details</Subtitle>
         <div>
-          <label htmlFor="name">Name</label>
+          <label htmlFor={name.id}>Name</label>
           <div>
-            <Input
-              ref={nameRef}
-              id="name"
-              required
-              name="name"
-              type="name"
-              autoComplete="name"
-              defaultValue={group.name}
-              aria-invalid={actionData?.errors?.name ? true : undefined}
-              aria-describedby="name-error"
-            />
-            {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
+            <Input {...conform.input(name, { ariaAttributes: true })} autoComplete="name" />
+            {name.error && <div id={`${name.id}-error`}>{name.error}</div>}
           </div>
         </div>
         <Spacer size={16} />
@@ -168,45 +159,36 @@ export default function GroupSettingsPage() {
           <div style={{ width: "100%" }}>
             <label>
               <span>Latitude</span>
-              <Input
-                ref={latRef}
-                name="lat"
-                onPaste={handleCoordinatePaste}
-                defaultValue={group.lat ?? ""}
-                aria-invalid={actionData?.errors?.lat ? true : undefined}
-                aria-errormessage={actionData?.errors?.lat ? "lat-error" : undefined}
-              />
+              <Input {...conform.input(lat)} ref={latRef} onPaste={handleCoordinatePaste} />
             </label>
-            {actionData?.errors?.lat && <div id="lat-error">{actionData.errors.lat}</div>}
+            {lat.error && <div id={`${lat.id}-error`}>{lat.error}</div>}
           </div>
 
           <div style={{ width: "100%" }}>
             <label>
               <span>Longitude</span>
-              <Input
-                ref={lonRef}
-                name="lon"
-                onPaste={handleCoordinatePaste}
-                defaultValue={group.lon ?? ""}
-                aria-invalid={actionData?.errors?.lon ? true : undefined}
-                aria-errormessage={actionData?.errors?.lon ? "lon-error" : undefined}
-              />
+              <Input {...conform.input(lon)} ref={lonRef} onPaste={handleCoordinatePaste} />
             </label>
-            {actionData?.errors?.lon && <div id="lon-error">{actionData.errors.lon}</div>}
+            {lon.error && <div id={`${lon.id}-error`}>{lon.error}</div>}
           </div>
         </Stack>
         <Spacer size={16} />
         <Subtitle>Settings</Subtitle>
         <div>
           <Stack axis="horizontal" gap={8} align="center">
-            <Checkbox name="public" id="public" defaultChecked={group.public} />
-            <label htmlFor="public">Public</label>
+            <Checkbox
+              name={publicSetting.name}
+              id={publicSetting.id}
+              defaultChecked={group.public}
+              required={publicSetting.required}
+            />
+            <label htmlFor={publicSetting.id}>Public</label>
             <Help>
               Public groups are accessible by anyone, even if they're not a user of Fredagslunchen or a member
               of your group.
             </Help>
           </Stack>
-          {actionData?.errors?.public && <div id="public-error">{actionData.errors.public}</div>}
+          {publicSetting.error && <div id="public-error">{publicSetting.error}</div>}
         </div>
         <Spacer size={16} />
         <input type="hidden" name="action" value="update" />
