@@ -1,20 +1,17 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node"
+import type { ActionFunction, LoaderFunction, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react"
-import * as React from "react"
-
+import { useForm } from "@conform-to/react"
+import { parse } from "@conform-to/zod"
 import { createUserSession, getUserId } from "~/session.server"
 import { verifyLogin } from "~/models/user.server"
-import { safeRedirect, validateEmail } from "~/utils"
+import { safeRedirect } from "~/utils"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
 import { Checkbox } from "~/components/Checkbox"
+import { z } from "zod"
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request)
@@ -22,55 +19,34 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({})
 }
 
-interface ActionData {
-  errors?: {
-    email?: string
-    password?: string
-  }
-}
+const schema = z.object({
+  email: z.string().min(1, "Email is required").email("Email is invalid"),
+  password: z.string().min(8, "Password is too short"),
+  remember: z.coerce.boolean(),
+  redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
+})
 
 export const action: ActionFunction = async ({ request }) => {
   const formData = await request.formData()
-  const email = formData.get("email")
-  const password = formData.get("password")
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/")
-  const remember = formData.get("remember")
 
-  if (!validateEmail(email)) {
-    return json<ActionData>(
-      { errors: { email: "Email is invalid" } },
-      { status: 400 }
-    )
+  const submission = parse(formData, { schema })
+
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
-  if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Password is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (password.length < 8) {
-    return json<ActionData>(
-      { errors: { password: "Password is too short" } },
-      { status: 400 }
-    )
-  }
-
-  const user = await verifyLogin(email, password)
+  const user = await verifyLogin(submission.value.email, submission.value.password)
 
   if (!user) {
-    return json<ActionData>(
-      { errors: { email: "Invalid email or password" } },
-      { status: 400 }
-    )
+    submission.error.email = "Email or password is incorrect"
+    return json(submission, { status: 400 })
   }
 
   return createUserSession({
     request,
     userId: user.id,
-    remember: remember === "on" ? true : false,
-    redirectTo,
+    remember: submission.value.remember,
+    redirectTo: submission.value.redirectTo,
   })
 }
 
@@ -82,41 +58,32 @@ export const meta: MetaFunction = () => {
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") || "/"
-  const actionData = useActionData() as ActionData
-  const emailRef = React.useRef<HTMLInputElement>(null)
-  const passwordRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus()
-    } else if (actionData?.errors?.password) {
-      passwordRef.current?.focus()
-    }
-  }, [actionData])
+  const redirectToParam = searchParams.get("redirectTo") || "/"
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { email, password, redirectTo, remember }] = useForm({
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+  })
 
   return (
     <Wrapper>
       <h2>Login</h2>
-      <Form method="post">
+      <Form method="post" {...form.props}>
         <Stack gap={16}>
           <div>
             <label htmlFor="email">Email address</label>
             <div>
               <Input
-                ref={emailRef}
                 id="email"
                 required
                 autoFocus={true}
-                name="email"
+                name={email.name}
                 type="email"
                 autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
+                aria-invalid={email.error ? true : undefined}
                 aria-describedby="email-error"
               />
-              {actionData?.errors?.email && (
-                <div id="email-error">{actionData.errors.email}</div>
-              )}
+              {email.error && <div id="email-error">{email.error}</div>}
             </div>
           </div>
 
@@ -125,29 +92,24 @@ export default function LoginPage() {
             <div>
               <Input
                 id="password"
-                ref={passwordRef}
-                name="password"
+                name={password.name}
                 type="password"
                 minLength={8}
                 autoComplete="current-password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
+                aria-invalid={password.error ? true : undefined}
                 aria-describedby="password-error"
               />
-              {actionData?.errors?.password && (
-                <div id="password-error">{actionData.errors.password}</div>
-              )}
+              {password.error && <div id="password-error">{password.error}</div>}
             </div>
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
+          <input type="hidden" name={redirectTo.name} value={redirectToParam} />
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Checkbox id="remember" name="remember" />
+            <Checkbox id="remember" name={remember.name} />
             <label htmlFor="remember">Remember me</label>
             <SubmitButton type="submit">Log in</SubmitButton>
           </div>
-          <ForgotPasswordLink to="/forgot-password">
-            Forgot your password?
-          </ForgotPasswordLink>
+          <ForgotPasswordLink to="/forgot-password">Forgot your password?</ForgotPasswordLink>
         </Stack>
       </Form>
     </Wrapper>

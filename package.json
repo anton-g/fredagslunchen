@@ -29,6 +29,8 @@
     "/public/build"
   ],
   "dependencies": {
+    "@conform-to/react": "^0.7.1",
+    "@conform-to/zod": "^0.7.1",
     "@faker-js/faker": "^6.3.1",
     "@nivo/core": "^0.80.0",
     "@nivo/line": "^0.80.0",
