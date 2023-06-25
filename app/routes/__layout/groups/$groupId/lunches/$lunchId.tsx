@@ -28,7 +28,6 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
 import { SortableTable } from "~/components/SortableTable"
-import { request } from "http"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)

@@ -39,9 +39,11 @@ export const CreateAnonymousUserButton = ({ groupId }: { groupId: Group["id"] })
             <p>Anonymous users are users without an account.</p>
             <p>
               They are perfect for your friend that doesn't have a computer, your lazy boss or anyone else
-              that still want to follow along on your lunch journeys.
+              that still want to follow along on your lunch journeys without a Fredagslunchen account.
             </p>
-            <p>You can transfer the anonymous users data to their account later.</p>
+            <p>
+              You can transfer the anonymous users data to them if they decide to create an account later on.
+            </p>
           </DialogDescription>
           <fetcher.Form method="post" action="/api/users/create-anonymous">
             <input type="hidden" name="groupId" value={groupId} />
