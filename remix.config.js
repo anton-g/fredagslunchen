@@ -7,5 +7,6 @@ module.exports = {
   serverDependenciesToBundle: ["nanoid"],
   future: {
     v2_errorBoundary: true,
+    v2_normalizeFormMethod: true,
   },
 }

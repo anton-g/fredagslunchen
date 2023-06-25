@@ -206,7 +206,7 @@ export default function NewLunchPage() {
               New location
             </LinkButton>
             <LoadingButton
-              loading={navigation.state !== "idle" && navigation.formMethod === "post"}
+              loading={navigation.state !== "idle" && navigation.formMethod === "POST"}
               style={{ marginLeft: "auto" }}
               type="submit"
             >
