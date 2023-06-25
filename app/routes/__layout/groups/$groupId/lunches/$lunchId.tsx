@@ -9,7 +9,7 @@ import { getGroupPermissions } from "~/models/group.server"
 import { useEffect, useRef } from "react"
 import styled from "styled-components"
 import { json, redirect } from "@remix-run/node"
-import { Form, Link, useCatch, useFetcher, useLoaderData } from "@remix-run/react"
+import { Form, Link, isRouteErrorResponse, useFetcher, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
 import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons"
@@ -269,20 +269,41 @@ function LunchScoreRow({
   )
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
+export function ErrorBoundary() {
+  const error = useRouteError()
 
-  return <div>An unexpected error occurred: {error.message}</div>
-}
-
-export function CatchBoundary() {
-  const caught = useCatch()
-
-  if (caught.status === 404) {
-    return <div>Lunch not found</div>
+  if (error instanceof Error) {
+    return <div>An unexpected error occurred: {error.message}</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`)
+  if (!isRouteErrorResponse(error)) {
+    return <h1>Unknown Error</h1>
+  }
+
+  if (error.status === 404) {
+    return (
+      <div>
+        <h2>Lunch not found</h2>
+      </div>
+    )
+  }
+
+  if (error.status === 401) {
+    return (
+      <div>
+        <h2>Access denied</h2>
+        If someone sent you this link, ask them to invite you to their club.
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h1>Oops</h1>
+      <p>Status: {error.status}</p>
+      <p>{error.data.message}</p>
+    </div>
+  )
 }
 
 const Title = styled.h2`

@@ -1,6 +1,7 @@
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
-import z, { ZodSchema } from "zod"
+import type { ZodSchema } from "zod"
+import z from "zod"
 
 import type { Email, User } from "~/models/user.server"
 

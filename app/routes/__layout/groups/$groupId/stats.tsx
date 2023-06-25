@@ -1,6 +1,6 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { useCatch, useLoaderData } from "@remix-run/react"
+import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { ResponsiveLine } from "@nivo/line"
 
@@ -59,16 +59,18 @@ export default function GroupStatsPage() {
   )
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
+export function ErrorBoundary() {
+  const error = useRouteError()
 
-  return <div>An unexpected error occurred: {error.message}</div>
-}
+  if (error instanceof Error) {
+    return <div>An unexpected error occurred: {error.message}</div>
+  }
 
-export function CatchBoundary() {
-  const caught = useCatch()
+  if (!isRouteErrorResponse(error)) {
+    return <h1>Unknown Error</h1>
+  }
 
-  if (caught.status === 404) {
+  if (error.status === 404) {
     return (
       <div>
         <h2>Club not found</h2>
@@ -76,16 +78,22 @@ export function CatchBoundary() {
     )
   }
 
-  if (caught.status === 401) {
+  if (error.status === 401) {
     return (
       <div>
         <h2>Access denied</h2>
-        If someone sent you this link, ask them to add you to their club.
+        If someone sent you this link, ask them to invite you to their club.
       </div>
     )
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`)
+  return (
+    <div>
+      <h1>Oops</h1>
+      <p>Status: {error.status}</p>
+      <p>{error.data.message}</p>
+    </div>
+  )
 }
 
 const Title = styled.h2`

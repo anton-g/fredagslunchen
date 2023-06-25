@@ -1,7 +1,13 @@
 import { CopyIcon, Cross2Icon } from "@radix-ui/react-icons"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { useActionData, useCatch, useFetcher, useLoaderData } from "@remix-run/react"
+import {
+  isRouteErrorResponse,
+  useActionData,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+} from "@remix-run/react"
 import * as React from "react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
@@ -178,18 +184,30 @@ const InviteDescription = styled.p`
   margin-bottom: 16px;
 `
 
-export function CatchBoundary() {
-  const caught = useCatch()
+export function ErrorBoundary() {
+  const error = useRouteError()
 
-  if (caught.status === 404) {
-    return <div>Club not found</div>
+  if (error instanceof Error) {
+    return <div>An unexpected error occurred: {error.message}</div>
   }
 
-  throw new Error(`Unexpected caught response with status: ${caught.status}`)
-}
+  if (!isRouteErrorResponse(error)) {
+    return <h1>Unknown Error</h1>
+  }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
+  if (error.status === 404) {
+    return (
+      <div>
+        <h2>Club not found</h2>
+      </div>
+    )
+  }
 
-  return <div>An unexpected error occurred: {error.message}</div>
+  return (
+    <div>
+      <h1>Oops</h1>
+      <p>Status: {error.status}</p>
+      <p>{error.data.message}</p>
+    </div>
+  )
 }
