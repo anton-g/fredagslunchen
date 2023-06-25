@@ -1,7 +1,7 @@
 # Next
 - Add public setting
   - User
-- Use zod (+ zod-form-data?) for validating inputs
+- Use Conform for all Forms
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Fix future date descriptions
@@ -19,7 +19,6 @@
 - Add optimistic UI when possible
 - Replace Cypress with Playwright
 - Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
-- Use Conform for all Forms
 
 # Before premium
 - Map designs for themes
