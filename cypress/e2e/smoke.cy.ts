@@ -7,7 +7,7 @@ describe("smoke tests", () => {
 
   it("should allow you to register, login, logout and reset forgotten password", () => {
     const testUser = {
-      name: faker.name.firstName(),
+      name: faker.person.firstName(),
       email: `${faker.internet.userName()}@example.com`,
       password: faker.internet.password(),
       updatedPassword: faker.internet.password(),
@@ -116,11 +116,11 @@ describe("smoke tests", () => {
     }
     const testLocation = {
       name: faker.lorem.words(2),
-      streetAddress: faker.address.streetAddress(),
-      zipCode: faker.address.zipCode(),
-      city: faker.address.city(),
-      lng: faker.address.longitude(),
-      lat: faker.address.latitude(),
+      streetAddress: faker.location.streetAddress(),
+      zipCode: faker.location.zipCode(),
+      city: faker.location.city(),
+      lng: faker.location.longitude(),
+      lat: faker.location.latitude(),
     }
     cy.login().then((user) => {
       cy.createGroup({ name: testGroup.name, userId: user.userId })
@@ -134,13 +134,11 @@ describe("smoke tests", () => {
     cy.findByRole("link", { name: /new location/i }).click()
 
     cy.findByRole("combobox", { name: /name/i }).type(testLocation.name)
-    cy.findByRole("textbox", { name: /address/i }).type(
-      testLocation.streetAddress
-    )
+    cy.findByRole("textbox", { name: /address/i }).type(testLocation.streetAddress)
     cy.findByRole("textbox", { name: /zip code/i }).type(testLocation.zipCode)
     cy.findByRole("textbox", { name: /city/i }).type(testLocation.city)
-    cy.findByRole("textbox", { name: /lat/i }).type(testLocation.lat)
-    cy.findByRole("textbox", { name: /lon/i }).type(testLocation.lng)
+    cy.findByRole("textbox", { name: /lat/i }).type(testLocation.lat.toString())
+    cy.findByRole("textbox", { name: /lon/i }).type(testLocation.lng.toString())
 
     cy.findByRole("button", { name: /save/i }).click()
 

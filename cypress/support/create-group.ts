@@ -3,7 +3,7 @@
 // npx ts-node --require tsconfig-paths/register ./cypress/support/create-group.ts groupName userId
 // and it will log out the group id value.
 
-import faker from "@faker-js/faker"
+import { faker } from "@faker-js/faker"
 import { installGlobals } from "@remix-run/node"
 import { createGroup } from "~/models/group.server"
 import { createGroupLocation } from "~/models/location.server"
@@ -20,13 +20,13 @@ async function createGroupCommand(name: string, userId: string) {
   const location = await createGroupLocation({
     discoveredById: userId,
     groupId: group.id,
-    name: faker.company.companyName(),
-    address: faker.address.streetAddress(),
-    city: faker.address.city(),
-    zipCode: faker.address.zipCode(),
-    lat: faker.address.latitude(),
-    lon: faker.address.longitude(),
-    countryCode: faker.address.countryCode(),
+    name: faker.company.name(),
+    address: faker.location.streetAddress(),
+    city: faker.location.city(),
+    zipCode: faker.location.zipCode(),
+    lat: faker.location.latitude().toString(),
+    lon: faker.location.longitude().toString(),
+    countryCode: faker.location.countryCode(),
     osmId: faker.datatype.uuid(),
     global: false,
   })

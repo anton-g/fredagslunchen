@@ -462,7 +462,7 @@ async function demoUser(gender: "male" | "female", key: string) {
           },
         },
       },
-      name: faker.name.firstName(gender),
+      name: faker.person.firstName(gender),
     },
   })
 }
