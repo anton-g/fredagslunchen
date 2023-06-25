@@ -1,17 +1,15 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useSearchParams } from "@remix-run/react"
-import * as React from "react"
 import { getUserId } from "~/session.server"
 import { changeUserPasswordWithToken as resetUserPassword } from "~/models/user.server"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
+import { z } from "zod"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await getUserId(request)
@@ -25,52 +23,27 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json({})
 }
 
-interface ActionData {
-  errors?: {
-    password?: string
-    confirmPassword?: string
-    token?: string
-  }
-}
+const schema = z
+  .object({
+    password: z.string().min(8, "Password is too short"),
+    confirmPassword: z.string().min(8, "Password is too short"),
+    token: z.string().min(1, "Missing password reset token"),
+  })
+  .refine(({ password, confirmPassword }) => password === confirmPassword, {
+    path: ["confirmPassword"],
+    message: "Passwords doesn't match",
+  })
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
-  const password = formData.get("password")
-  const confirmPassword = formData.get("confirm-password")
-  const token = formData.get("token")
-
-  if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Password is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (password.length < 8) {
-    return json<ActionData>(
-      { errors: { password: "Password is too short" } },
-      { status: 400 }
-    )
-  }
-
-  // TODO maybe only do this client side?
-  if (typeof confirmPassword !== "string" || password !== confirmPassword) {
-    return json<ActionData>(
-      { errors: { confirmPassword: "Password doesn't match" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof token !== "string" || token.length === 0) {
-    return json<ActionData>(
-      { errors: { token: "Reset token is required" } },
-      { status: 400 }
-    )
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
   await resetUserPassword({
-    token,
-    newPassword: password,
+    token: submission.value.token,
+    newPassword: submission.value.password,
   })
 
   return redirect("/login")
@@ -84,73 +57,43 @@ export const meta: MetaFunction = () => {
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()
-  const actionData = useActionData() as ActionData
-
-  const passwordRef = React.useRef<HTMLInputElement>(null)
-  const confirmPasswordRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (actionData?.errors?.password) {
-      passwordRef.current?.focus()
-    } else if (actionData?.errors?.confirmPassword) {
-      confirmPasswordRef.current?.focus()
-    }
-  }, [actionData])
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { password, confirmPassword, token }] = useForm({
+    id: "reset-password-form",
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+  })
 
   const resetToken = searchParams.get("token")
 
   return (
     <>
       <h2>Reset password</h2>
-      <Form method="post">
+      <Form method="post" {...form.props}>
         <Stack gap={16}>
           {resetToken && (
             <>
               <div>
-                <label htmlFor="password">New password</label>
+                <label htmlFor={password.id}>New password</label>
                 <div>
                   <Input
-                    ref={passwordRef}
-                    id="password"
-                    required
                     autoFocus={true}
-                    name="password"
-                    type="password"
-                    minLength={8}
                     autoComplete="password"
-                    aria-invalid={
-                      actionData?.errors?.password ? true : undefined
-                    }
-                    aria-describedby="password-error"
+                    {...conform.input(password, { type: "password", ariaAttributes: true })}
                   />
-                  {actionData?.errors?.password && (
-                    <div id="password-error">{actionData.errors.password}</div>
-                  )}
+                  {password.error && <div id={`${password.id}-error`}>{password.error}</div>}
                 </div>
               </div>
               <div>
-                <label htmlFor="confirm-password">Confirm password</label>
+                <label htmlFor={confirmPassword.id}>Confirm password</label>
                 <div>
-                  <Input
-                    ref={confirmPasswordRef}
-                    id="confirm-password"
-                    required
-                    minLength={8}
-                    name="confirm-password"
-                    type="password"
-                    aria-invalid={
-                      actionData?.errors?.confirmPassword ? true : undefined
-                    }
-                    aria-describedby="confirm-password-error"
-                  />
-                  {actionData?.errors?.confirmPassword && (
-                    <div id="confirm-password-error">
-                      {actionData.errors.confirmPassword}
-                    </div>
+                  <Input {...conform.input(confirmPassword, { type: "password", ariaAttributes: true })} />
+                  {confirmPassword.error && (
+                    <div id={`${confirmPassword.id}-error`}>{confirmPassword.error}</div>
                   )}
                 </div>
               </div>
-              <input type="hidden" name="token" value={resetToken} />
+              <input value={resetToken} {...conform.input(token, { hidden: true })} />
               <SubmitButton type="submit">Save password</SubmitButton>
             </>
           )}
