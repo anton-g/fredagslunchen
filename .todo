@@ -17,8 +17,9 @@
 - Feedback
 - Add transitions and loading state when necessary
 - Add optimistic UI when possible
-- Test the cypress workaround in updated Indie Stack
+- Replace Cypress with Playwright
 - Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
+- Use Conform for all Forms
 
 # Before premium
 - Map designs for themes
@@ -33,6 +34,7 @@
 # Later
 - Integrations
   - Slack notification when adding lunch, getting request?
+  - Only Supporters?
 - Delete user
 - Social login
 - Restructure api routes
