@@ -53,8 +53,6 @@ export const action: ActionFunction = async ({ request }) => {
     })
   }
 
-  console.log({ locationToId, locationFromId })
-
   await mergeLocations({
     locationFromId: parseInt(locationFromId),
     locationToId: parseInt(locationToId),
@@ -111,9 +109,7 @@ export default function AdminLocationsMergePage() {
               </Item>
             )}
           </ComboBox>
-          {actionData?.errors?.locationTo && (
-            <div id="locationTo-error">{actionData.errors.locationTo}</div>
-          )}
+          {actionData?.errors?.locationTo && <div id="locationTo-error">{actionData.errors.locationTo}</div>}
         </div>
         <Button style={{ marginLeft: "auto" }}>Submit</Button>
       </Stack>

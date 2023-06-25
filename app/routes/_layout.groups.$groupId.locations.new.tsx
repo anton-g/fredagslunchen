@@ -164,8 +164,6 @@ export default function NewLocationPage() {
     nameRef.current.focus()
   }
 
-  console.log(lastSubmission)
-
   return (
     <>
       <h3>New location</h3>

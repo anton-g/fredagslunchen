@@ -17,8 +17,6 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json<ActionData>({ ok: false }, { status: 400 })
   }
 
-  console.log(requestId)
-
   deleteScoreRequest({
     id: parseInt(requestId),
   })

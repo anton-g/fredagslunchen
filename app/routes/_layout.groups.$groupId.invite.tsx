@@ -129,8 +129,12 @@ export default function InvitePage() {
           <Stack gap={16}>
             <Input
               value={`${baseUrl}/join?token=${groupInviteToken}`}
+              readOnly
               onFocus={(e) => e.target.select()}
               aria-label="Invite link"
+              style={{
+                cursor: "text",
+              }}
             />
             <Stack gap={8} axis="horizontal" style={{ marginLeft: "auto" }}>
               <fetcher.Form method="post" action="/groups/api/invite-token">
