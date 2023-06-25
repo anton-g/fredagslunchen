@@ -6,6 +6,7 @@ import { getEnv } from "./env.server"
 
 global.ENV = getEnv()
 
+// TODO update this to support streaming?
 export default function handleRequest(
   request: Request,
   responseStatusCode: number,
@@ -14,11 +15,7 @@ export default function handleRequest(
 ) {
   const sheet = new ServerStyleSheet()
 
-  let markup = renderToString(
-    sheet.collectStyles(
-      <RemixServer context={remixContext} url={request.url} />
-    )
-  )
+  let markup = renderToString(sheet.collectStyles(<RemixServer context={remixContext} url={request.url} />))
   const styles = sheet.getStyleTags()
   markup = markup.replace("__STYLES__", styles)
 
