@@ -1,20 +1,21 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionArgs, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import invariant from "tiny-invariant"
 import { Button, LoadingButton } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { getGroup, getGroupPermissions } from "~/models/group.server"
-import { zfd } from "zod-form-data"
 import z from "zod"
 import { createGroupLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
-import { mapToActualErrors, safeRedirect, useUser } from "~/utils"
+import { numeric, safeRedirect, useUser } from "~/utils"
 import { LocationAutocomplete } from "~/components/LocationAutocomplete"
 import type { LocationSuggestion } from "~/services/locationiq.server"
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -37,37 +38,30 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ group, permissions })
 }
 
-const formSchema = zfd.formData({
-  osmId: zfd.text(),
-  name: zfd.text(),
-  address: zfd.text(),
-  zipCode: zfd.text(),
-  city: zfd.text(),
-  countryCode: zfd.text(),
-  lat: zfd.text(z.string().optional()),
-  lon: zfd.text(z.string().optional()),
-  "discoveredBy-key": zfd.text(),
-  redirectTo: zfd.text(z.string().optional()),
+const schema = z.object({
+  osmId: z.string().optional(),
+  name: z.string().min(1, "Name is required"),
+  address: z.string().min(1, "Address is required"),
+  zipCode: z.string().min(1, "Zip code is required"),
+  city: z.string().min(1, "City is required"),
+  countryCode: z.string().optional(),
+  lat: numeric(),
+  lon: numeric(),
+  discoveredBy: z.string().min(1, "Discovered by is required"),
+  "discoveredBy-key": z.string().min(1, "Discovered by is required"),
+  redirectTo: z.string().optional(),
 })
 
-type ActionData = {
-  errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
-}
-
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionArgs) => {
   await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")
 
-  const result = formSchema.safeParse(await request.formData())
+  const formData = await request.formData()
 
-  if (!result.success) {
-    return json<ActionData>(
-      {
-        errors: mapToActualErrors<typeof formSchema>(result),
-      },
-      { status: 400 }
-    )
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
   const {
@@ -81,19 +75,19 @@ export const action: ActionFunction = async ({ request, params }) => {
     zipCode,
     countryCode,
     "discoveredBy-key": discoveredById,
-  } = result.data
+  } = submission.value
 
   const location = await createGroupLocation({
     groupId,
     name,
     address,
-    lat: lat ?? null,
-    lon: lon ?? null,
+    lat: lat?.toString() ?? null,
+    lon: lon?.toString() ?? null,
     city,
     zipCode,
     discoveredById,
-    osmId,
-    countryCode,
+    osmId: osmId || null,
+    countryCode: countryCode || null,
     global: false,
   })
 
@@ -107,11 +101,17 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function NewLocationPage() {
   const user = useUser()
-  const actionData = useActionData() as ActionData
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { osmId, name, address, zipCode, city, countryCode, lat, lon, discoveredBy, redirectTo }] =
+    useForm({
+      id: "new-location-form",
+      lastSubmission,
+      onValidate: ({ formData }) => parse(formData, { schema }),
+    })
   const { group, permissions } = useLoaderData<typeof loader>()
   const navigation = useNavigation()
   const [searchParams] = useSearchParams()
-  const redirectTo = searchParams.get("redirectTo") ?? undefined
+  const redirectToValue = searchParams.get("redirectTo") ?? undefined
   const nameRef = useRef<HTMLInputElement>(null!)
   const addressRef = useRef<HTMLInputElement>(null)
   const zipCodeRef = useRef<HTMLInputElement>(null)
@@ -121,29 +121,14 @@ export default function NewLocationPage() {
   const idRef = useRef<HTMLInputElement>(null)
   const countryRef = useRef<HTMLInputElement>(null)
   const discoveredByRef = useRef<HTMLInputElement>(null!)
-  const [manualEdit, setManualEdit] = useState(false)
 
-  useEffect(() => {
-    if (actionData?.errors?.name) {
-      nameRef.current?.focus()
-    } else if (actionData?.errors?.address) {
-      addressRef.current?.focus()
-    } else if (actionData?.errors?.zipCode) {
-      zipCodeRef.current?.focus()
-    } else if (actionData?.errors?.city) {
-      cityRef.current?.focus()
-    } else if (actionData?.errors?.lat) {
-      latRef.current?.focus()
-    } else if (actionData?.errors?.lon) {
-      lonRef.current?.focus()
-    } else if (actionData?.errors?.["discoveredBy-key"]) {
-      discoveredByRef.current?.focus()
-    }
-
-    if (actionData?.errors) {
-      setManualEdit(true)
-    }
-  }, [actionData])
+  // TODO this should probably work but some issue with Conform
+  const [manualEdit, setManualEdit] = useState(true)
+  // useEffect(() => {
+  //   if (lastSubmission?.error) {
+  //     setManualEdit(true)
+  //   }
+  // }, [lastSubmission])
 
   const members = group.members.map((x) => ({
     id: x.userId,
@@ -179,11 +164,14 @@ export default function NewLocationPage() {
     nameRef.current.focus()
   }
 
+  console.log(lastSubmission)
+
   return (
     <>
       <h3>New location</h3>
       <Form
         method="post"
+        {...form.props}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -191,8 +179,9 @@ export default function NewLocationPage() {
           width: "100%",
         }}
       >
-        <input type="hidden" name="osmId" ref={idRef} />
-        <input type="hidden" name="countryCode" ref={countryRef} />
+        <input type="hidden" {...conform.input(osmId, { hidden: true })} ref={idRef} />
+        <input type="hidden" {...conform.input(countryCode, { hidden: true })} ref={countryRef} />
+        <input type="hidden" name={redirectTo.name} value={redirectToValue} />
         <Stack gap={16}>
           <div style={{ marginBottom: 16 }}>
             <LocationAutocomplete
@@ -224,13 +213,10 @@ export default function NewLocationPage() {
                 readOnly={!manualEdit}
                 tabIndex={!manualEdit ? -1 : undefined}
                 ref={nameRef}
-                name="name"
-                required
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-errormessage={actionData?.errors?.name ? "name-error" : undefined}
+                {...conform.input(name, { ariaAttributes: true })}
               />
             </label>
-            {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
+            {name.error && <div id={`${name.id}-error`}>{name.error}</div>}
           </div>
 
           <div>
@@ -240,13 +226,10 @@ export default function NewLocationPage() {
                 readOnly={!manualEdit}
                 tabIndex={!manualEdit ? -1 : undefined}
                 ref={addressRef}
-                name="address"
-                required
-                aria-invalid={actionData?.errors?.address ? true : undefined}
-                aria-errormessage={actionData?.errors?.address ? "address-error" : undefined}
+                {...conform.input(address, { ariaAttributes: true })}
               />
             </label>
-            {actionData?.errors?.address && <div id="address-error">{actionData.errors.address}</div>}
+            {address.error && <div id={`${address.id}-error`}>{address.error}</div>}
           </div>
 
           <Stack axis="horizontal" gap={16}>
@@ -257,13 +240,10 @@ export default function NewLocationPage() {
                   readOnly={!manualEdit}
                   tabIndex={!manualEdit ? -1 : undefined}
                   ref={zipCodeRef}
-                  name="zipCode"
-                  required
-                  aria-invalid={actionData?.errors?.zipCode ? true : undefined}
-                  aria-errormessage={actionData?.errors?.zipCode ? "zip-code-error" : undefined}
+                  {...conform.input(zipCode, { ariaAttributes: true })}
                 />
               </label>
-              {actionData?.errors?.zipCode && <div id="zip-code-error">{actionData.errors.zipCode}</div>}
+              {zipCode.error && <div id={`${zipCode}-error`}>{zipCode.error}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
@@ -273,13 +253,10 @@ export default function NewLocationPage() {
                   readOnly={!manualEdit}
                   tabIndex={!manualEdit ? -1 : undefined}
                   ref={cityRef}
-                  name="city"
-                  required
-                  aria-invalid={actionData?.errors?.city ? true : undefined}
-                  aria-errormessage={actionData?.errors?.city ? "city-error" : undefined}
+                  {...conform.input(city, { ariaAttributes: true })}
                 />
               </label>
-              {actionData?.errors?.city && <div id="city-error">{actionData.errors.city}</div>}
+              {city.error && <div id={`${city}-error`}>{city.error}</div>}
             </div>
           </Stack>
 
@@ -291,13 +268,11 @@ export default function NewLocationPage() {
                   readOnly={!manualEdit}
                   tabIndex={!manualEdit ? -1 : undefined}
                   ref={latRef}
-                  name="lat"
                   onPaste={handleCoordinatePaste}
-                  aria-invalid={actionData?.errors?.lat ? true : undefined}
-                  aria-errormessage={actionData?.errors?.lat ? "lat-error" : undefined}
+                  {...conform.input(lat, { ariaAttributes: true })}
                 />
               </label>
-              {actionData?.errors?.lat && <div id="lat-error">{actionData.errors.lat}</div>}
+              {lat.error && <div id={`${lat}-error`}>{lat.error}</div>}
             </div>
 
             <div style={{ width: "100%" }}>
@@ -307,20 +282,18 @@ export default function NewLocationPage() {
                   readOnly={!manualEdit}
                   tabIndex={!manualEdit ? -1 : undefined}
                   ref={lonRef}
-                  name="lon"
                   onPaste={handleCoordinatePaste}
-                  aria-invalid={actionData?.errors?.lon ? true : undefined}
-                  aria-errormessage={actionData?.errors?.lon ? "lon-error" : undefined}
+                  {...conform.input(lon, { ariaAttributes: true })}
                 />
               </label>
-              {actionData?.errors?.lon && <div id="lon-error">{actionData.errors.lon}</div>}
+              {lon.error && <div id={`${lon}-error`}>{lon.error}</div>}
             </div>
           </Stack>
 
           <div>
             <ComboBox
               label="Discovered by"
-              name="discoveredBy"
+              name={discoveredBy.name}
               defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={discoveredByRef}
@@ -334,12 +307,9 @@ export default function NewLocationPage() {
                 </Item>
               )}
             </ComboBox>
-            {actionData?.errors?.["discoveredBy-key"] && (
-              <div id="discoveredBy-error">{actionData.errors["discoveredBy-key"]}</div>
-            )}
+            {discoveredBy.error && <div id={`${discoveredBy.id}-error`}>{discoveredBy.error}</div>}
           </div>
 
-          <input type="hidden" name="redirectTo" value={redirectTo} />
           <div>
             <LoadingButton loading={navigation.state !== "idle"} style={{ marginLeft: "auto" }} type="submit">
               Save location

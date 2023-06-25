@@ -16,7 +16,7 @@ import z from "zod"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
-import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import { numeric, type RecursivelyConvertDatesToStrings } from "~/utils"
 import { Checkbox } from "~/components/Checkbox"
 import { Help } from "~/components/Help"
 import { parse } from "@conform-to/zod"
@@ -43,9 +43,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     userId,
   })
 }
-
-const numeric = (schema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
-  z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
 
 const updateSchema = z.object({
   name: z.string().min(1, "Name is required"),

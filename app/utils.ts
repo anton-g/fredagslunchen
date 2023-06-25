@@ -1,6 +1,6 @@
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
-import type z from "zod"
+import z from "zod"
 
 import type { Email, User } from "~/models/user.server"
 
@@ -184,3 +184,6 @@ export function mapToActualErrors<T extends z.ZodType<any, any, any>>(result: z.
   )
   return actualErrors
 }
+
+export const numeric = (schema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
+  z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)

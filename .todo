@@ -2,6 +2,7 @@
 - Add public setting
   - User
 - Use Conform for all Forms
+  - Open issue in Conform about readonly
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
 - Fix future date descriptions
