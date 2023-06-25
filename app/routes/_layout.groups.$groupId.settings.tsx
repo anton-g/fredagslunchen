@@ -300,7 +300,7 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
           This will delete all their scores and comments. This action <strong>cannot be undone</strong>!
         </DialogDescription>
         <Spacer size={16} />
-        <fetcher.Form action="/groups/api/member" method="post">
+        <fetcher.Form action="/api/groups/member" method="post">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
           <input name="action" value={"delete"} type="hidden" />
@@ -351,7 +351,7 @@ const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
           )}
         </DialogDescription>
         <Spacer size={8} />
-        <fetcher.Form action="/groups/api/member" method="post">
+        <fetcher.Form action="/api/groups/member" method="post">
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
           <input name="action" value={"update"} type="hidden" />
@@ -381,13 +381,13 @@ const InactiveMemberAction = ({ member }: InactiveMemberActionProps) => {
       },
       {
         method: "post",
-        action: "/groups/api/member",
+        action: "/api/groups/member",
       }
     )
   }
 
   return (
-    <fetcher.Form action="/groups/api/member" method="post">
+    <fetcher.Form action="/api/groups/member" method="post">
       <input name="userId" value={member.userId} type="hidden" />
       <input name="groupId" value={member.groupId} type="hidden" />
       <input name="action" value={"update"} type="hidden" />

@@ -347,7 +347,7 @@ const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps
             <Spacer size={16} />
             This will delete all your scores and comments. This action <strong>cannot be undone.</strong>
             <Spacer size={16} />
-            <fetcher.Form method="post" action="/groups/api/leave">
+            <fetcher.Form method="post" action="/api/groups/leave">
               <input type="hidden" name="groupId" value={groupId} />
               <Button size="large" style={{ marginLeft: "auto" }}>
                 I am sure
