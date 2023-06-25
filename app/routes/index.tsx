@@ -2,7 +2,7 @@ import { json } from "@remix-run/node"
 import type { LoaderArgs } from "@remix-run/node"
 import { Link, useFetcher, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
-import { Button, LinkButton, LoadingButton } from "~/components/Button"
+import { LinkButton, LoadingButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { getUserId } from "~/session.server"
 import { getFullUserById } from "~/models/user.server"
@@ -54,7 +54,7 @@ export default function Index() {
           <p>
             <Link to="/groups/new">Create a new club</Link> to get started! You can create a club for whatever
             constellation of people you want. How about your team at work, that group of friends you always
-            meet with over a bowl of ramen, or maybe a club just for you?
+            meet with over a bowl of ramen, or maybe a club just for yourself?
           </p>
           <Spacer size={24} />
           <LinkButton to="/groups/new" size="large" style={{ margin: "0 auto" }}>

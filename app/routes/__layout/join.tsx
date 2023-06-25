@@ -1,28 +1,19 @@
-import type {
-  ActionFunction,
-  LoaderFunction,
-  MetaFunction,
-} from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import {
-  Form,
-  Link,
-  useActionData,
-  useLocation,
-  useSearchParams,
-} from "@remix-run/react"
+import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
-
 import { getUserId, createUserSession } from "~/session.server"
-
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
 import { createUser, getUserByEmail } from "~/models/user.server"
-import { safeRedirect, validateEmail } from "~/utils"
+import { safeRedirect } from "~/utils"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/mail.server"
+import { z } from "zod"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await getUserId(request)
@@ -45,73 +36,46 @@ export const loader: LoaderFunction = async ({ request, params }) => {
   return json({})
 }
 
-interface ActionData {
-  errors: {
-    email?: string
-    password?: string
-    name?: string
-  }
-}
+const schema = z.object({
+  email: z.string().min(1, "Email is required").email("Email is invalid"),
+  password: z.string().min(8, "Password is too short"),
+  name: z.string().min(1, "Name is required"),
+  redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
+})
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionArgs) => {
   const formData = await request.formData()
-  const email = formData.get("email")
-  const name = formData.get("name")
-  const password = formData.get("password")
-  const redirectTo = safeRedirect(formData.get("redirectTo"), "/")
+
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
+  }
+
   const url = new URL(request.url)
   const inviteToken = url.searchParams.get("token")
 
-  if (!validateEmail(email)) {
-    return json<ActionData>(
-      { errors: { email: "Email is invalid" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof name !== "string" || name.length === 0) {
-    return json<ActionData>(
-      { errors: { name: "Name is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Password is required" } },
-      { status: 400 }
-    )
-  }
-
-  if (password.length < 8) {
-    return json<ActionData>(
-      { errors: { password: "Password is too short" } },
-      { status: 400 }
-    )
-  }
-
-  const existingUser = await getUserByEmail(email)
+  const existingUser = await getUserByEmail(submission.value.email)
   if (existingUser) {
-    return json<ActionData>(
-      { errors: { email: "A user already exists with this email" } },
-      { status: 400 }
-    )
+    submission.error.email = "Email or password is incorrect"
+    return json(submission, { status: 400 })
   }
 
-  const { user, groupId } = await createUser(email, name, password, inviteToken)
+  const { user, groupId } = await createUser(
+    submission.value.email,
+    submission.value.name,
+    submission.value.password,
+    inviteToken
+  )
 
   if (user.email?.verificationToken) {
-    await sendEmailVerificationEmail(
-      user.email.email,
-      user.email.verificationToken
-    )
+    await sendEmailVerificationEmail(user.email.email, user.email.verificationToken)
   }
 
   return createUserSession({
     request,
     userId: user.id,
     remember: false,
-    redirectTo: groupId ? `/groups/${groupId}` : redirectTo,
+    redirectTo: groupId ? `/groups/${groupId}` : submission.value.redirectTo,
   })
 }
 
@@ -124,81 +88,52 @@ export const meta: MetaFunction = () => {
 export default function Join() {
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
-  const actionData = useActionData() as ActionData
-  const emailRef = React.useRef<HTMLInputElement>(null)
-  const passwordRef = React.useRef<HTMLInputElement>(null)
-  const nameRef = React.useRef<HTMLInputElement>(null)
-  const location = useLocation()
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { email, password, name }] = useForm({
+    id: "signup-form",
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+  })
 
-  React.useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus()
-    } else if (actionData?.errors?.password) {
-      passwordRef.current?.focus()
-    }
-  }, [actionData])
+  const location = useLocation()
 
   return (
     <Wrapper>
       <h2>Join the club</h2>
       {/* Workaround to include search to action: https://github.com/remix-run/remix/issues/3133 */}
-      <Form method="post" action={`${location.pathname}${location.search}`}>
+      <Form method="post" {...form.props} action={`${location.pathname}${location.search}`}>
         <Stack gap={16}>
           <div>
-            <label htmlFor="name">Name</label>
+            <label htmlFor={name.id}>Name</label>
             <div>
               <Input
-                ref={nameRef}
-                id="name"
-                required
+                {...conform.input(name, { ariaAttributes: true })}
                 autoFocus={true}
-                name="name"
-                type="name"
                 autoComplete="name"
-                aria-invalid={actionData?.errors?.name ? true : undefined}
-                aria-describedby="name-error"
               />
-              {actionData?.errors?.name && (
-                <div id="name-error">{actionData.errors.name}</div>
-              )}
+              {name.error && <div id={`${name.id}-error`}>{name.error}</div>}
             </div>
           </div>
 
           <div>
-            <label htmlFor="email">Email address</label>
+            <label htmlFor={email.id}>Email address</label>
             <div>
               <Input
-                ref={emailRef}
-                id="email"
-                required
-                name="email"
-                type="email"
+                {...conform.input(email, { type: "email", ariaAttributes: true })}
                 autoComplete="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-describedby="email-error"
               />
-              {actionData?.errors?.email && (
-                <div id="email-error">{actionData.errors.email}</div>
-              )}
+              {email.error && <div id={`${email.id}-error`}>{email.error}</div>}
             </div>
           </div>
 
           <div>
-            <label htmlFor="password">Password</label>
+            <label htmlFor={password.id}>Password</label>
             <div>
               <Input
-                id="password"
-                ref={passwordRef}
-                name="password"
-                type="password"
-                minLength={8}
+                {...conform.input(password, { type: "password", ariaAttributes: true })}
                 autoComplete="new-password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
-                aria-describedby="password-error"
               />
-              {actionData?.errors?.password && (
-                <div id="password-error">{actionData.errors.password}</div>
-              )}
+              {password.error && <div id={`${password.id}-error`}>{password.error}</div>}
             </div>
           </div>
 
