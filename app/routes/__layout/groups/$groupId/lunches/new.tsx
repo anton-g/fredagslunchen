@@ -1,8 +1,8 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionArgs, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLoaderData, useLocation } from "@remix-run/react"
 import isSameDay from "date-fns/isSameDay"
-import { useEffect, useRef, useState } from "react"
+import { useRef, useState } from "react"
 import invariant from "tiny-invariant"
 import { LinkButton, LoadingButton } from "~/components/Button"
 import { Card } from "~/components/Card"
@@ -10,12 +10,14 @@ import { ComboBox, Description, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { getGroup, getGroupPermissions } from "~/models/group.server"
-import { zfd } from "zod-form-data"
-import type z from "zod"
+import z from "zod"
 import { createLunch } from "~/models/lunch.server"
 import { requireUserId } from "~/session.server"
-import { mapToActualErrors, useUser } from "~/utils"
+import { useUser } from "~/utils"
 import { useNavigation } from "@remix-run/react"
+import { numeric } from "zod-form-data"
+import { parse } from "@conform-to/zod"
+import { useForm, conform } from "@conform-to/react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await requireUserId(request)
@@ -44,33 +46,26 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   })
 }
 
-const formSchema = zfd.formData({
-  date: zfd.text(),
-  "choosenBy-key": zfd.text(),
-  "location-key": zfd.numeric(),
+const schema = z.object({
+  date: z.string().min(1, "Date is required"),
+  choosenBy: z.string().min(1, "Choosen by is required"),
+  "choosenBy-key": z.string().min(1, "Choosen by is required"),
+  location: z.string().min(1, "Location is required"),
+  "location-key": numeric(),
 })
 
-type ActionData = {
-  errors?: Partial<Record<keyof z.infer<typeof formSchema>, string>>
-}
-
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionArgs) => {
   await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")
 
-  const result = formSchema.safeParse(await request.formData())
-
-  if (!result.success) {
-    return json<ActionData>(
-      {
-        errors: mapToActualErrors<typeof formSchema>(result),
-      },
-      { status: 400 }
-    )
+  const formData = await request.formData()
+  const submission = parse(formData, { schema })
+  if (!submission.value || submission.intent !== "submit") {
+    return json(submission, { status: 400 })
   }
 
-  const { "choosenBy-key": choosenById, date, "location-key": locationId } = result.data
+  const { "choosenBy-key": choosenById, date, "location-key": locationId } = submission.value
 
   const lunch = await createLunch({
     choosenByUserId: choosenById,
@@ -83,29 +78,26 @@ export const action: ActionFunction = async ({ request, params }) => {
 }
 
 export default function NewLunchPage() {
-  const location = useLocation()
+  const { pathname } = useLocation()
   const navigation = useNavigation()
   const user = useUser()
-  const actionData = useActionData() as ActionData
+  const defaultDate = new Date().toISOString().split("T")[0]
+  const lastSubmission = useActionData<typeof action>()
+  const [form, { choosenBy, date, location }] = useForm({
+    id: "new-lunch-form",
+    lastSubmission,
+    onValidate: ({ formData }) => parse(formData, { schema }),
+    defaultValue: {
+      date: defaultDate,
+    },
+  })
   const { group, preSelectedLocationId } = useLoaderData<typeof loader>()
   const choosenByRef = useRef<HTMLInputElement>(null!)
   const locationRef = useRef<HTMLInputElement>(null!)
   const dateRef = useRef<HTMLInputElement>(null)
 
-  const defaultDate = new Date().toISOString().split("T")[0]
-
   const [selectedLocation, setSelectedLocation] = useState<number | null>(null)
   const [selectedDate, setSelectedDate] = useState<string | null>(defaultDate)
-
-  useEffect(() => {
-    if (actionData?.errors?.date) {
-      dateRef.current?.focus()
-    } else if (actionData?.errors?.["choosenBy-key"]) {
-      choosenByRef.current?.focus()
-    } else if (actionData?.errors?.["location-key"]) {
-      locationRef.current?.focus()
-    }
-  }, [actionData])
 
   const locations = group.groupLocations.map((x) => ({
     id: x.locationId,
@@ -130,6 +122,7 @@ export default function NewLunchPage() {
       <h3>New lunch</h3>
       <Form
         method="post"
+        {...form.props}
         style={{
           display: "flex",
           flexDirection: "column",
@@ -143,22 +136,17 @@ export default function NewLunchPage() {
               <span>Date</span>
               <Input
                 ref={dateRef}
-                defaultValue={defaultDate}
-                name="date"
-                type="date"
-                // required
+                {...conform.input(date, { ariaAttributes: true, type: "date" })}
                 onChange={(e) => setSelectedDate(e.target.value)}
-                aria-invalid={actionData?.errors?.date ? true : undefined}
-                aria-errormessage={actionData?.errors?.date ? "date-error" : undefined}
               />
             </label>
-            {actionData?.errors?.date && <div id="date-error">{actionData.errors.date}</div>}
+            {date.error && <div id={`${date.id}-error`}>{date.error}</div>}
           </div>
 
           <div>
             <ComboBox
               label="Choosen by"
-              name="choosenBy"
+              name={choosenBy.name}
               defaultItems={members}
               defaultSelectedKey={user.id}
               inputRef={choosenByRef}
@@ -172,15 +160,13 @@ export default function NewLunchPage() {
                 </Item>
               )}
             </ComboBox>
-            {actionData?.errors?.["choosenBy-key"] && (
-              <div id="choosenBy-error">{actionData.errors?.["choosenBy-key"]}</div>
-            )}
+            {choosenBy.error && <div id={`${choosenBy.id}-error`}>{choosenBy.error}</div>}
           </div>
 
           <div>
             <ComboBox
               label="Location"
-              name="location"
+              name={location.name}
               defaultItems={locations}
               inputRef={locationRef}
               menuTrigger="focus"
@@ -200,9 +186,7 @@ export default function NewLunchPage() {
                 </Item>
               )}
             </ComboBox>
-            {actionData?.errors?.["location-key"] && (
-              <div id="location-error">{actionData.errors?.["location-key"]}</div>
-            )}
+            {location.error && <div id={`${location.id}-error`}>{location.error}</div>}
           </div>
 
           {existingLunch && (
@@ -219,7 +203,7 @@ export default function NewLunchPage() {
           )}
 
           <Stack gap={16} axis="horizontal">
-            <LinkButton to={`/groups/${group.id}/locations/new?redirectTo=${location.pathname}`}>
+            <LinkButton to={`/groups/${group.id}/locations/new?redirectTo=${pathname}`}>
               New location
             </LinkButton>
             <LoadingButton
