@@ -8,7 +8,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request)
+  const currentUserId = await requireUserId(request)
 
   const formData = await request.formData()
   const requestId = formData.get("requestId")
@@ -17,8 +17,9 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json<ActionData>({ ok: false }, { status: 400 })
   }
 
-  deleteScoreRequest({
+  await deleteScoreRequest({
     id: parseInt(requestId),
+    byUserId: currentUserId,
   })
 
   return json({ ok: true })

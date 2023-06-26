@@ -61,6 +61,7 @@ type CreateLunchInput = {
   choosenByUserId: Lunch["choosenByUserId"]
   locationId: Location["id"]
   groupId: Group["id"]
+  requestedByUserId: User["id"]
 }
 
 export async function createLunch({
@@ -68,15 +69,23 @@ export async function createLunch({
   choosenByUserId,
   locationId,
   groupId,
+  requestedByUserId,
 }: CreateLunchInput) {
   const groupLocation = await prisma.groupLocation.findFirst({
     where: {
       groupId,
       locationId,
+      group: {
+        members: {
+          some: {
+            userId: requestedByUserId,
+          },
+        },
+      },
     },
   })
 
-  if (!groupLocation) throw "handle this"
+  if (!groupLocation) throw new Error("Tried to create lunch for invalid location")
 
   return await prisma.lunch.create({
     data: {
@@ -120,9 +129,7 @@ export async function deleteLunch({
 }
 
 export type LunchStat = FullLunch & { stats: { avg: number | null } }
-export async function getGroupLunchStats({
-  id,
-}: Pick<Group, "id">): Promise<LunchStat[]> {
+export async function getGroupLunchStats({ id }: Pick<Group, "id">): Promise<LunchStat[]> {
   const lunches = await prisma.lunch.findMany({
     where: {
       groupLocationGroupId: id,
@@ -155,9 +162,7 @@ export async function getGroupLunchStats({
   return result
 }
 
-export type GroupMembersWithScores = NonNullable<
-  Prisma.PromiseReturnType<typeof getGroupLunchStatsPerMember>
->
+export type GroupMembersWithScores = NonNullable<Prisma.PromiseReturnType<typeof getGroupLunchStatsPerMember>>
 export async function getGroupLunchStatsPerMember({ id }: Pick<Group, "id">) {
   const users = await prisma.user.findMany({
     where: {

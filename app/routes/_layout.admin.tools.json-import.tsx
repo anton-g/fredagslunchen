@@ -64,7 +64,10 @@ export const action: ActionFunction = async ({ request }) => {
   for (const lunch of result.data.lunches) {
     let picker = users[lunch.picker]
     if (!picker) {
-      const newUser = await createAnonymousUser(lunch.picker, group.id)
+      const newUser = await createAnonymousUser(lunch.picker, group.id, userId)
+
+      if (!newUser) continue
+
       users[lunch.picker] = newUser
       picker = newUser
     }
@@ -83,7 +86,11 @@ export const action: ActionFunction = async ({ request }) => {
         name: lunch.location,
         osmId: null,
         zipCode: "N/A",
+        requestedByUserId: userId,
       })
+
+      if (!newLocation) continue
+
       locations[lunch.location] = newLocation
       location = newLocation
     }
@@ -93,12 +100,16 @@ export const action: ActionFunction = async ({ request }) => {
       choosenByUserId: picker.id,
       groupId: group.id,
       locationId: location.locationId,
+      requestedByUserId: userId,
     })
 
     for (const score of lunch.scores) {
       let scoreUser = users[score.author]
       if (!scoreUser) {
-        const newUser = await createAnonymousUser(score.author, group.id)
+        const newUser = await createAnonymousUser(score.author, group.id, userId)
+
+        if (!newUser) continue
+
         users[score.author] = newUser
         scoreUser = newUser
       }
@@ -108,6 +119,7 @@ export const action: ActionFunction = async ({ request }) => {
         lunchId: createdLunch.id,
         score: score.score,
         userId: scoreUser.id,
+        byUserId: userId,
       })
     }
   }

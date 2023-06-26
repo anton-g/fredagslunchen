@@ -15,7 +15,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request, "/")
+  const currentUserId = await requireUserId(request, "/")
 
   const formData = await request.formData()
   const scoreString = formData.get("score")
@@ -47,6 +47,7 @@ export const action: ActionFunction = async ({ request, params }) => {
       score,
       comment: comment ? comment.toString() : null,
       lunchId: parseInt(lunchId),
+      byUserId: currentUserId,
     })
 
     const redirectToValue = formData.get("redirectTo")

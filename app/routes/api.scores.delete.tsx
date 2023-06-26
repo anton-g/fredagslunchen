@@ -17,7 +17,7 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json<ActionData>({ ok: false }, { status: 400 })
   }
 
-  deleteScore({
+  await deleteScore({
     id: parseInt(scoreId),
     requestedByUserId: currentUserId,
   })

@@ -1,4 +1,4 @@
-import type { Group, GroupLocation, Location } from "@prisma/client"
+import type { Group, GroupLocation, Location, User } from "@prisma/client"
 
 import { prisma } from "~/db.server"
 import { getAverageNumber } from "~/utils"
@@ -71,6 +71,7 @@ type CreateGroupLocationInput = Omit<Location, "id"> & {
   groupId: Group["id"]
   discoveredById: NonNullable<GroupLocation["discoveredById"]>
   osmId?: Location["osmId"]
+  requestedByUserId: User["id"]
 }
 
 export async function createGroupLocation({
@@ -84,7 +85,21 @@ export async function createGroupLocation({
   discoveredById,
   countryCode,
   osmId,
+  requestedByUserId,
 }: CreateGroupLocationInput) {
+  const group = await prisma.group.findFirst({
+    where: {
+      id: groupId,
+      members: {
+        some: {
+          userId: requestedByUserId,
+        },
+      },
+    },
+  })
+
+  if (!group) return null
+
   const existingLocation = await prisma.location.findUnique({
     where: {
       osmId: osmId || "NOT_FOUND",

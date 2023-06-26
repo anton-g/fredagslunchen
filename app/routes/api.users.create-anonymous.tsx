@@ -11,7 +11,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request, "/")
+  const currentUserId = await requireUserId(request, "/")
 
   const formData = await request.formData()
   const name = formData.get("name")
@@ -25,7 +25,11 @@ export const action: ActionFunction = async ({ request, params }) => {
     return json<ActionData>({ errors: { groupId: "GroupId is required" } }, { status: 400 })
   }
 
-  await createAnonymousUser(name, groupId)
+  const createdUser = await createAnonymousUser(name, groupId, currentUserId)
+
+  if (!createdUser) {
+    return json({ ok: false })
+  }
 
   return json({ ok: true })
 }

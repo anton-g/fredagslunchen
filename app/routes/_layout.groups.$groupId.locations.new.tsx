@@ -53,7 +53,7 @@ const schema = z.object({
 })
 
 export const action = async ({ request, params }: ActionArgs) => {
-  await requireUserId(request)
+  const currentUserId = await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")
 
@@ -89,7 +89,20 @@ export const action = async ({ request, params }: ActionArgs) => {
     osmId: osmId || null,
     countryCode: countryCode || null,
     global: false,
+    requestedByUserId: currentUserId,
   })
+
+  if (!location) {
+    return json(
+      {
+        ...submission,
+        error: {
+          "": "Something went wrong",
+        },
+      },
+      { status: 400 }
+    )
+  }
 
   const safeRedirectTo = safeRedirect(
     redirectTo + `?loc=${location.locationId}`,

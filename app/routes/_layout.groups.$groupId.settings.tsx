@@ -76,11 +76,11 @@ export const action = async ({ request, params }: ActionArgs) => {
     case "delete":
       return deleteGroupAction(userId, params.groupId)
     default:
-      return updateGroupAction(formData, params.groupId)
+      return updateGroupAction(userId, formData, params.groupId)
   }
 }
 
-const updateGroupAction = async (formData: FormData, groupId: Group["id"]) => {
+const updateGroupAction = async (requestedByUserId: User["id"], formData: FormData, groupId: Group["id"]) => {
   const submission = parse(formData, { schema })
   if (!submission.value || submission.intent !== "submit" || submission.value.action === "delete") {
     return json(submission, { status: 400 })
@@ -88,15 +88,16 @@ const updateGroupAction = async (formData: FormData, groupId: Group["id"]) => {
 
   const { name, lat, lon, public: isGroupPublic } = submission.value
 
-  const group = await updateGroup({
+  await updateGroup({
     id: groupId,
     name,
     lat,
     lon,
     public: isGroupPublic,
+    requestedByUserId,
   })
 
-  return redirect(`/groups/${group.id}`)
+  return redirect(`/groups/${groupId}`)
 }
 
 const deleteGroupAction = async (userId: User["id"], groupId: Group["id"]) => {

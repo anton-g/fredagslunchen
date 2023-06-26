@@ -1,14 +1,7 @@
 import { CopyIcon, Cross2Icon } from "@radix-ui/react-icons"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import {
-  isRouteErrorResponse,
-  useActionData,
-  useFetcher,
-  useLoaderData,
-  useRouteError,
-} from "@remix-run/react"
-import * as React from "react"
+import { isRouteErrorResponse, useFetcher, useLoaderData, useRouteError } from "@remix-run/react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
 import { Button, LoadingButton } from "~/components/Button"
@@ -40,7 +33,6 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({
     groupInviteToken: group.inviteToken,
     groupId: params.groupId,
-    userId,
     baseUrl: origin,
   })
 }
@@ -51,6 +43,7 @@ type ActionData = {
   }
 }
 
+// TODO merge with separate api
 export const action: ActionFunction = async ({ request, params }) => {
   await requireUserId(request)
   const groupId = params.groupId
@@ -74,54 +67,10 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function InvitePage() {
   const fetcher = useFetcher()
-  const { groupInviteToken, groupId, userId, baseUrl } = useLoaderData<typeof loader>()
-  const actionData = useActionData() as ActionData
-  const emailRef = React.useRef<HTMLInputElement>(null)
-
-  React.useEffect(() => {
-    if (actionData?.errors?.email) {
-      emailRef.current?.focus()
-    }
-  }, [actionData])
+  const { groupInviteToken, groupId, baseUrl } = useLoaderData<typeof loader>()
 
   return (
     <>
-      {/* <h3>Add existing user to club</h3>
-      <Form
-        method="post"
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 8,
-          width: "100%",
-        }}
-      >
-        <Stack gap={16}>
-          <div>
-            <label>
-              <span>Email</span>
-              <Input
-                ref={emailRef}
-                name="email"
-                type="email"
-                aria-invalid={actionData?.errors?.email ? true : undefined}
-                aria-errormessage={
-                  actionData?.errors?.email ? "email-error" : undefined
-                }
-              />
-            </label>
-            {actionData?.errors?.email && (
-              <div id="email-error">{actionData.errors.email}</div>
-            )}
-          </div>
-
-          <div>
-            <Button style={{ marginLeft: "auto" }} type="submit">
-              Add
-            </Button>
-          </div>
-        </Stack>
-      </Form> */}
       <h3 style={{ marginBottom: 0 }}>Invite with link</h3>
       {groupInviteToken ? (
         <>
@@ -140,7 +89,6 @@ export default function InvitePage() {
               <fetcher.Form method="post" action="/api/groups/invite-token">
                 <input type="hidden" name="action" value={"delete"} />
                 <input type="hidden" name="groupId" value={groupId} />
-                <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
                   <Tooltip.Trigger asChild>
                     <LoadingButton
@@ -175,7 +123,6 @@ export default function InvitePage() {
           <InviteDescription>Create a link that anyone can use to join your club.</InviteDescription>
           <input type="hidden" name="action" value={"create"} />
           <input type="hidden" name="groupId" value={groupId} />
-          <input type="hidden" name="userId" value={userId} />
           <LoadingButton loading={fetcher.state !== "idle"}>Create invite link</LoadingButton>
         </fetcher.Form>
       )}

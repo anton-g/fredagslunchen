@@ -9,10 +9,31 @@ export async function createScore({
   comment,
   userId,
   lunchId,
+  byUserId,
 }: Pick<Score, "score" | "comment"> & {
   userId: User["id"]
   lunchId: Lunch["id"]
+  byUserId: User["id"]
 }) {
+  const lunch = await prisma.lunch.findFirst({
+    where: {
+      id: lunchId,
+      groupLocation: {
+        group: {
+          members: {
+            some: {
+              userId: byUserId,
+            },
+          },
+        },
+      },
+    },
+  })
+
+  if (!lunch) {
+    return null
+  }
+
   const result = await prisma.score.create({
     data: {
       score,
@@ -82,6 +103,26 @@ export async function createScoreRequest({
   requestedById: User["id"]
   lunchId: Lunch["id"]
 }) {
+  const lunch = await prisma.lunch.findFirst({
+    where: {
+      id: lunchId,
+      groupLocation: {
+        group: {
+          members: {
+            some: {
+              userId: requestedById,
+            },
+          },
+        },
+      },
+    },
+  })
+  if (!lunch) {
+    return {
+      error: "Can't request for group you're not a member of",
+    }
+  }
+
   const user = await prisma.user.findUnique({
     where: {
       id,
@@ -102,10 +143,21 @@ export async function createScoreRequest({
   })
 }
 
-export async function deleteScoreRequest({ id }: { id: ScoreRequest["id"] }) {
-  await prisma.scoreRequest.delete({
+export async function deleteScoreRequest({ id, byUserId }: { id: ScoreRequest["id"]; byUserId: User["id"] }) {
+  await prisma.scoreRequest.deleteMany({
     where: {
       id,
+      lunch: {
+        groupLocation: {
+          group: {
+            members: {
+              some: {
+                userId: byUserId,
+              },
+            },
+          },
+        },
+      },
     },
   })
 }

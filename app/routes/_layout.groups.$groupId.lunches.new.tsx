@@ -54,7 +54,7 @@ const schema = z.object({
 })
 
 export const action = async ({ request, params }: ActionArgs) => {
-  await requireUserId(request)
+  const currentUserId = await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")
 
@@ -71,6 +71,7 @@ export const action = async ({ request, params }: ActionArgs) => {
     date,
     locationId,
     groupId,
+    requestedByUserId: currentUserId,
   })
 
   return redirect(`/groups/${groupId}/lunches/${lunch.id}`)
