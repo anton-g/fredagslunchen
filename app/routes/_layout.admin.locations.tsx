@@ -5,10 +5,10 @@ import styled from "styled-components"
 import { NavLink } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   return json({})
 }

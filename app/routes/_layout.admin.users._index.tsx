@@ -5,11 +5,11 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import { getAllAnonymousUsers, getAllUsers } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 import { format } from "date-fns"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   const users = await getAllUsers()
   const anonymousUsers = await getAllAnonymousUsers()

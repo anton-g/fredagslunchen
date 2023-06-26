@@ -10,10 +10,10 @@ import { Checkbox } from "~/components/Checkbox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { getLocation, updateLocation } from "~/models/location.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
   invariant(params.locationId, "locationId not found")
 
   const location = await getLocation({ id: parseInt(params.locationId) })
@@ -33,7 +33,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
   invariant(params.locationId, "locationId not found")
 
   const formData = await request.formData()

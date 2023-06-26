@@ -192,9 +192,7 @@ const Content = () => {
   )
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
-
+export function ErrorBoundary() {
   return (
     <div>
       <h1>Uh oh!</h1>

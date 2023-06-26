@@ -8,9 +8,6 @@
   - Delete (require club admin?)
 - Themes
   - Improve dark theme map
-- More stats
-  - Best average picker
-  - Average score on choice vs others choice
 - Feedback
 - Replace Cypress with Playwright
 - Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
@@ -20,6 +17,8 @@
 - Exclusive stats
   - Historical stats
   - Avg score per month / last 5 lunches / something something
+  - Average score on choice vs others choice
+  - Best average picker
 - Database backups
   - Litestream?
   - Cron? https://litestream.io/alternatives/cron/

@@ -1,14 +1,14 @@
 import type { LoaderArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { useLoaderData } from "@remix-run/react"
-import { requireUserId } from "~/session.server"
+import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
+import { requireAdminUserId } from "~/session.server"
 import styled from "styled-components"
 import { getAdminStats } from "~/models/admin.server"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Stat } from "~/components/Stat"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   const stats = await getAdminStats()
 
@@ -33,10 +33,32 @@ export default function AdminPage() {
   )
 }
 
-export function ErrorBoundary({ error }: { error: Error }) {
-  console.error(error)
+export function ErrorBoundary() {
+  const error = useRouteError()
 
-  return <div>An unexpected error occurred: {error.message}</div>
+  if (error instanceof Error) {
+    return <div>An unexpected error occurred: {error.message}</div>
+  }
+
+  if (!isRouteErrorResponse(error)) {
+    return <h1>Unknown Error</h1>
+  }
+
+  if (error.status === 404) {
+    return (
+      <div>
+        <h2>Not Found</h2>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <h1>Oops</h1>
+      <p>Status: {error.status}</p>
+      <p>{error.data.message}</p>
+    </div>
+  )
 }
 
 const Title = styled.h3`

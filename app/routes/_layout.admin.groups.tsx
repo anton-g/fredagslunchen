@@ -5,10 +5,10 @@ import styled from "styled-components"
 import { HoverCard } from "~/components/HoverCard"
 import { Table } from "~/components/Table"
 import { getAllGroups } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   const groups = await getAllGroups()
 
@@ -51,19 +51,11 @@ export default function AdminGroupsPage() {
               </Table.Cell>
               <Table.Cell numeric>{group.groupLocations.length}</Table.Cell>
               <Table.Cell numeric>
-                {group.groupLocations.reduce(
-                  (tot, cur) => tot + cur.lunches.length,
-                  0
-                )}
+                {group.groupLocations.reduce((tot, cur) => tot + cur.lunches.length, 0)}
               </Table.Cell>
               <Table.Cell numeric>
                 {group.groupLocations.reduce(
-                  (tot, cur) =>
-                    tot +
-                    cur.lunches.reduce(
-                      (tot2, cur2) => tot2 + cur2._count.scores,
-                      0
-                    ),
+                  (tot, cur) => tot + cur.lunches.reduce((tot2, cur2) => tot2 + cur2._count.scores, 0),
                   0
                 )}
               </Table.Cell>

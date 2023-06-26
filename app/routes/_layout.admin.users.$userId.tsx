@@ -8,24 +8,13 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
-import {
-  checkIsAdmin,
-  forceCreateResetPasswordTokenForUserId,
-  getUserForAdmin,
-  updateUser,
-} from "~/models/user.server"
+import { forceCreateResetPasswordTokenForUserId, getUserForAdmin, updateUser } from "~/models/user.server"
 
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
-  const userId = await requireUserId(request)
+  await requireAdminUserId(request)
   invariant(params.userId, "userId is required")
-
-  const isAdmin = checkIsAdmin(userId)
-
-  if (!isAdmin) {
-    throw new Response("Not Found", { status: 404 })
-  }
 
   const user = await getUserForAdmin({ id: params.userId })
 
@@ -45,14 +34,8 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request, params }) => {
-  const userId = await requireUserId(request)
+  await requireAdminUserId(request)
   invariant(params.userId, "userId not found")
-
-  const isAdmin = checkIsAdmin(userId)
-
-  if (!isAdmin) {
-    throw new Response("Bad Request", { status: 400 })
-  }
 
   const formData = await request.formData()
 

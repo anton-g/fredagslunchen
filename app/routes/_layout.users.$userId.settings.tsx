@@ -9,12 +9,7 @@ import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import type { User } from "~/models/user.server"
-import {
-  changeUserPassword,
-  checkIsAdmin,
-  getFullUserById,
-  updateUser,
-} from "~/models/user.server"
+import { changeUserPassword, checkIsAdmin, getFullUserById, updateUser } from "~/models/user.server"
 import { requireUserId } from "~/session.server"
 import { ThemePicker } from "~/components/ThemePicker"
 import { AvatarPicker } from "~/components/AvatarPicker"
@@ -79,10 +74,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 const updateDetails = async (formData: FormData, userId: User["id"]) => {
   const name = formData.get("name")
   if (typeof name !== "string" || name.length === 0) {
-    return json<ActionData>(
-      { errors: { name: "Name is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { name: "Name is required" } }, { status: 400 })
   }
 
   const user = await updateUser({
@@ -96,19 +88,13 @@ const updateDetails = async (formData: FormData, userId: User["id"]) => {
 const updateAvatar = async (formData: FormData, userId: User["id"]) => {
   const avatar = formData.get("avatar")
   if (typeof avatar !== "string" || avatar.length === 0) {
-    return json<ActionData>(
-      { errors: { avatar: "Invalid avatar" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { avatar: "Invalid avatar" } }, { status: 400 })
   }
 
   const avatarId = parseInt(avatar)
 
   if (avatarId < 1 || avatarId > 30) {
-    return json<ActionData>(
-      { errors: { avatar: "Invalid avatar" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { avatar: "Invalid avatar" } }, { status: 400 })
   }
 
   await updateUser({
@@ -122,10 +108,7 @@ const updateAvatar = async (formData: FormData, userId: User["id"]) => {
 const updateTheme = async (formData: FormData, userId: User["id"]) => {
   const theme = formData.get("theme")
   if (typeof theme !== "string" || theme.length === 0) {
-    return json<ActionData>(
-      { errors: { theme: "Invalid theme" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { theme: "Invalid theme" } }, { status: 400 })
   }
 
   await updateUser({
@@ -141,24 +124,15 @@ const updatePassword = async (formData: FormData, userId: User["id"]) => {
   const newPassword = formData.get("new-password")
 
   if (typeof password !== "string" || password.length === 0) {
-    return json<ActionData>(
-      { errors: { password: "Current password is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { password: "Current password is required" } }, { status: 400 })
   }
 
   if (typeof newPassword !== "string" || newPassword.length === 0) {
-    return json<ActionData>(
-      { errors: { newPassword: "New password is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { newPassword: "New password is required" } }, { status: 400 })
   }
 
   if (newPassword.length < 8) {
-    return json<ActionData>(
-      { errors: { newPassword: "Password is too short" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { newPassword: "Password is too short" } }, { status: 400 })
   }
 
   const userOrError = await changeUserPassword({
@@ -168,10 +142,7 @@ const updatePassword = async (formData: FormData, userId: User["id"]) => {
   })
 
   if ("error" in userOrError) {
-    return json<ActionData>(
-      { errors: { password: userOrError.error } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { password: userOrError.error } }, { status: 400 })
   }
 
   return redirect(`/users/${userOrError.id}`)
@@ -211,9 +182,7 @@ export default function UserSettingsPage() {
                 aria-invalid={actionData?.errors?.name ? true : undefined}
                 aria-describedby="name-error"
               />
-              {actionData?.errors?.name && (
-                <div id="name-error">{actionData.errors.name}</div>
-              )}
+              {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
             </div>
           </div>
           <div>
@@ -255,9 +224,7 @@ export default function UserSettingsPage() {
                 aria-describedby="current-password-error"
               />
               {actionData?.errors?.password && (
-                <div id="current-password-error">
-                  {actionData.errors.password}
-                </div>
+                <div id="current-password-error">{actionData.errors.password}</div>
               )}
             </div>
           </div>
@@ -270,15 +237,11 @@ export default function UserSettingsPage() {
                 name="new-password"
                 minLength={8}
                 type="password"
-                aria-invalid={
-                  actionData?.errors?.newPassword ? true : undefined
-                }
+                aria-invalid={actionData?.errors?.newPassword ? true : undefined}
                 aria-describedby="new-password-error"
               />
               {actionData?.errors?.newPassword && (
-                <div id="new-password-error">
-                  {actionData.errors.newPassword}
-                </div>
+                <div id="new-password-error">{actionData.errors.newPassword}</div>
               )}
             </div>
           </div>

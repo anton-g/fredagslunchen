@@ -13,10 +13,10 @@ import { createLunch } from "~/models/lunch.server"
 import { createScore } from "~/models/score.server"
 import type { User } from "~/models/user.server"
 import { createAnonymousUser } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   return json({})
 }
@@ -28,7 +28,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request)
+  const userId = await requireAdminUserId(request)
 
   const formData = await request.formData()
   const data = formData.get("data")

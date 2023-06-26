@@ -6,16 +6,16 @@ import { Button, LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { recreateDemoGroup } from "~/models/admin.server"
 import { setAllUserAvatars } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   return json({})
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   const formData = await request.formData()
   const action = formData.get("action")

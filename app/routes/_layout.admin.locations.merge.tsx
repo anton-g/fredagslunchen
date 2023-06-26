@@ -9,11 +9,10 @@ import { Button } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Stack } from "~/components/Stack"
 import { getAllLocations, mergeLocations } from "~/models/location.server"
-import { checkIsAdmin } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { requireAdminUserId } from "~/session.server"
 
 export const loader = async ({ request }: LoaderArgs) => {
-  await requireUserId(request)
+  await requireAdminUserId(request)
 
   const locations = await getAllLocations()
 
@@ -28,10 +27,7 @@ type ActionData = {
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const userId = await requireUserId(request, "/")
-  const isAdmin = checkIsAdmin(userId)
-
-  if (!isAdmin) return redirect("/")
+  await requireAdminUserId(request, "/")
 
   const formData = await request.formData()
   const locationFromId = formData.get("locationFrom-key")
