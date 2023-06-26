@@ -16,7 +16,7 @@ import z from "zod"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
-import { numeric, type RecursivelyConvertDatesToStrings } from "~/utils"
+import { optionalNumeric, type RecursivelyConvertDatesToStrings } from "~/utils"
 import { Checkbox } from "~/components/Checkbox"
 import { Help } from "~/components/Help"
 import { parse } from "@conform-to/zod"
@@ -46,8 +46,8 @@ export const loader = async ({ request, params }: LoaderArgs) => {
 
 const updateSchema = z.object({
   name: z.string().min(1, "Name is required"),
-  lat: numeric(),
-  lon: numeric(),
+  lat: optionalNumeric(),
+  lon: optionalNumeric(),
   public: z.preprocess((x) => x === "on", z.boolean()),
   action: z.literal("update", {
     required_error: "Action is required",

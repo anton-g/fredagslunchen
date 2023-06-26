@@ -50,7 +50,7 @@ const schema = z.object({
   choosenBy: z.string().min(1, "Choosen by is required"),
   "choosenBy-key": z.string().min(1, "Choosen by is required"),
   location: z.string().min(1, "Location is required"),
-  "location-key": numeric(z.coerce.number({ invalid_type_error: "Invalid" })),
+  "location-key": numeric(),
 })
 
 export const action = async ({ request, params }: ActionArgs) => {
@@ -69,7 +69,7 @@ export const action = async ({ request, params }: ActionArgs) => {
   const lunch = await createLunch({
     choosenByUserId: choosenById,
     date,
-    locationId: locationId.toString(),
+    locationId,
     groupId,
   })
 

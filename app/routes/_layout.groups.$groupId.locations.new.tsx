@@ -11,7 +11,7 @@ import { getGroup, getGroupPermissions } from "~/models/group.server"
 import z from "zod"
 import { createGroupLocation } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
-import { numeric, safeRedirect, useUser } from "~/utils"
+import { optionalNumeric, safeRedirect, useUser } from "~/utils"
 import { LocationAutocomplete } from "~/components/LocationAutocomplete"
 import type { LocationSuggestion } from "~/services/locationiq.server"
 import { parse } from "@conform-to/zod"
@@ -45,8 +45,8 @@ const schema = z.object({
   zipCode: z.string().min(1, "Zip code is required"),
   city: z.string().min(1, "City is required"),
   countryCode: z.string().optional(),
-  lat: numeric(),
-  lon: numeric(),
+  lat: optionalNumeric(),
+  lon: optionalNumeric(),
   discoveredBy: z.string().min(1, "Discovered by is required"),
   "discoveredBy-key": z.string().min(1, "Discovered by is required"),
   redirectTo: z.string().optional(),

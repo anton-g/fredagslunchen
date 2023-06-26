@@ -5,7 +5,6 @@
   - Open issue in Conform about readonly
 - Check that all child routes are protected
   - https://remix.run/docs/en/v1/pages/faq#how-can-i-have-a-parent-route-loader-validate-the-user-and-protect-all-child-routes
-- Fix future date descriptions
 - Update user email
 - Club locations
   - Update
@@ -16,8 +15,6 @@
   - Best average picker
   - Average score on choice vs others choice
 - Feedback
-- Add transitions and loading state when necessary
-- Add optimistic UI when possible
 - Replace Cypress with Playwright
 - Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
 

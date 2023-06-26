@@ -24,11 +24,7 @@ const ColorStack = styled(Stack)`
 const ColorTitle = styled.h2`
   margin-left: auto;
 `
-const RadioItemCard = ({
-  children,
-  style,
-  ...props
-}: React.ComponentProps<typeof RadioGroup.Item>) => {
+const RadioItemCard = ({ children, style, ...props }: React.ComponentProps<typeof RadioGroup.Item>) => {
   return (
     <Wrapper style={style}>
       <Content>{children}</Content>
@@ -75,17 +71,10 @@ export const ThemePicker = () => {
   }))
 
   return (
-    <fetcher.Form
-      method="post"
-      onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}
-    >
+    <fetcher.Form method="post" onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}>
       <input type="hidden" name="action" value="updateTheme" />
       <Subtitle>Theme</Subtitle>
-      <RadioGroup
-        defaultValue={theme}
-        onValueChange={(theme: any) => setTheme(theme)}
-        name="theme"
-      >
+      <RadioGroup defaultValue={theme} onValueChange={(theme: any) => setTheme(theme)} name="theme">
         <Stack gap={16}>
           {themes
             .filter((t) => !t.premium)
@@ -106,6 +95,7 @@ export const ThemePicker = () => {
               <PremiumOverlay />
               {themes
                 .filter((t) => t.premium)
+                .slice(0, 4)
                 .map((t, i) => (
                   <RadioItemCard
                     value={t.key}

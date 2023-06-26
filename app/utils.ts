@@ -1,6 +1,5 @@
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
-import type { ZodSchema } from "zod"
 import z from "zod"
 
 import type { Email, User } from "~/models/user.server"
@@ -168,5 +167,12 @@ export const getRandomAvatarId = (input: string) => {
   return (hash % 30) + 1
 }
 
-export const numeric = (schema: ZodSchema = z.coerce.number({ invalid_type_error: "Invalid" }).optional()) =>
-  z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
+const numericSchema = z.coerce.number({ invalid_type_error: "Invalid" })
+export function optionalNumeric() {
+  let schema = numericSchema.optional()
+
+  return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
+}
+export function numeric() {
+  return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), numericSchema)
+}
