@@ -297,7 +297,20 @@ export async function createUser(
   return { user, groupId: group?.id }
 }
 
-export async function createAnonymousUser(name: string, groupId: Group["id"]) {
+export async function createAnonymousUser(name: string, groupId: Group["id"], byUserId: User["id"]) {
+  const group = await prisma.group.findFirst({
+    where: {
+      id: groupId,
+      members: {
+        some: {
+          userId: byUserId,
+        },
+      },
+    },
+  })
+
+  if (!group) return null
+
   const avatarId = getRandomAvatarId(name)
 
   const user = await prisma.user.create({

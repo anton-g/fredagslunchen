@@ -12,7 +12,7 @@ export function ThreePeopleVibing({ className }: ThreePeopleVibingProps) {
       className={className}
       preserveAspectRatio="xMidYMax meet"
     >
-      <g clip-path="url(#clip0_4_319)">
+      <g clipPath="url(#clip0_4_319)">
         <path
           fillRule="evenodd"
           clipRule="evenodd"

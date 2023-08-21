@@ -351,17 +351,17 @@ export async function addUserEmailToGroup({
 
 export async function createGroupInviteToken({
   groupId,
-  userId,
+  requestedByUserId,
 }: {
   groupId: Group["id"]
-  userId: User["id"]
+  requestedByUserId: User["id"]
 }) {
   return prisma.group.updateMany({
     where: {
       id: groupId,
       members: {
         some: {
-          userId,
+          userId: requestedByUserId,
         },
       },
     },
@@ -373,15 +373,19 @@ export async function createGroupInviteToken({
 
 export async function deleteGroupInviteToken({
   groupId,
-  userId,
+  requestedByUserId,
 }: {
   groupId: Group["id"]
-  userId: User["id"]
+  requestedByUserId: User["id"]
 }) {
-  // TODO only allow this if user is in group?
-  return prisma.group.update({
+  return prisma.group.updateMany({
     where: {
       id: groupId,
+      members: {
+        some: {
+          userId: requestedByUserId,
+        },
+      },
     },
     data: {
       inviteToken: null,
@@ -409,15 +413,27 @@ export async function deleteGroup({
   })
 }
 
-export async function updateGroup(update: Partial<Group>) {
-  return prisma.group.update({
+export async function updateGroup({
+  requestedByUserId,
+  ...update
+}: Partial<Group> & { requestedByUserId: User["id"] }) {
+  const result = await prisma.group.updateMany({
     where: {
       id: update.id,
+      members: {
+        some: {
+          userId: requestedByUserId,
+        },
+      },
     },
     data: {
       ...update,
     },
   })
+
+  if (result.count !== 1) {
+    throw new Error("Update group failed, more than 1 hit")
+  }
 }
 
 export async function deleteGroupMember({

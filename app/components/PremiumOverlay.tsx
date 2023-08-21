@@ -9,7 +9,7 @@ export const PremiumOverlay = () => {
       <Backdrop />
       <h3>Support Fredagslunchen</h3>
       <Spacer size={8} />
-      <p>Get access to exclusive themes, avatars and more!</p>
+      <p>Get access to exclusive themes, statistics and more!</p>
       <Spacer size={16} />
       <LinkButton to="/supporter" size="large">
         Become a supporter

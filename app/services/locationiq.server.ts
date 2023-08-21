@@ -25,7 +25,6 @@ export async function autocomplete(
   let viewbox = ""
   if (options) {
     const p = turf.point([options.lat, options.lng])
-    console.log(p)
     const buffer = turf.buffer(p, 5, { units: "kilometers" })
     const [minX, minY, maxX, maxY] = turf.bbox(buffer)
     // const poly = turf.bboxPolygon(bbox)

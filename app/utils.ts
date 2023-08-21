@@ -1,6 +1,6 @@
 import { useMatches } from "@remix-run/react"
 import { useMemo } from "react"
-import type z from "zod"
+import z from "zod"
 
 import type { Email, User } from "~/models/user.server"
 
@@ -61,10 +61,6 @@ export function useUser(): User {
     )
   }
   return maybeUser
-}
-
-export function validateEmail(email: unknown): email is string {
-  return typeof email === "string" && email.length > 3 && email.includes("@")
 }
 
 export type RecursivelyConvertDatesToStrings<T> = T extends Date
@@ -171,20 +167,12 @@ export const getRandomAvatarId = (input: string) => {
   return (hash % 30) + 1
 }
 
-// if this doesn't someday break..
-export function mapToActualErrors<T extends z.ZodType<any, any, any>>(result: z.SafeParseError<z.infer<T>>) {
-  const errors = result.error.flatten()
+const numericSchema = z.coerce.number({ invalid_type_error: "Invalid" })
+export function optionalNumeric() {
+  let schema = numericSchema.optional()
 
-  type FlattenedErrors = z.inferFlattenedErrors<T>
-  type Keys = keyof FlattenedErrors["fieldErrors"]
-
-  const actualErrors = Object.entries(errors.fieldErrors).reduce<Partial<Record<Keys, string>>>(
-    (acc, [key, value]) => {
-      acc[key as Keys] = (value as string[])[0]
-
-      return acc
-    },
-    {}
-  )
-  return actualErrors
+  return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
+}
+export function numeric() {
+  return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), numericSchema)
 }
