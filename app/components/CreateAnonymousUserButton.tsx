@@ -2,7 +2,7 @@ import { useFetcher } from "@remix-run/react"
 import type { Group } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
-import { Button } from "~/components/Button"
+import { Button, LoadingButton } from "~/components/Button"
 import { useEffect, useState } from "react"
 import { useRef } from "react"
 import { Dialog } from "~/components/Dialog"
@@ -58,9 +58,9 @@ export const CreateAnonymousUserButton = ({ groupId }: { groupId: Group["id"] })
             </label>
             {fetcher.data?.errors?.name && <div id="name-error">{fetcher.data.errors.name}</div>}
             <Spacer size={16} />
-            <Button size="large" style={{ marginLeft: "auto" }}>
+            <LoadingButton loading={fetcher.state !== "idle"} size="large" style={{ marginLeft: "auto" }}>
               Create anonymous user
-            </Button>
+            </LoadingButton>
           </fetcher.Form>
         </Dialog.Content>
       </Dialog>

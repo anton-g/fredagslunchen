@@ -1,24 +1,15 @@
 import { CopyIcon, Cross2Icon } from "@radix-ui/react-icons"
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import {
-  useActionData,
-  useCatch,
-  useFetcher,
-  useLoaderData,
-} from "@remix-run/react"
+import { useActionData, useCatch, useFetcher, useLoaderData } from "@remix-run/react"
 import * as React from "react"
 import styled from "styled-components"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, LoadingButton } from "~/components/Button"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { Tooltip } from "~/components/Tooltip"
-import {
-  addUserEmailToGroup,
-  getGroup,
-  getGroupPermissions,
-} from "~/models/group.server"
+import { addUserEmailToGroup, getGroup, getGroupPermissions } from "~/models/group.server"
 
 import { requireUserId } from "~/session.server"
 
@@ -36,8 +27,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     group,
   })
 
-  if (!permissions.invite)
-    throw new Response("Permission denied", { status: 401 })
+  if (!permissions.invite) throw new Response("Permission denied", { status: 401 })
 
   const { origin } = new URL(request.url)
 
@@ -64,10 +54,7 @@ export const action: ActionFunction = async ({ request, params }) => {
   const email = formData.get("email")
 
   if (typeof email !== "string" || email.length === 0) {
-    return json<ActionData>(
-      { errors: { email: "Email is required" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ errors: { email: "Email is required" } }, { status: 400 })
   }
 
   const group = await addUserEmailToGroup({ groupId, email })
@@ -81,8 +68,7 @@ export const action: ActionFunction = async ({ request, params }) => {
 
 export default function InvitePage() {
   const fetcher = useFetcher()
-  const { groupInviteToken, groupId, userId, baseUrl } =
-    useLoaderData<typeof loader>()
+  const { groupInviteToken, groupId, userId, baseUrl } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
   const emailRef = React.useRef<HTMLInputElement>(null)
 
@@ -133,9 +119,7 @@ export default function InvitePage() {
       <h3 style={{ marginBottom: 0 }}>Invite with link</h3>
       {groupInviteToken ? (
         <>
-          <InviteDescription>
-            Anyone with the link can join your club.
-          </InviteDescription>
+          <InviteDescription>Anyone with the link can join your club.</InviteDescription>
           <Stack gap={16}>
             <Input
               value={`${baseUrl}/join?token=${groupInviteToken}`}
@@ -149,9 +133,13 @@ export default function InvitePage() {
                 <input type="hidden" name="userId" value={userId} />
                 <Tooltip>
                   <Tooltip.Trigger asChild>
-                    <Button variant="round" aria-label="Remove invite link">
+                    <LoadingButton
+                      variant="round"
+                      aria-label="Remove invite link"
+                      loading={fetcher.state !== "idle"}
+                    >
                       <Cross2Icon />
-                    </Button>
+                    </LoadingButton>
                   </Tooltip.Trigger>
                   <Tooltip.Content>Remove invite link</Tooltip.Content>
                 </Tooltip>
@@ -161,9 +149,7 @@ export default function InvitePage() {
                   <Button
                     variant="round"
                     onClick={() => {
-                      navigator.clipboard.writeText(
-                        `${baseUrl}/join?token=${groupInviteToken}`
-                      )
+                      navigator.clipboard.writeText(`${baseUrl}/join?token=${groupInviteToken}`)
                     }}
                   >
                     <CopyIcon />
@@ -176,13 +162,11 @@ export default function InvitePage() {
         </>
       ) : (
         <fetcher.Form method="post" action="/groups/api/invite-token">
-          <InviteDescription>
-            Create a link that anyone can use to join your club.
-          </InviteDescription>
+          <InviteDescription>Create a link that anyone can use to join your club.</InviteDescription>
           <input type="hidden" name="action" value={"create"} />
           <input type="hidden" name="groupId" value={groupId} />
           <input type="hidden" name="userId" value={userId} />
-          <Button>Create invite link</Button>
+          <LoadingButton loading={fetcher.state !== "idle"}>Create invite link</LoadingButton>
         </fetcher.Form>
       )}
     </>

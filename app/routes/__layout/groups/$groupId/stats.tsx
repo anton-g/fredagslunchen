@@ -4,24 +4,18 @@ import { useCatch, useLoaderData } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { ResponsiveLine } from "@nivo/line"
 
-import {
-  getGroupDetails,
-  getGroupPermissionsForRequest,
-} from "~/models/group.server"
+import { getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { getUserId } from "~/session.server"
 import { format } from "date-fns"
 import { Card } from "~/components/Card"
-import type {
-  FullLunch,
-  GroupMembersWithScores,
-  LunchStat,
-} from "~/models/lunch.server"
+import type { FullLunch, GroupMembersWithScores, LunchStat } from "~/models/lunch.server"
 import { getGroupLunchStatsPerMember } from "~/models/lunch.server"
 import { getGroupLunchStats } from "~/models/lunch.server"
 import { Stack } from "~/components/Stack"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import type { ComponentProps } from "react"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   await getUserId(request)
@@ -194,11 +188,7 @@ const Subtitle = styled.h3`
   margin: 16px 0;
 `
 
-const GroupLunchesLineGraph = ({
-  data,
-}: {
-  data: RecursivelyConvertDatesToStrings<LunchStat>[]
-}) => {
+const GroupLunchesLineGraph = ({ data }: { data: RecursivelyConvertDatesToStrings<LunchStat>[] }) => {
   const lunchData = data
     .filter((s) => s.stats.avg !== null)
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
@@ -263,19 +253,12 @@ const GroupLunchesLineGraph = ({
                 const lunch = point.data.lunch as GroupLunchStat
 
                 return (
-                  <Stack
-                    axis="horizontal"
-                    gap={18}
-                    key={point.id}
-                    style={{ alignItems: "center" }}
-                  >
+                  <Stack axis="horizontal" gap={18} key={point.id} style={{ alignItems: "center" }}>
                     <Stack gap={4}>
                       <strong>{lunch.groupLocation.location.name}</strong>
                       {point.data.xFormatted}
                     </Stack>
-                    <span style={{ fontSize: 32, fontWeight: "bold" }}>
-                      {point.data.yFormatted}
-                    </span>
+                    <span style={{ fontSize: 32, fontWeight: "bold" }}>{point.data.yFormatted}</span>
                   </Stack>
                 )
               })}
@@ -297,10 +280,7 @@ const GroupMemberScoresLineGraph = ({
     .map((x) => ({
       id: x.name,
       data: x.scores
-        .sort(
-          (a, b) =>
-            new Date(a.lunch.date).getTime() - new Date(b.lunch.date).getTime()
-        )
+        .sort((a, b) => new Date(a.lunch.date).getTime() - new Date(b.lunch.date).getTime())
         .map((s) => ({
           x: format(new Date(s.lunch.date), "yyyy-MM-dd"),
           y: s.score,
@@ -311,13 +291,29 @@ const GroupMemberScoresLineGraph = ({
 
   const lunches = data.flatMap((x) => x.scores.map((s) => s.lunch))
 
+  const { legends, margin } = wrappedLegend(graphData, 6, {
+    anchor: "bottom",
+    direction: "row",
+    justify: false,
+    toggleSerie: true,
+    translateX: 0,
+    translateY: 50,
+    itemsSpacing: 32,
+    itemDirection: "left-to-right",
+    itemWidth: 80,
+    itemHeight: 20,
+    itemOpacity: 0.75,
+    symbolSize: 12,
+    symbolShape: "circle",
+  })
+
   return (
-    <div style={{ height: 200 }}>
+    <div style={{ height: 200 + margin }}>
       <ResponsiveLine
         data={graphData}
-        colors={{ scheme: "dark2" }}
+        colors={colors}
         theme={theme}
-        margin={{ top: 0, right: 8, bottom: 0, left: 16 }}
+        margin={{ top: 0, right: 8, bottom: margin, left: 16 }}
         xScale={{
           type: "time",
           format: "%Y-%m-%d",
@@ -350,23 +346,7 @@ const GroupMemberScoresLineGraph = ({
           tickValues: [0, 2, 4, 6, 8, 10],
         }}
         enableSlices="x"
-        legends={[
-          {
-            anchor: "bottom",
-            direction: "row",
-            justify: false,
-            toggleSerie: true,
-            translateX: 0,
-            translateY: 50,
-            itemsSpacing: 32,
-            itemDirection: "left-to-right",
-            itemWidth: 80,
-            itemHeight: 20,
-            itemOpacity: 0.75,
-            symbolSize: 12,
-            symbolShape: "circle",
-          },
-        ]}
+        legends={legends}
         sliceTooltip={({ slice }) => {
           // @ts-expect-error
           const lunch = slice.points[0].data.lunch as FullLunch
@@ -393,9 +373,7 @@ const GroupMemberScoresLineGraph = ({
                       }}
                     >
                       <strong>{user}</strong>
-                      <span style={{ fontSize: 16 }}>
-                        {point.data.yFormatted}
-                      </span>
+                      <span style={{ fontSize: 16 }}>{point.data.yFormatted}</span>
                     </Stack>
                   )
                 })}
@@ -406,6 +384,66 @@ const GroupMemberScoresLineGraph = ({
       />
     </div>
   )
+}
+
+const colors = [
+  "red",
+  "green",
+  "yellow",
+  "blue",
+  "snow",
+  "palegoldenrod",
+  "aliceblue",
+  "blueviolet",
+  "brown",
+  "cadetblue",
+  "coral",
+  "cornsilk",
+  "darkgreen",
+  "darkorange",
+  "darksalmon",
+  "darkturquoise",
+  "dodgerblue",
+  "gold",
+  "greenyellow",
+  "indigo",
+  "lightgreen",
+  "maroon",
+  "mediumspringgreen",
+  "olive",
+  "palevioletred",
+  "sienna",
+  "thistle",
+  "wheat",
+  "yellowgreen",
+  "teal",
+]
+
+type LegendProps = NonNullable<ComponentProps<typeof ResponsiveLine>["legends"]>[0]
+function wrappedLegend<T extends { id: string }>(data: T[], columns: number, legendProps: LegendProps) {
+  const translateY = legendProps.translateY || 0
+
+  if (data.length <= columns) {
+    return { legends: [legendProps], margin: 0 }
+  }
+
+  const rows = Math.ceil(data.length / columns)
+
+  const legends: LegendProps[] = []
+
+  for (let i = 0; i < rows; i++) {
+    legends.push({
+      ...legendProps,
+      translateY: translateY + i * 30,
+      data: data.slice(i * columns, (i + 1) * columns).map((cur, index) => ({
+        id: cur.id,
+        label: cur.id,
+        color: colors.slice(i * columns, (i + 1) * columns)[index],
+      })),
+    })
+  }
+
+  return { legends, margin: 30 * rows }
 }
 
 const getTickValues = (data: { date: string }[]) => {

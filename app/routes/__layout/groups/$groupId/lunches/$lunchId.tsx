@@ -21,13 +21,14 @@ import { Input } from "~/components/Input"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
 import { Stack } from "~/components/Stack"
-import { Button, UnstyledButton } from "~/components/Button"
+import { Button, LoadingButton, UnstyledButton } from "~/components/Button"
 import { Tooltip } from "~/components/Tooltip"
 import { Dialog } from "~/components/Dialog"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
 import { SortableTable } from "~/components/SortableTable"
+import { request } from "http"
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)
@@ -452,7 +453,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
           </CommentLabel>
         </div>
       </Stack>
-      <Button>Save rating</Button>
+      <LoadingButton loading={scoreFetcher.state !== "idle"}>Save rating</LoadingButton>
     </scoreFetcher.Form>
   )
 }
@@ -523,7 +524,7 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
         </Stack>
       </Stack>
       <Stack axis="horizontal" gap={16} style={{ width: "100%", justifyContent: "flex-end" }}>
-        <Button>Request rating</Button>
+        <LoadingButton loading={requestFetcher.state !== "idle"}>Request rating</LoadingButton>
       </Stack>
     </requestFetcher.Form>
   )

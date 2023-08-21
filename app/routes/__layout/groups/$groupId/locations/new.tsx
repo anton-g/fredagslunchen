@@ -1,9 +1,9 @@
 import type { ActionFunction, LoaderArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
-import { Form, useActionData, useLoaderData, useSearchParams } from "@remix-run/react"
+import { Form, Link, useActionData, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react"
 import { useEffect, useRef, useState } from "react"
 import invariant from "tiny-invariant"
-import { Button } from "~/components/Button"
+import { Button, LoadingButton } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
@@ -34,7 +34,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
     throw new Response("Unauthorized", { status: 401 })
   }
 
-  return json({ group })
+  return json({ group, permissions })
 }
 
 const formSchema = zfd.formData({
@@ -108,7 +108,8 @@ export const action: ActionFunction = async ({ request, params }) => {
 export default function NewLocationPage() {
   const user = useUser()
   const actionData = useActionData() as ActionData
-  const { group } = useLoaderData<typeof loader>()
+  const { group, permissions } = useLoaderData<typeof loader>()
+  const navigation = useNavigation()
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
   const nameRef = useRef<HTMLInputElement>(null!)
@@ -137,6 +138,10 @@ export default function NewLocationPage() {
       lonRef.current?.focus()
     } else if (actionData?.errors?.["discoveredBy-key"]) {
       discoveredByRef.current?.focus()
+    }
+
+    if (actionData?.errors) {
+      setManualEdit(true)
     }
   }, [actionData])
 
@@ -195,6 +200,15 @@ export default function NewLocationPage() {
               onSelect={handleLocationSelect}
               origin={group.lat && group.lon ? { lat: group.lat, lng: group.lon } : undefined}
             />
+            {!(group.lat && group.lon) && permissions.settings && (
+              <span>
+                Update your{" "}
+                <Link to={`/groups/${group.id}/settings`} style={{ textDecoration: "underline" }}>
+                  club location
+                </Link>{" "}
+                to get better suggestions.
+              </span>
+            )}
           </div>
           <Button
             style={{ marginLeft: "auto", marginBottom: -28, visibility: manualEdit ? "hidden" : "visible" }}
@@ -327,9 +341,9 @@ export default function NewLocationPage() {
 
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <div>
-            <Button style={{ marginLeft: "auto" }} type="submit">
-              Save
-            </Button>
+            <LoadingButton loading={navigation.state !== "idle"} style={{ marginLeft: "auto" }} type="submit">
+              Save location
+            </LoadingButton>
           </div>
         </Stack>
       </Form>

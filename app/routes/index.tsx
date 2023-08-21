@@ -2,7 +2,7 @@ import { json } from "@remix-run/node"
 import type { LoaderArgs } from "@remix-run/node"
 import { Link, useFetcher, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
-import { Button, LinkButton } from "~/components/Button"
+import { Button, LinkButton, LoadingButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { getUserId } from "~/session.server"
 import { getFullUserById } from "~/models/user.server"
@@ -183,7 +183,9 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
           name="redirectTo"
           value={`/groups/${request.lunch.groupLocation.group.id}/lunches/${request.lunchId}`}
         />
-        <Button style={{ marginLeft: "auto" }}>Save rating</Button>
+        <LoadingButton loading={scoreFetcher.state !== "idle"} style={{ marginLeft: "auto" }}>
+          Save rating
+        </LoadingButton>
       </scoreFetcher.Form>
     </Card>
   )
