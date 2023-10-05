@@ -10,7 +10,6 @@ import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
-import { Checkbox } from "~/components/Checkbox"
 import { z } from "zod"
 
 export const loader: LoaderFunction = async ({ request }) => {
@@ -22,7 +21,6 @@ export const loader: LoaderFunction = async ({ request }) => {
 const schema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
   password: z.string().min(8, "Password is too short"),
-  remember: z.preprocess((x) => x === "on", z.boolean()),
   redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
 })
 
@@ -45,7 +43,6 @@ export const action = async ({ request }: ActionArgs) => {
   return createUserSession({
     request,
     userId: user.id,
-    remember: submission.value.remember,
     redirectTo: submission.value.redirectTo,
   })
 }
@@ -60,7 +57,7 @@ export default function LoginPage() {
   const [searchParams] = useSearchParams()
   const redirectToParam = searchParams.get("redirectTo") || "/"
   const lastSubmission = useActionData<typeof action>()
-  const [form, { email, password, redirectTo, remember }] = useForm({
+  const [form, { email, password, redirectTo }] = useForm({
     id: "login-form",
     lastSubmission,
     onValidate: ({ formData }) => parse(formData, { schema }),
@@ -96,8 +93,6 @@ export default function LoginPage() {
 
           <input type="hidden" name={redirectTo.name} value={redirectToParam} />
           <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Checkbox id="remember" name={remember.name} />
-            <label htmlFor="remember">Remember me</label>
             <SubmitButton type="submit">Log in</SubmitButton>
           </div>
           <ForgotPasswordLink to="/forgot-password">Forgot your password?</ForgotPasswordLink>

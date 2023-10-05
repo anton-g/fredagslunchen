@@ -74,7 +74,6 @@ export const action = async ({ request }: ActionArgs) => {
   return createUserSession({
     request,
     userId: user.id,
-    remember: false,
     redirectTo: groupId ? `/groups/${groupId}` : submission.value.redirectTo,
   })
 }
