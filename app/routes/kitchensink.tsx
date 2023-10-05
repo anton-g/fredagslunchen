@@ -1,5 +1,5 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons"
-import type { LoaderArgs, MetaFunction } from "@remix-run/node"
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import type { ReactNode } from "react"
 import { Link, useLoaderData } from "@remix-run/react"
@@ -26,12 +26,13 @@ import { Popover } from "~/components/Popover"
 import { RadioGroup } from "~/components/RadioGroup"
 import { useAsyncList } from "@react-stately/data"
 import { SortableTable } from "~/components/SortableTable"
+import { mergeMeta } from "~/merge-meta"
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Kitchensink",
-  }
-}
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
+    title: "Kitchensink - Fredagslunchen",
+  },
+])
 
 export const loader = async ({ request }: LoaderArgs) => {
   return json({

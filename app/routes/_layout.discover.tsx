@@ -1,4 +1,4 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/node"
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -7,6 +7,7 @@ import { Map } from "~/components/Map"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import { useFeatureFlags } from "~/FeatureFlagContext"
+import { mergeMeta } from "~/merge-meta"
 
 import { getAllLocationsStats } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
@@ -18,11 +19,11 @@ export const loader = async ({ request }: LoaderArgs) => {
   return json({ locations })
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Discover",
-  }
-}
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
+    title: "Discover - Fredagslunchen",
+  },
+])
 
 export default function DiscoverPage() {
   const { maps } = useFeatureFlags()
@@ -48,9 +49,7 @@ export default function DiscoverPage() {
                 <tr key={loc.id}>
                   <Table.Cell>{loc.name}</Table.Cell>
                   <Table.Cell>{loc.address}</Table.Cell>
-                  <Table.Cell numeric>
-                    {formatNumber(loc.averageScore)}
-                  </Table.Cell>
+                  <Table.Cell numeric>{formatNumber(loc.averageScore)}</Table.Cell>
                 </tr>
               )
             })}

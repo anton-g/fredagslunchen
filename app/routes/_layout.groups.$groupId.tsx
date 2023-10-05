@@ -1,4 +1,4 @@
-import type { LoaderArgs, MetaFunction } from "@remix-run/node"
+import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData, Outlet, Link, useRouteError, isRouteErrorResponse } from "@remix-run/react"
 import invariant from "tiny-invariant"
@@ -8,18 +8,28 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { LinkButton } from "~/components/Button"
 import { getUserId } from "~/session.server"
+import { mergeMeta } from "~/merge-meta"
 
-export const meta: MetaFunction = ({ data }) => {
+export const meta: V2_MetaFunction = mergeMeta(({ data }) => {
   if (!data || !data.details) {
-    return {}
+    return []
   }
 
-  return {
-    "twitter:title": `${data.details.group.name} on Fredagslunchen`,
-    "og:title": `${data.details.group.name} on Fredagslunchen`,
-    "og:image": `https://res.cloudinary.com/anton-g/image/upload/w_1280,h_699/c_fit,l_text:Roboto_150_bold:${data.details.group.name},w_1100/fl_layer_apply,g_north_west,y_90,x_75/c_fit,l_text:Roboto_90_bold:${data.details.stats.averageScore},w_1100/fl_layer_apply,g_south_east,y_95,x_150/c_fit,l_text:Roboto_35_bold:avg,w_1100/fl_layer_apply,g_south_east,y_95,x_90/c_fit,l_text:Roboto_28_bold:fredagslunchen.club,w_1100/fl_layer_apply,g_south_west,y_60,x_65/template_ns4drh.png`,
-  }
-}
+  return [
+    {
+      title: `${data.details.group.name} on Fredagslunchen`,
+    },
+    {
+      "twitter:title": `${data.details.group.name} on Fredagslunchen`,
+    },
+    {
+      "og:title": `${data.details.group.name} on Fredagslunchen`,
+    },
+    {
+      "og:image": `https://res.cloudinary.com/anton-g/image/upload/w_1280,h_699/c_fit,l_text:Roboto_150_bold:${data.details.group.name},w_1100/fl_layer_apply,g_north_west,y_90,x_75/c_fit,l_text:Roboto_90_bold:${data.details.stats.averageScore},w_1100/fl_layer_apply,g_south_east,y_95,x_150/c_fit,l_text:Roboto_35_bold:avg,w_1100/fl_layer_apply,g_south_east,y_95,x_90/c_fit,l_text:Roboto_28_bold:fredagslunchen.club,w_1100/fl_layer_apply,g_south_west,y_60,x_65/template_ns4drh.png`,
+    },
+  ]
+})
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   const userId = await getUserId(request)

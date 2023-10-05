@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useSearchParams } from "@remix-run/react"
 import { getUserId } from "~/session.server"
@@ -10,6 +10,7 @@ import { Input } from "~/components/Input"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 import { z } from "zod"
+import { mergeMeta } from "~/merge-meta"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await getUserId(request)
@@ -49,11 +50,11 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect("/login")
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Forgot password",
-  }
-}
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
+    title: "Forgot password - Fredagslunchen",
+  },
+])
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams()

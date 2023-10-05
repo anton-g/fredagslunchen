@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import type { LinksFunction, LoaderArgs, MetaFunction } from "@remix-run/node"
+import type { LinksFunction, LoaderArgs, V2_MetaFunction } from "@remix-run/node"
 import mapboxgl from "mapbox-gl"
 import { json } from "@remix-run/node"
 import {
@@ -86,18 +86,18 @@ if (ENV.MAPBOX_ACCESS_TOKEN) {
   mapboxgl.accessToken = ENV.MAPBOX_ACCESS_TOKEN
 }
 
-export const meta: MetaFunction = () => ({
-  charset: "utf-8",
-  title: "Fredagslunchen",
-  viewport: "width=device-width,initial-scale=1",
-  "twitter:title": "Fredagslunchen",
-  "twitter:card": "summary_large_image",
-  "twitter:description": "Never worry about where to eat again.",
-  "og:title": "Fredagslunchen",
-  "og:description": "Never worry about where to eat again.",
-  "og:image":
-    "https://res.cloudinary.com/anton-g/image/upload/c_fill,w_1280,h_699/l_text:Roboto_140_bold:Fredagslunchen/template_ns4drh.png",
-})
+export const meta: V2_MetaFunction = () => [
+  { title: "Fredagslunchen" },
+  { "twitter:title": "Fredagslunchen" },
+  { "twitter:card": "summary_large_image" },
+  { "twitter:description": "Never worry about where to eat again." },
+  { "og:title": "Fredagslunchen" },
+  { "og:description": "Never worry about where to eat again." },
+  {
+    "og:image":
+      "https://res.cloudinary.com/anton-g/image/upload/c_fill,w_1280,h_699/l_text:Roboto_140_bold:Fredagslunchen/template_ns4drh.png",
+  },
+]
 
 export const loader = async ({ request }: LoaderArgs) => {
   const user = await getUser(request)
@@ -129,6 +129,8 @@ export default function App() {
   return (
     <html lang="en">
       <head>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
         <CanonicalLink origin={data.requestInfo.origin} fathomQueue={fathomQueue} />

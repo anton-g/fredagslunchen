@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react"
 import { useForm, conform } from "@conform-to/react"
@@ -11,6 +11,7 @@ import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
 import { z } from "zod"
+import { mergeMeta } from "~/merge-meta"
 
 export const loader: LoaderFunction = async ({ request }) => {
   const userId = await getUserId(request)
@@ -47,11 +48,11 @@ export const action = async ({ request }: ActionArgs) => {
   })
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Login",
-  }
-}
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
+    title: "Login - Fredagslunchen",
+  },
+])
 
 export default function LoginPage() {
   const [searchParams] = useSearchParams()

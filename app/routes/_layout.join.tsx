@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionArgs, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
@@ -14,6 +14,7 @@ import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/mail.server"
 import { z } from "zod"
+import { mergeMeta } from "~/merge-meta"
 
 export const loader: LoaderFunction = async ({ request, params }) => {
   const userId = await getUserId(request)
@@ -78,11 +79,11 @@ export const action = async ({ request }: ActionArgs) => {
   })
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Sign Up",
-  }
-}
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
+    title: "Sign up - Fredagslunchen",
+  },
+])
 
 export default function Join() {
   const [searchParams] = useSearchParams()

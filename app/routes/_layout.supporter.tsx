@@ -1,12 +1,12 @@
-import type { ActionFunction, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionFunction, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
 import { redirect } from "@remix-run/node"
 import { json } from "@remix-run/node"
-
 import { getUserId } from "~/session.server"
 import styled from "styled-components"
 import { Button } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { getEnv } from "~/env.server"
+import { mergeMeta } from "~/merge-meta"
 
 export const loader: LoaderFunction = async ({ request }) => {
   await getUserId(request)
@@ -19,11 +19,11 @@ export const loader: LoaderFunction = async ({ request }) => {
 
 export const action: ActionFunction = async ({ request }) => {}
 
-export const meta: MetaFunction = () => {
-  return {
+export const meta: V2_MetaFunction = mergeMeta(() => [
+  {
     title: "Become a Fredagslunchen supporter",
-  }
-}
+  },
+])
 
 export default function SupporterPage() {
   // const actionData = useActionData() as ActionData
