@@ -30,7 +30,7 @@ export async function sendEmailVerificationEmail(
 }
 
 export async function sendEmail({ react, ...options }: { to: string; subject: string; react: ReactElement }) {
-  const from = "hello@fredagslunchen.club"
+  const from = "Fredagslunchen <hello@fredagslunchen.club>"
 
   try {
     await resend.emails.send({
