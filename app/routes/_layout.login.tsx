@@ -37,7 +37,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await verifyLogin(submission.value.email, submission.value.password)
 
   if (!user) {
-    submission.error.email = "Email or password is incorrect"
+    submission.error.email = ["Email or password is incorrect"]
     return json(submission, { status: 400 })
   }
 

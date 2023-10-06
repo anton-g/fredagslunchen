@@ -41,7 +41,7 @@ const schema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
   password: z.string().min(8, "Password is too short"),
   name: z.string().min(1, "Name is required"),
-  redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
+  redirectTo: z.string().optional(),
 })
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -57,7 +57,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const existingUser = await getUserByEmail(submission.value.email)
   if (existingUser) {
-    submission.error.email = "Email or password is incorrect"
+    submission.error.email = ["This email already exists"]
     return json(submission, { status: 400 })
   }
 
@@ -75,7 +75,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return createUserSession({
     request,
     userId: user.id,
-    redirectTo: groupId ? `/groups/${groupId}` : submission.value.redirectTo,
+    redirectTo: groupId ? `/groups/${groupId}` : safeRedirect(submission.value.redirectTo, "/"),
   })
 }
 
@@ -92,6 +92,7 @@ export default function Join() {
   const [form, { email, password, name }] = useForm({
     id: "signup-form",
     lastSubmission,
+    shouldValidate: "onSubmit",
     onValidate: ({ formData }) => parse(formData, { schema }),
   })
 

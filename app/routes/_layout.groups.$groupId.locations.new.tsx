@@ -97,7 +97,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       {
         ...submission,
         error: {
-          "": "Something went wrong",
+          "": ["Something went wrong"],
         },
       },
       { status: 400 }
