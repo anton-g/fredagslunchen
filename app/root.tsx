@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import type { LinksFunction, LoaderArgs, V2_MetaFunction } from "@remix-run/node"
+import type { LinksFunction, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import mapboxgl from "mapbox-gl"
 import { json } from "@remix-run/node"
 import {
@@ -86,7 +86,7 @@ if (ENV.MAPBOX_ACCESS_TOKEN) {
   mapboxgl.accessToken = ENV.MAPBOX_ACCESS_TOKEN
 }
 
-export const meta: V2_MetaFunction = () => [
+export const meta: MetaFunction = () => [
   { title: "Fredagslunchen" },
   { "twitter:title": "Fredagslunchen" },
   { "twitter:card": "summary_large_image" },
@@ -99,7 +99,7 @@ export const meta: V2_MetaFunction = () => [
   },
 ]
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getUser(request)
 
   const env = getEnv()

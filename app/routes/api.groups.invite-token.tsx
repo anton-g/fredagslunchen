@@ -1,4 +1,4 @@
-import type { ActionFunction } from "@remix-run/server-runtime"
+import type { ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import { createGroupInviteToken, deleteGroupInviteToken } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
@@ -13,7 +13,7 @@ type ActionData = {
   }
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request)
 
   const formData = await request.formData()

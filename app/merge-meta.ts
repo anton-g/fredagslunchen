@@ -1,18 +1,18 @@
-import type { LoaderFunction, V2_MetaFunction } from "@remix-run/node"
+import type { LoaderFunction, MetaFunction } from "@remix-run/node"
 
 export const mergeMeta = <
   Loader extends LoaderFunction | unknown = unknown,
-  ParentsLoaders extends Record<string, LoaderFunction> = Record<string, LoaderFunction>
+  ParentsLoaders extends Record<string, LoaderFunction | unknown> = Record<string, LoaderFunction | unknown>
 >(
-  leafMetaFn: V2_MetaFunction<Loader, ParentsLoaders>
-): V2_MetaFunction<Loader, ParentsLoaders> => {
+  leafMetaFn: MetaFunction<Loader, ParentsLoaders>
+): MetaFunction<Loader, ParentsLoaders> => {
   return (arg) => {
-    let leafMeta = leafMetaFn(arg)
+    const leafMeta = leafMetaFn(arg)
 
     return arg.matches.reduceRight((acc, match) => {
-      for (let parentMeta of match.meta) {
+      for (const parentMeta of match.meta) {
         // This can't be the way to do it..
-        let index = acc.findIndex(
+        const index = acc.findIndex(
           (meta) =>
             ("name" in meta && "name" in parentMeta && meta.name === parentMeta.name) ||
             ("property" in meta && "property" in parentMeta && meta.property === parentMeta.property) ||

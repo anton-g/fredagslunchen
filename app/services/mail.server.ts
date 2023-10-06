@@ -39,9 +39,7 @@ const sendEmail = async ({
   dynamicData: Record<string, any>
 }) => {
   if (!ENV.SENDGRID_API_KEY) {
-    console.warn(
-      `Missing Sendgrid API Key. Ignoring email: ${email} - ${templateId}`
-    )
+    console.warn(`Missing Sendgrid API Key. Ignoring email: ${email} - ${templateId}`)
     return
   }
 

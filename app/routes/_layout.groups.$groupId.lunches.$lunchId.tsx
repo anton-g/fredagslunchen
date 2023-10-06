@@ -4,7 +4,7 @@ import type { Score, ScoreRequest } from "~/models/score.server"
 import type { User } from "~/models/user.server"
 import type { Group } from "~/models/group.server"
 import type { ReactNode } from "react"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { getGroupPermissions } from "~/models/group.server"
 import { useEffect, useRef } from "react"
 import styled from "styled-components"
@@ -28,8 +28,10 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Help } from "~/components/Help"
 import { Popover } from "~/components/Popover"
 import { SortableTable } from "~/components/SortableTable"
+import type { action as newScoreAction } from "~/routes/api.scores.new"
+import type { action as scoreRequestAction } from "~/routes/api.scores.request"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
   invariant(params.lunchId, "lunchId not found")
@@ -60,7 +62,7 @@ type ActionData = {
   }
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.lunchId, "lunchId not found")
   invariant(params.groupId, "groupId not found")
@@ -395,13 +397,13 @@ type NewScoreFormProps = {
   userId: User["id"]
 }
 const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) => {
-  const scoreFetcher = useFetcher()
+  const scoreFetcher = useFetcher<typeof newScoreAction>()
   const formRef = useRef<HTMLFormElement>(null)
   const userRef = useRef<HTMLInputElement>(null!)
   const scoreRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    if (scoreFetcher.type === "done" && scoreFetcher.data.ok) {
+    if (scoreFetcher.state === "idle" && scoreFetcher.data != null && scoreFetcher.data.ok) {
       formRef.current?.reset()
     }
 
@@ -495,17 +497,17 @@ type RequestScoreFormProps = {
   userId: User["id"]
 }
 const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormProps) => {
-  const requestFetcher = useFetcher()
+  const requestFetcher = useFetcher<typeof scoreRequestAction>()
   const formRef = useRef<HTMLFormElement>(null)
   const userRef = useRef<HTMLInputElement>(null!)
 
   useEffect(() => {
-    if (requestFetcher.type === "done" && requestFetcher.data.ok) {
+    if (requestFetcher.state === "idle" && requestFetcher.data != null && requestFetcher.data.ok) {
       formRef.current?.reset()
     }
 
     const errors = requestFetcher.data?.errors
-    if (errors?.user) {
+    if (errors?.userId) {
       userRef.current?.focus()
     }
   }, [requestFetcher])

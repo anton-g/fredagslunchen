@@ -1,4 +1,4 @@
-import type { ActionArgs } from "@remix-run/node"
+import type { ActionFunctionArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData } from "@remix-run/react"
 import z from "zod"
@@ -14,7 +14,7 @@ const schema = z.object({
   name: z.string().min(1, "Name is required"),
 })
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request)
 
   const formData = await request.formData()

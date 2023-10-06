@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
@@ -16,7 +16,7 @@ import { sendEmailVerificationEmail } from "~/services/mail.server"
 import { z } from "zod"
 import { mergeMeta } from "~/merge-meta"
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
 
   if (userId) {
@@ -44,7 +44,7 @@ const schema = z.object({
   redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
 })
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
 
   const submission = parse(formData, { schema })
@@ -79,7 +79,7 @@ export const action = async ({ request }: ActionArgs) => {
   })
 }
 
-export const meta: V2_MetaFunction = mergeMeta(() => [
+export const meta: MetaFunction = mergeMeta(() => [
   {
     title: "Sign up - Fredagslunchen",
   },

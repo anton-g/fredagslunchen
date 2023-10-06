@@ -5,15 +5,10 @@ import { Card } from "./Card"
 type HoverCardProps = HoverCardPrimitive.HoverCardProps
 
 const HoverCard = ({ children, ...props }: HoverCardProps) => {
-  return (
-    <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
-  )
+  return <HoverCardPrimitive.Root {...props}>{children}</HoverCardPrimitive.Root>
 }
 
-const HoverCardContent = ({
-  children,
-  ...props
-}: HoverCardPrimitive.HoverCardContentProps) => {
+const HoverCardContent = ({ children, ...props }: HoverCardPrimitive.HoverCardContentProps) => {
   return (
     <StyledContent sideOffset={5} {...props}>
       <Card>{children}</Card>

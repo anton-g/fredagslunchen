@@ -1,23 +1,25 @@
-import type { LoaderArgs } from "@remix-run/node"
-import { json } from "@remix-run/node"
+import { json, type LoaderFunctionArgs } from "@remix-run/node"
 import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { ResponsiveLine } from "@nivo/line"
-
 import { getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { getUserId } from "~/session.server"
 import { format } from "date-fns"
 import { Card } from "~/components/Card"
-import type { FullLunch, GroupMembersWithScores, LunchStat } from "~/models/lunch.server"
-import { getGroupLunchStatsPerMember } from "~/models/lunch.server"
-import { getGroupLunchStats } from "~/models/lunch.server"
+import {
+  getGroupLunchStats,
+  getGroupLunchStatsPerMember,
+  type FullLunch,
+  type GroupMembersWithScores,
+  type LunchStat,
+} from "~/models/lunch.server"
 import { Stack } from "~/components/Stack"
 import type { RecursivelyConvertDatesToStrings } from "~/utils"
 import type { ComponentProps } from "react"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await getUserId(request)
   invariant(params.groupId, "groupId not found")
 

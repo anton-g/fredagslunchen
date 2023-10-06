@@ -13,10 +13,9 @@ export function Landing() {
       <Content>
         <Title style={{ textAlign: "center" }}>Hey you.</Title>
         <p>
-          <strong>Tired of discussions about where to eat?</strong> You've found
-          the right place. Get together with your friends, colleagues or family,
-          have a lovely time, rate your lunch, soak in the statistics. And then
-          do it all again.
+          <strong>Tired of discussions about where to eat?</strong> You've found the right place. Get together
+          with your friends, colleagues or family, have a lovely time, rate your lunch, soak in the
+          statistics. And then do it all again.
         </p>
         <Spacer size={36} />
         <LinkButton to="/join" size="huge" variant="inverted">

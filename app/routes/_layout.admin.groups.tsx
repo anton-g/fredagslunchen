@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Link, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -7,7 +7,7 @@ import { Table } from "~/components/Table"
 import { getAllGroups } from "~/models/group.server"
 import { requireAdminUserId } from "~/session.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   const groups = await getAllGroups()

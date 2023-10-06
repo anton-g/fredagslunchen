@@ -1,7 +1,5 @@
-import { redirect } from "@remix-run/server-runtime"
-import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
+import { redirect, json, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/server-runtime"
 import { useLoaderData, Link, Form } from "@remix-run/react"
-import { json } from "@remix-run/server-runtime"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { getFullUserById, mergeUsers } from "~/models/user.server"
@@ -12,7 +10,7 @@ import { Dialog } from "~/components/Dialog"
 import { Input } from "~/components/Input"
 import { useState } from "react"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const currentUserId = await requireUserId(request)
   invariant(params.userId, "userId not found")
 
@@ -34,7 +32,7 @@ export const loader = async ({ request, params }: LoaderArgs) => {
   return json({ user })
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request)
   const userId = params.userId
   invariant(userId, "userId not found")

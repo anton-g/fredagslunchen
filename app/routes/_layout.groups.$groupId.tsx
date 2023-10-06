@@ -1,4 +1,4 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData, Outlet, Link, useRouteError, isRouteErrorResponse } from "@remix-run/react"
 import invariant from "tiny-invariant"
@@ -10,7 +10,7 @@ import { LinkButton } from "~/components/Button"
 import { getUserId } from "~/session.server"
 import { mergeMeta } from "~/merge-meta"
 
-export const meta: V2_MetaFunction = mergeMeta(({ data }) => {
+export const meta: MetaFunction<typeof loader> = mergeMeta(({ data }) => {
   if (!data || !data.details) {
     return []
   }
@@ -31,7 +31,7 @@ export const meta: V2_MetaFunction = mergeMeta(({ data }) => {
   ]
 })
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
 

@@ -1,10 +1,10 @@
-import type { V2_MetaFunction } from "@remix-run/node"
+import type { MetaFunction } from "@remix-run/node"
 import { Link } from "@remix-run/react"
 import styled from "styled-components"
 import { UnboxingIllustration } from "~/illustrations/Unboxing"
 import { mergeMeta } from "~/merge-meta"
 
-export const meta: V2_MetaFunction = mergeMeta(() => [
+export const meta: MetaFunction = mergeMeta(() => [
   {
     title: "About Fredagslunchen",
   },

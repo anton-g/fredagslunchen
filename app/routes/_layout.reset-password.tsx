@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, V2_MetaFunction } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useSearchParams } from "@remix-run/react"
 import { getUserId } from "~/session.server"
@@ -12,7 +12,7 @@ import { useForm, conform } from "@conform-to/react"
 import { z } from "zod"
 import { mergeMeta } from "~/merge-meta"
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   if (userId) return redirect("/")
 
@@ -35,7 +35,7 @@ const schema = z
     message: "Passwords doesn't match",
   })
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
   const submission = parse(formData, { schema })
   if (!submission.value || submission.intent !== "submit") {
@@ -50,7 +50,7 @@ export const action = async ({ request }: ActionArgs) => {
   return redirect("/login")
 }
 
-export const meta: V2_MetaFunction = mergeMeta(() => [
+export const meta: MetaFunction = mergeMeta(() => [
   {
     title: "Forgot password - Fredagslunchen",
   },

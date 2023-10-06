@@ -1,5 +1,5 @@
 import { CopyIcon, Cross2Icon } from "@radix-ui/react-icons"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { isRouteErrorResponse, useFetcher, useLoaderData, useRouteError } from "@remix-run/react"
 import styled from "styled-components"
@@ -12,7 +12,7 @@ import { addUserEmailToGroup, getGroup, getGroupPermissions } from "~/models/gro
 
 import { requireUserId } from "~/session.server"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId is required")
   const group = await getGroup({
@@ -44,7 +44,7 @@ type ActionData = {
 }
 
 // TODO merge with separate api
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")

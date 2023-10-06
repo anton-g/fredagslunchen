@@ -1,5 +1,5 @@
 import { GlobeIcon, MagnifyingGlassIcon, MixerHorizontalIcon } from "@radix-ui/react-icons"
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import { ExternalLinkButton, LinkButton } from "~/components/Button"
@@ -7,7 +7,7 @@ import { Table } from "~/components/Table"
 import { getAllLocations } from "~/models/location.server"
 import { requireAdminUserId } from "~/session.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   const locations = await getAllLocations()

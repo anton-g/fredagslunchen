@@ -58,10 +58,7 @@ const StyledArrow = styled(TooltipPrimitive.Arrow)`
   fill: ${({ theme }) => theme.colors.primary};
 `
 
-const Content: React.FC<ComponentProps<typeof TooltipPrimitive.Content>> = ({
-  children,
-  ...props
-}) => {
+const Content: React.FC<ComponentProps<typeof TooltipPrimitive.Content>> = ({ children, ...props }) => {
   return (
     <TooltipPrimitive.Portal>
       <StyledContent {...props}>

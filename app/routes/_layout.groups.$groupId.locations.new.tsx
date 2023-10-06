@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLoaderData, useNavigation, useSearchParams } from "@remix-run/react"
 import { useRef, useState } from "react"
@@ -17,7 +17,7 @@ import type { LocationSuggestion } from "~/services/locationiq.server"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
@@ -52,7 +52,7 @@ const schema = z.object({
   redirectTo: z.string().optional(),
 })
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")

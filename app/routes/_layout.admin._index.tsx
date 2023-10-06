@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
 import { requireAdminUserId } from "~/session.server"
@@ -7,7 +7,7 @@ import { getAdminStats } from "~/models/admin.server"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Stat } from "~/components/Stat"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   const stats = await getAdminStats()

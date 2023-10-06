@@ -1,5 +1,5 @@
 import { json } from "@remix-run/node"
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { Link, useFetcher, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
 import { LinkButton, LoadingButton } from "~/components/Button"
@@ -17,11 +17,12 @@ import { Landing } from "~/views/landing"
 import { Layout } from "~/views/layout"
 import { IceCream } from "~/illustrations/IceCream"
 import { useThemeContext } from "~/styles/theme"
+import type { action as scoreRequestAction } from "~/routes/api.scores.request"
 
 type FullUser = NonNullable<Awaited<ReturnType<typeof getFullUserById>>>
 type ScoreRequest = RecursivelyConvertDatesToStrings<FullUser["scoreRequests"][0]>
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
 
   const user = userId ? await getFullUserById({ id: userId, requestUserId: userId }) : null
@@ -121,7 +122,7 @@ const Illustration = styled(IceCream)`
 `
 
 const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
-  const scoreFetcher = useFetcher()
+  const scoreFetcher = useFetcher<typeof scoreRequestAction>()
   const formRef = useRef<HTMLFormElement>(null)
   const scoreRef = useRef<HTMLInputElement>(null)
 

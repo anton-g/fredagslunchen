@@ -1,11 +1,11 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Outlet, useLoaderData } from "@remix-run/react"
 import { checkIsAdmin } from "~/models/user.server"
 import { getUserId } from "~/session.server"
 import { Layout } from "~/views/layout"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
 
   const isAdmin = userId ? await checkIsAdmin(userId) : false

@@ -12,8 +12,8 @@ const TextArea = styled.textarea`
   font-size: 16px;
   padding: 6px 8px;
   width: 100%;
-  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
-    Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  font-family: Inter, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans,
+    Helvetica Neue, sans-serif;
 `
 
 export { TextArea }

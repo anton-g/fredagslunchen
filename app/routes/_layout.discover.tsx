@@ -1,4 +1,4 @@
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -13,13 +13,13 @@ import { getAllLocationsStats } from "~/models/location.server"
 import { requireUserId } from "~/session.server"
 import { formatNumber } from "~/utils"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireUserId(request)
   const locations = await getAllLocationsStats()
   return json({ locations })
 }
 
-export const meta: V2_MetaFunction = mergeMeta(() => [
+export const meta: MetaFunction = mergeMeta(() => [
   {
     title: "Discover - Fredagslunchen",
   },

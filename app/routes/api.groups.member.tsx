@@ -1,18 +1,20 @@
-import type { ActionFunction } from "@remix-run/server-runtime"
+import type { ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
-import {
-  deleteGroupMember,
-  updateGroupMembership as updateGroupMember,
-} from "~/models/group.server"
+import { deleteGroupMember, updateGroupMembership as updateGroupMember } from "~/models/group.server"
 import { requireUserId } from "~/session.server"
 
-type ActionData = {
-  errors?: {
-    error?: string
-  }
-}
+type ActionData =
+  | {
+      ok: false
+      errors?: {
+        error?: string
+      }
+    }
+  | {
+      ok: true
+    }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request)
 
   const formData = await request.formData()
@@ -21,24 +23,15 @@ export const action: ActionFunction = async ({ request, params }) => {
   const action = formData.get("action")
 
   if (typeof action !== "string" || action.length === 0) {
-    return json<ActionData>(
-      { errors: { error: "Something went wrong" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
   }
 
   if (typeof userId !== "string" || userId.length === 0) {
-    return json<ActionData>(
-      { errors: { error: "Something went wrong" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
   }
 
   if (typeof groupId !== "string" || groupId.length === 0) {
-    return json<ActionData>(
-      { errors: { error: "Something went wrong" } },
-      { status: 400 }
-    )
+    return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
   }
 
   if (action === "delete") {
@@ -47,29 +40,17 @@ export const action: ActionFunction = async ({ request, params }) => {
       userId,
       requestedByUserId: currentUserId,
     })
-    return json({ ok: true })
+    return json<ActionData>({ ok: true })
   }
 
   const role = formData.get("role")
-  if (
-    role &&
-    (typeof role !== "string" || !["ADMIN", "MEMBER"].includes(role))
-  ) {
-    return json<ActionData>(
-      { errors: { error: "Something went wrong" } },
-      { status: 400 }
-    )
+  if (role && (typeof role !== "string" || !["ADMIN", "MEMBER"].includes(role))) {
+    return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
   }
 
   const inactive = formData.get("inactive")
-  if (
-    inactive &&
-    (typeof inactive !== "string" || !["true", "false"].includes(inactive))
-  ) {
-    return json<ActionData>(
-      { errors: { error: "Something went wrong" } },
-      { status: 400 }
-    )
+  if (inactive && (typeof inactive !== "string" || !["true", "false"].includes(inactive))) {
+    return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
   }
 
   await updateGroupMember({
@@ -82,5 +63,5 @@ export const action: ActionFunction = async ({ request, params }) => {
     },
   })
 
-  return json({ ok: true })
+  return json<ActionData>({ ok: true })
 }

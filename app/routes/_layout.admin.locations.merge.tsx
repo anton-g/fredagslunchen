@@ -1,6 +1,5 @@
 import { ArrowDownIcon } from "@radix-ui/react-icons"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
-import { redirect } from "@remix-run/node"
+import { redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Form, useActionData, useLoaderData } from "@remix-run/react"
 import { useRef } from "react"
@@ -11,7 +10,7 @@ import { Stack } from "~/components/Stack"
 import { getAllLocations, mergeLocations } from "~/models/location.server"
 import { requireAdminUserId } from "~/session.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   const locations = await getAllLocations()
@@ -26,7 +25,7 @@ type ActionData = {
   }
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   await requireAdminUserId(request, "/")
 
   const formData = await request.formData()

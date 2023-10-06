@@ -1,5 +1,5 @@
 import type { GroupLocation } from "@prisma/client"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Form } from "@remix-run/react"
 import styled from "styled-components"
@@ -15,7 +15,7 @@ import type { User } from "~/models/user.server"
 import { createAnonymousUser } from "~/models/user.server"
 import { requireAdminUserId } from "~/session.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   return json({})
@@ -27,7 +27,7 @@ type ActionData = {
   }
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await requireAdminUserId(request)
 
   const formData = await request.formData()

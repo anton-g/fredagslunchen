@@ -1,12 +1,13 @@
-import type { LoaderArgs } from "@remix-run/node"
-import type { RecursivelyConvertDatesToStrings } from "~/utils"
-import { formatNumber, formatTimeAgo, getAverageNumber } from "~/utils"
-import { json } from "@remix-run/node"
+import { json, type LoaderFunctionArgs } from "@remix-run/node"
+import { formatNumber, formatTimeAgo, getAverageNumber, type RecursivelyConvertDatesToStrings } from "~/utils"
 import { isRouteErrorResponse, useFetcher, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
-import type { Group, GroupPermissions } from "~/models/group.server"
-import { getGroupPermissions } from "~/models/group.server"
-import { getGroupDetails } from "~/models/group.server"
+import {
+  getGroupDetails,
+  getGroupPermissions,
+  type Group,
+  type GroupPermissions,
+} from "~/models/group.server"
 import { getUserId } from "~/session.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
@@ -28,8 +29,8 @@ import { Popover } from "~/components/Popover"
 import { CreateAnonymousUserButton } from "~/components/CreateAnonymousUserButton"
 import { SortableTable } from "~/components/SortableTable"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
-  let userId = await getUserId(request)
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
 
   const details = await getGroupDetails({ id: params.groupId })

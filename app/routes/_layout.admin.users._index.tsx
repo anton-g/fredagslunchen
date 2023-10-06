@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -8,7 +8,7 @@ import { getAllAnonymousUsers, getAllUsers } from "~/models/user.server"
 import { requireAdminUserId } from "~/session.server"
 import { format } from "date-fns"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   const users = await getAllUsers()

@@ -4,10 +4,7 @@ import type { ReactNode } from "react"
 import styled from "styled-components"
 import { Card } from "./Card"
 
-const Dialog = ({
-  children,
-  ...props
-}: { children: ReactNode } & DialogPrimitive.DialogProps) => (
+const Dialog = ({ children, ...props }: { children: ReactNode } & DialogPrimitive.DialogProps) => (
   <DialogPrimitive.Root {...props}>{children}</DialogPrimitive.Root>
 )
 

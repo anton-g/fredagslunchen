@@ -12,12 +12,7 @@ type CardProps = {
 const Card = React.forwardRef<HTMLDivElement, CardProps>(
   ({ variant = "normal", children, className, onClick }, ref) => {
     return (
-      <Wrapper
-        className={className}
-        ref={ref}
-        inverted={variant === "inverted"}
-        onClick={onClick}
-      >
+      <Wrapper className={className} ref={ref} inverted={variant === "inverted"} onClick={onClick}>
         {children}
       </Wrapper>
     )

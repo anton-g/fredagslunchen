@@ -15,11 +15,7 @@ export function FeatureFlagProvider({
   defaultValue: FeatureFlags
   children: ReactNode
 }) {
-  return (
-    <FeatureFlagContext.Provider value={defaultValue}>
-      {children}
-    </FeatureFlagContext.Provider>
-  )
+  return <FeatureFlagContext.Provider value={defaultValue}>{children}</FeatureFlagContext.Provider>
 }
 
 export const useFeatureFlags = () => useContext(FeatureFlagContext)

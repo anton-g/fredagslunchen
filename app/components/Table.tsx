@@ -29,7 +29,7 @@ const Heading = styled.th<{ numeric?: boolean; wide?: boolean }>`
   text-align: ${({ numeric }) => (numeric ? "right" : "left")};
   padding: 4px 12px;
   white-space: nowrap;
-  width: ${({ wide }) => (wide ? "100%" : "auto")}; ;
+  width: ${({ wide }) => (wide ? "100%" : "auto")};
 `
 
 const Cell = styled.td<{ numeric?: boolean; wide?: boolean }>`

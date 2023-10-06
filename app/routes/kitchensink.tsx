@@ -1,5 +1,5 @@
 import { CubeIcon, RocketIcon } from "@radix-ui/react-icons"
-import type { LoaderArgs, V2_MetaFunction } from "@remix-run/node"
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import type { ReactNode } from "react"
 import { Link, useLoaderData } from "@remix-run/react"
@@ -28,13 +28,13 @@ import { useAsyncList } from "@react-stately/data"
 import { SortableTable } from "~/components/SortableTable"
 import { mergeMeta } from "~/merge-meta"
 
-export const meta: V2_MetaFunction = mergeMeta(() => [
+export const meta: MetaFunction = mergeMeta(() => [
   {
     title: "Kitchensink - Fredagslunchen",
   },
 ])
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({
     ENV: getEnv(),
   })
@@ -500,8 +500,8 @@ const ComboBoxExample = () => {
 const AsyncComboBoxExample = () => {
   const list = useAsyncList<{ name: string }>({
     async load({ signal, filterText }) {
-      let res = await fetch(`https://swapi.py4e.com/api/people/?search=${filterText}`, { signal })
-      let json = await res.json()
+      const res = await fetch(`https://swapi.py4e.com/api/people/?search=${filterText}`, { signal })
+      const json = await res.json()
 
       return {
         items: json.results,
