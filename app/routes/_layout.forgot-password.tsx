@@ -9,7 +9,7 @@ import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
-import { sendPasswordResetEmail } from "~/services/mail.server"
+import { sendPasswordResetEmail } from "~/services/email.server"
 import { z } from "zod"
 import { mergeMeta } from "~/merge-meta"
 

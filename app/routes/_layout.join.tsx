@@ -12,7 +12,7 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
-import { sendEmailVerificationEmail } from "~/services/mail.server"
+import { sendEmailVerificationEmail } from "~/services/email.server"
 import { z } from "zod"
 import { mergeMeta } from "~/merge-meta"
 
@@ -65,7 +65,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     submission.value.email,
     submission.value.name,
     submission.value.password,
-    inviteToken
+    inviteToken,
   )
 
   if (user.email?.verificationToken) {
