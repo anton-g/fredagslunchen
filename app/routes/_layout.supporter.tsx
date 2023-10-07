@@ -45,7 +45,9 @@ export default function SupporterPage() {
         <li>Custom avatars</li>
         <li>Advanced statistics</li>
       </ul>
-      <p>It's okay if you decide to not become a supporter, but if you do, it would mean the world to us ♥</p>
+      <p>
+        It's okay if you decide not to become a supporter, but if you do, it would mean the world to us ♥
+      </p>
       <Spacer size={16} />
       <Button size="huge" variant="inverted" style={{ margin: "0 auto" }}>
         Become a Supporter

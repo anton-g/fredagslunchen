@@ -44,6 +44,7 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
         select: {
           verified: true,
           email: true,
+          verificationRequestTime: true,
         },
       },
       groups: {
@@ -152,7 +153,7 @@ export async function getFullUserById({ id, requestUserId }: { id: User["id"]; r
       if (score.lunch.groupLocation.group.public) return true
 
       return score.lunch.groupLocation.group.members.some(
-        (x) => x.userId === requestUserId || score.lunch.groupLocation.group.public
+        (x) => x.userId === requestUserId || score.lunch.groupLocation.group.public,
       )
     }),
   }
@@ -227,7 +228,7 @@ export async function createUser(
   email: Email["email"],
   name: string,
   password: string,
-  inviteToken?: string | null
+  inviteToken?: string | null,
 ) {
   const hashedPassword = await hashPassword(password)
 
