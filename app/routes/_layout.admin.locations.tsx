@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Outlet } from "@remix-run/react"
 import styled from "styled-components"
@@ -7,7 +7,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { requireAdminUserId } from "~/session.server"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   return json({})

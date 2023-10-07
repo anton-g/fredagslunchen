@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { Link, Outlet, isRouteErrorResponse, useRouteError } from "@remix-run/react"
 import { requireAdminUserId } from "~/session.server"
@@ -7,7 +7,7 @@ import { Stack } from "~/components/Stack"
 import { NavLink } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 
-export const loader = async ({ request }: LoaderArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
 
   return json({})

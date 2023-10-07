@@ -3,17 +3,19 @@ import type { Group } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Button, LoadingButton } from "~/components/Button"
-import { useEffect, useState } from "react"
-import { useRef } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Dialog } from "~/components/Dialog"
 import { Input } from "~/components/Input"
+import type { action as createAnonymousAction } from "~/routes/api.users.create-anonymous"
 
 export const CreateAnonymousUserButton = ({ groupId }: { groupId: Group["id"] }) => {
   const [isOpen, setIsOpen] = useState(false)
-  const fetcher = useFetcher()
+  const fetcher = useFetcher<typeof createAnonymousAction>()
   const nameRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
+    if (fetcher.data?.ok) return
+
     const errors = fetcher.data?.errors
     if (errors?.name) {
       nameRef.current?.focus()

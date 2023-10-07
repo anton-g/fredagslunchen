@@ -7,10 +7,7 @@ const { isE2E, updateFixture } = require("./utils")
 const handlers = [
   rest.post("https://api.sendgrid.com/v3/mail/send", async (req, res, ctx) => {
     const body = req.body
-    console.info(
-      "🔶 mocked email contents:",
-      util.inspect(body, false, null, true)
-    )
+    console.info("🔶 mocked email contents:", util.inspect(body, false, null, true))
 
     if (isE2E && body.from) {
       await updateFixture({ email: body })

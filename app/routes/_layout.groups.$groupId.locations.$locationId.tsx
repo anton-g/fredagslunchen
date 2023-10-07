@@ -1,4 +1,4 @@
-import type { LoaderArgs } from "@remix-run/node"
+import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
@@ -13,7 +13,7 @@ import { formatNumber, formatTimeAgo } from "~/utils"
 import { getGroupPermissions } from "~/models/group.server"
 import { SortableTable } from "~/components/SortableTable"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   invariant(params.groupId, "groupId not found")
   invariant(params.locationId, "locationId not found")

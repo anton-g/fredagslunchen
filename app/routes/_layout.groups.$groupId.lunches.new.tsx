@@ -1,6 +1,5 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node"
-import { json, redirect } from "@remix-run/node"
-import { Form, Link, useActionData, useLoaderData, useLocation } from "@remix-run/react"
+import { json, redirect, type ActionFunctionArgs, type LoaderFunctionArgs } from "@remix-run/node"
+import { useNavigation, Form, Link, useActionData, useLoaderData, useLocation } from "@remix-run/react"
 import isSameDay from "date-fns/isSameDay"
 import { useRef, useState } from "react"
 import invariant from "tiny-invariant"
@@ -14,11 +13,10 @@ import z from "zod"
 import { createLunch } from "~/models/lunch.server"
 import { requireUserId } from "~/session.server"
 import { numeric, useUser } from "~/utils"
-import { useNavigation } from "@remix-run/react"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
@@ -53,7 +51,7 @@ const schema = z.object({
   "location-key": numeric(),
 })
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request)
   const groupId = params.groupId
   invariant(groupId, "groupId not found")

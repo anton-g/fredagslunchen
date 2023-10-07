@@ -23,7 +23,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
@@ -46,7 +46,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
@@ -69,7 +69,7 @@ jobs:
       - name: ⎔ Setup node
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
 
       - name: 📥 Download deps
         uses: bahmutov/npm-install@v1
@@ -161,7 +161,7 @@ jobs:
 
       - name: 🚀 Deploy Staging
         if: ${{ github.ref == 'refs/heads/dev' }}
-        uses: superfly/flyctl-actions@1.3
+        uses: superfly/flyctl-actions@1.4
         with:
           args: "deploy --app ${{ steps.app_name.outputs.value }}-staging --image registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.ref_name }}-${{ github.sha }}"
         env:
@@ -169,7 +169,7 @@ jobs:
 
       - name: 🚀 Deploy Production
         if: ${{ github.ref == 'refs/heads/main' }}
-        uses: superfly/flyctl-actions@1.3
+        uses: superfly/flyctl-actions@1.4
         with:
           args: "deploy --image registry.fly.io/${{ steps.app_name.outputs.value }}:${{ github.ref_name }}-${{ github.sha }}"
         env:

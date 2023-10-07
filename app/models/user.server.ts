@@ -698,7 +698,7 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
   const lowestScore = sortedScores.at(0)
   const highestScore = sortedScores.at(-1)
 
-  const bestChoosenLunch = user.choosenLunches.reduce<typeof user.choosenLunches[0] | null>((acc, cur) => {
+  const bestChoosenLunch = user.choosenLunches.reduce<(typeof user.choosenLunches)[0] | null>((acc, cur) => {
     if (!acc) return cur
 
     if (getAverageNumber(cur.scores, "score") > getAverageNumber(acc.scores, "score")) {

@@ -37,7 +37,7 @@ export function safeRedirect(
 export function useMatchesData(id: string): Record<string, unknown> | undefined {
   const matchingRoutes = useMatches()
   const route = useMemo(() => matchingRoutes.find((route) => route.id === id), [matchingRoutes, id])
-  return route?.data
+  return route?.data as Record<string, unknown>
 }
 
 function isUser(user: any): user is User {
@@ -154,9 +154,9 @@ export function cleanEmail(email: Email["email"]) {
 }
 
 export function hashStr(str: string) {
-  var hash = 0
-  for (var i = 0; i < str.length; i++) {
-    var charCode = str.charCodeAt(i)
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    const charCode = str.charCodeAt(i)
     hash += charCode
   }
   return hash
@@ -169,7 +169,7 @@ export const getRandomAvatarId = (input: string) => {
 
 const numericSchema = z.coerce.number({ invalid_type_error: "Invalid" })
 export function optionalNumeric() {
-  let schema = numericSchema.optional()
+  const schema = numericSchema.optional()
 
   return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), schema)
 }

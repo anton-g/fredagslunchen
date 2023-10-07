@@ -1,14 +1,18 @@
-import type { ActionFunction, LoaderFunction, MetaFunction } from "@remix-run/node"
-import { redirect } from "@remix-run/node"
+import {
+  redirect,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
+  type MetaFunction,
+} from "@remix-run/node"
 import { json } from "@remix-run/node"
-
 import { getUserId } from "~/session.server"
 import styled from "styled-components"
 import { Button } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { getEnv } from "~/env.server"
+import { mergeMeta } from "~/merge-meta"
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   await getUserId(request)
 
   const ENV = getEnv()
@@ -17,13 +21,15 @@ export const loader: LoaderFunction = async ({ request }) => {
   return json({})
 }
 
-export const action: ActionFunction = async ({ request }) => {}
-
-export const meta: MetaFunction = () => {
-  return {
-    title: "Become a Fredagslunchen supporter",
-  }
+export const action = async ({ request }: ActionFunctionArgs) => {
+  console.log("become supporter")
 }
+
+export const meta: MetaFunction = mergeMeta(() => [
+  {
+    title: "Become a Fredagslunchen supporter",
+  },
+])
 
 export default function SupporterPage() {
   // const actionData = useActionData() as ActionData

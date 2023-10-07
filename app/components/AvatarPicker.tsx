@@ -29,7 +29,8 @@ export const AvatarPicker = ({ user }: { user: RecursivelyConvertDatesToStrings<
   if (hasPremium) {
     return (
       <>
-        <fetcher.Form method="post" onChange={(e) => fetcher.submit(e.currentTarget, { replace: true })}>
+        {/* TODO replace??? */}
+        <fetcher.Form method="post" onChange={(e) => fetcher.submit(e.currentTarget)}>
           <input type="hidden" name="action" value="updateAvatar" />
           <AvatarRadioGroup defaultValue={`${initialAvatar}`} name="avatar">
             <AvatarScrollArea axis="horizontal" gap={16}>

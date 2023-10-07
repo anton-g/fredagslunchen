@@ -3,11 +3,7 @@ import type { ComponentProps } from "react"
 import styled from "styled-components"
 
 const RadioGroup = (props: ComponentProps<typeof RadioGroupPrimitive.Root>) => {
-  return (
-    <RadioGroupPrimitive.Root {...props}>
-      {props.children}
-    </RadioGroupPrimitive.Root>
-  )
+  return <RadioGroupPrimitive.Root {...props}>{props.children}</RadioGroupPrimitive.Root>
 }
 
 const RadioItem = (props: ComponentProps<typeof StyledRadioItem>) => {

@@ -10,15 +10,9 @@ async function updateFixture(updates) {
     const contents = await fs.promises.readFile(mswDataPath)
     mswData = JSON.parse(contents.toString())
   } catch (error) {
-    console.error(
-      `Error reading and parsing the msw fixture. Clearing it.`,
-      error.stack ?? error
-    )
+    console.error(`Error reading and parsing the msw fixture. Clearing it.`, error.stack ?? error)
   }
-  await fs.promises.writeFile(
-    mswDataPath,
-    JSON.stringify({ ...mswData, ...updates }, null, 2)
-  )
+  await fs.promises.writeFile(mswDataPath, JSON.stringify({ ...mswData, ...updates }, null, 2))
 }
 
 module.exports = { isE2E, updateFixture }

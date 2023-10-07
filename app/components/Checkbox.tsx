@@ -5,9 +5,10 @@ import { Cross2Icon } from "@radix-ui/react-icons"
 
 type CheckboxVariant = "normal" | "large"
 
-const Checkbox: FC<
-  ComponentProps<typeof CheckboxPrimitive.Root> & { variant?: CheckboxVariant }
-> = ({ variant = "normal", ...props }) => {
+const Checkbox: FC<ComponentProps<typeof CheckboxPrimitive.Root> & { variant?: CheckboxVariant }> = ({
+  variant = "normal",
+  ...props
+}) => {
   return (
     <StyledCheckbox {...props} variant={variant}>
       <StyledIndicator>

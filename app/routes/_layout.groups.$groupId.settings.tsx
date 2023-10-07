@@ -1,6 +1,12 @@
-import type { ActionArgs, LoaderArgs } from "@remix-run/node"
-import type { Group, GroupMember } from "~/models/group.server"
-import { getGroupPermissions } from "~/models/group.server"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
+import {
+  deleteGroup,
+  getGroup,
+  updateGroup,
+  getGroupPermissions,
+  type Group,
+  type GroupMember,
+} from "~/models/group.server"
 import type { User } from "~/models/user.server"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useFetcher, useLoaderData } from "@remix-run/react"
@@ -11,7 +17,6 @@ import { Dialog } from "~/components/Dialog"
 import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
-import { deleteGroup, getGroup, updateGroup } from "~/models/group.server"
 import z from "zod"
 import { requireUserId } from "~/session.server"
 import { useEffect, useRef, useState } from "react"
@@ -21,8 +26,9 @@ import { Checkbox } from "~/components/Checkbox"
 import { Help } from "~/components/Help"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
+import type { action as memberAction } from "~/routes/api.groups.member"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId is required")
   const group = await getGroup({
@@ -62,7 +68,7 @@ const deleteSchema = z.object({
 
 const schema = z.discriminatedUnion("action", [updateSchema, deleteSchema])
 
-export const action = async ({ request, params }: ActionArgs) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.groupId, "groupId not found")
 
@@ -319,7 +325,7 @@ type ChangeMemberRoleActionProps = {
 }
 const ChangeMemberRoleAction = ({ member }: ChangeMemberRoleActionProps) => {
   const [open, setOpen] = useState(false)
-  const fetcher = useFetcher()
+  const fetcher = useFetcher<typeof memberAction>()
 
   useEffect(() => {
     if (fetcher.data?.ok) setOpen(false)

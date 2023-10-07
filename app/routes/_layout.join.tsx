@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
@@ -12,10 +12,11 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
-import { sendEmailVerificationEmail } from "~/services/mail.server"
+import { sendEmailVerificationEmail } from "~/services/email.server"
 import { z } from "zod"
+import { mergeMeta } from "~/merge-meta"
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
 
   if (userId) {
@@ -40,10 +41,10 @@ const schema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
   password: z.string().min(8, "Password is too short"),
   name: z.string().min(1, "Name is required"),
-  redirectTo: z.string().refine((x) => safeRedirect(x, "/")),
+  redirectTo: z.string().optional(),
 })
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
 
   const submission = parse(formData, { schema })
@@ -56,7 +57,7 @@ export const action = async ({ request }: ActionArgs) => {
 
   const existingUser = await getUserByEmail(submission.value.email)
   if (existingUser) {
-    submission.error.email = "Email or password is incorrect"
+    submission.error.email = ["This email already exists"]
     return json(submission, { status: 400 })
   }
 
@@ -64,7 +65,7 @@ export const action = async ({ request }: ActionArgs) => {
     submission.value.email,
     submission.value.name,
     submission.value.password,
-    inviteToken
+    inviteToken,
   )
 
   if (user.email?.verificationToken) {
@@ -74,16 +75,15 @@ export const action = async ({ request }: ActionArgs) => {
   return createUserSession({
     request,
     userId: user.id,
-    remember: false,
-    redirectTo: groupId ? `/groups/${groupId}` : submission.value.redirectTo,
+    redirectTo: groupId ? `/groups/${groupId}` : safeRedirect(submission.value.redirectTo, "/"),
   })
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Sign Up",
-  }
-}
+export const meta: MetaFunction = mergeMeta(() => [
+  {
+    title: "Sign up - Fredagslunchen",
+  },
+])
 
 export default function Join() {
   const [searchParams] = useSearchParams()
@@ -92,6 +92,7 @@ export default function Join() {
   const [form, { email, password, name }] = useForm({
     id: "signup-form",
     lastSubmission,
+    shouldValidate: "onSubmit",
     onValidate: ({ formData }) => parse(formData, { schema }),
   })
 

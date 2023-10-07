@@ -1,10 +1,10 @@
+import type { LoaderFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
-import type { LoaderFunction } from "react-router"
 import type { LocationSuggestion } from "~/services/locationiq.server"
 import { autocomplete } from "~/services/locationiq.server"
 import { requireUserId } from "~/session.server"
 
-export const loader: LoaderFunction = async ({ request, params }) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await requireUserId(request)
 
   const url = new URL(request.url)

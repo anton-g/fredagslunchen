@@ -1,4 +1,4 @@
-import type { ActionArgs, LoaderFunction, MetaFunction } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useNavigation } from "@remix-run/react"
 import { useForm, conform } from "@conform-to/react"
@@ -9,10 +9,11 @@ import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import styled from "styled-components"
 import { Input } from "~/components/Input"
-import { sendPasswordResetEmail } from "~/services/mail.server"
+import { sendPasswordResetEmail } from "~/services/email.server"
 import { z } from "zod"
+import { mergeMeta } from "~/merge-meta"
 
-export const loader: LoaderFunction = async ({ request }) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   if (userId) return redirect("/")
   return json({})
@@ -22,7 +23,7 @@ const schema = z.object({
   email: z.string().min(1, "Email is required").email("Email is invalid"),
 })
 
-export const action = async ({ request }: ActionArgs) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
 
   const submission = parse(formData, { schema })
@@ -36,11 +37,11 @@ export const action = async ({ request }: ActionArgs) => {
   return json({ submission, success: true })
 }
 
-export const meta: MetaFunction = () => {
-  return {
-    title: "Forgot password",
-  }
-}
+export const meta: MetaFunction = mergeMeta(() => [
+  {
+    title: "Forgot password - Fredagslunchen",
+  },
+])
 
 export default function ForgotPasswordPage() {
   const actionData = useActionData<typeof action>()

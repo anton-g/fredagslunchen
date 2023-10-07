@@ -8,10 +8,7 @@ const Popover = ({ children, ...props }: PopoverProps) => {
   return <PopoverPrimitive.Root {...props}>{children}</PopoverPrimitive.Root>
 }
 
-const PopoverContent = ({
-  children,
-  ...props
-}: PopoverPrimitive.PopoverContentProps) => {
+const PopoverContent = ({ children, ...props }: PopoverPrimitive.PopoverContentProps) => {
   return (
     <PopoverPrimitive.Portal>
       <StyledContent sideOffset={5} {...props}>

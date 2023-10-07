@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react"
-import type { ActionFunction, LoaderArgs } from "@remix-run/node"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useLoaderData } from "@remix-run/react"
 import styled from "styled-components"
@@ -14,7 +14,7 @@ import { requireUserId } from "~/session.server"
 import { ThemePicker } from "~/components/ThemePicker"
 import { AvatarPicker } from "~/components/AvatarPicker"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const currentUserId = await requireUserId(request)
   invariant(params.userId, "userId is required")
 
@@ -48,7 +48,7 @@ type ActionData = {
   }
 }
 
-export const action: ActionFunction = async ({ request, params }) => {
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const userId = await requireUserId(request)
   invariant(params.userId, "userId not found")
 

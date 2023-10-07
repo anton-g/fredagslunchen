@@ -741,7 +741,7 @@ const generateUserStats = (
   const lowestScore = sortedScores.at(0)
   const highestScore = sortedScores.at(-1)
 
-  const bestChoosenLunch = member.user.choosenLunches.reduce<typeof member.user.choosenLunches[0] | null>(
+  const bestChoosenLunch = member.user.choosenLunches.reduce<(typeof member.user.choosenLunches)[0] | null>(
     (acc, cur) => {
       if (!acc) return cur
 

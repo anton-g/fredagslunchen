@@ -1,4 +1,4 @@
-import type { ActionFunction, LoaderArgs } from "@remix-run/server-runtime"
+import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/server-runtime"
 import { formatNumber, formatTimeAgo, getAverageNumber, shorten } from "~/utils"
 import { useLoaderData, Link, Form, useActionData } from "@remix-run/react"
 import { json } from "@remix-run/server-runtime"
@@ -13,9 +13,9 @@ import { Stat } from "~/components/Stat"
 import { StatsGrid } from "~/components/StatsGrid"
 import { Button, LinkButton } from "~/components/Button"
 import { Stack } from "~/components/Stack"
-import { sendEmailVerificationEmail } from "~/services/mail.server"
+import { sendEmailVerificationEmail } from "~/services/email.server"
 
-export const loader = async ({ request, params }: LoaderArgs) => {
+export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
   invariant(params.userId, "userId not found")
 
@@ -43,7 +43,7 @@ interface ActionData {
   ok: boolean
 }
 
-export const action: ActionFunction = async ({ request }) => {
+export const action = async ({ request }: ActionFunctionArgs) => {
   const userId = await requireUserId(request)
 
   const result = await createEmailVerificationToken({ id: userId })
@@ -59,7 +59,7 @@ export default function Index() {
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
-    (a, b) => new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime()
+    (a, b) => new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime(),
   )
 
   return (

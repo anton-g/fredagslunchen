@@ -1,9 +1,5 @@
 import type { ReactNode } from "react"
-import {
-  CheckIcon,
-  ChevronDownIcon,
-  ChevronUpIcon,
-} from "@radix-ui/react-icons"
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@radix-ui/react-icons"
 import * as SelectPrimitive from "@radix-ui/react-select"
 import styled, { css } from "styled-components"
 
