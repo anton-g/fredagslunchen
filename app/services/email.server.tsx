@@ -4,6 +4,7 @@ import { renderAsync } from "@react-email/components"
 import { type ReactElement } from "react"
 import EmailVerificationEmail from "emails/EmailVerificationEmail"
 import ResetPasswordEmail from "emails/ResetPasswordEmail"
+import WelcomeEmail from "emails/WelcomeEmail"
 
 const resend = new Resend(ENV.RESEND_API_KEY)
 
@@ -25,6 +26,17 @@ export async function sendEmailVerificationEmail(
   await sendEmail({
     react: <EmailVerificationEmail verificationToken={token} email={email} />,
     subject: "Reset your password",
+    to: email,
+  })
+}
+
+export async function sendWelcomeEmail(
+  email: Email["email"],
+  token: NonNullable<Email["verificationToken"]>,
+) {
+  await sendEmail({
+    react: <WelcomeEmail verificationToken={token} email={email} />,
+    subject: "Welcome to the club!",
     to: email,
   })
 }
