@@ -131,7 +131,11 @@ export async function getUserForAdmin({ id }: { id: User["id"] }) {
     select: {
       id: true,
       name: true,
-      passwordResetToken: true,
+      password: {
+        select: {
+          passwordResetToken: true,
+        },
+      },
       email: {
         select: {
           verified: true,
@@ -465,28 +469,43 @@ export async function verifyLogin(email: Email["email"], password: Password["has
 }
 
 export async function forceCreateResetPasswordTokenForUserId(id: User["id"]) {
-  const user = await prisma.user.update({
-    where: { id },
+  const password = await prisma.password.update({
+    where: {
+      userId: id,
+    },
     data: {
       passwordResetTime: null,
       passwordResetToken: null,
     },
-    select: { email: { select: { email: true } } },
+    select: {
+      user: {
+        select: {
+          email: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
   })
 
-  if (!user.email) return ""
+  if (!password.user.email) return ""
 
-  return createResetPasswordToken(user.email.email)
+  return createResetPasswordToken(password.user.email.email)
 }
 
 export async function createResetPasswordToken(email: Email["email"]) {
   // TODO investigate value in hashing the tokens
+  // Maybe hash tokens and store hash in db, then include both token and salt in email link ??
   const token = nanoid()
 
-  const users = await prisma.user.updateMany({
+  const passwords = await prisma.password.updateMany({
     where: {
-      email: {
-        email,
+      user: {
+        email: {
+          email,
+        },
       },
       OR: [
         {
@@ -505,11 +524,11 @@ export async function createResetPasswordToken(email: Email["email"]) {
     },
   })
 
-  if (users.count === 0) {
+  if (passwords.count === 0) {
     return null
   }
 
-  if (users.count > 1) {
+  if (passwords.count > 1) {
     throw "something went really wrong"
   }
 
@@ -547,10 +566,10 @@ export async function changeUserPassword({
       id,
     },
     data: {
-      passwordResetTime: null,
-      passwordResetToken: null,
       password: {
         update: {
+          passwordResetTime: null,
+          passwordResetToken: null,
           hash: hashedPassword,
         },
       },
@@ -565,7 +584,7 @@ export async function changeUserPasswordWithToken({
   token: string
   newPassword: string
 }) {
-  const userWithPasswordResetToken = await prisma.user.findFirst({
+  const password = await prisma.password.findFirst({
     where: {
       passwordResetToken: token,
       passwordResetTime: {
@@ -574,7 +593,7 @@ export async function changeUserPasswordWithToken({
     },
   })
 
-  if (!userWithPasswordResetToken || !userWithPasswordResetToken.passwordResetToken) {
+  if (!password || !password.passwordResetToken) {
     return null
   }
 
@@ -582,13 +601,13 @@ export async function changeUserPasswordWithToken({
 
   return await prisma.user.update({
     where: {
-      id: userWithPasswordResetToken.id,
+      id: password.userId,
     },
     data: {
-      passwordResetTime: null,
-      passwordResetToken: null,
       password: {
         update: {
+          passwordResetTime: null,
+          passwordResetToken: null,
           hash: hashedPassword,
         },
       },

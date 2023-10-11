@@ -127,8 +127,8 @@ export default function AdminUserSettingsPage() {
             id="reset-link"
             disabled
             value={
-              user.passwordResetToken
-                ? `https://fredagslunchen.club/reset-password?token=${user.passwordResetToken}`
+              user.password?.passwordResetToken
+                ? `https://fredagslunchen.club/reset-password?token=${user.password.passwordResetToken}`
                 : ""
             }
           />

@@ -25,6 +25,7 @@
 - Check security of all models
 
 # Later
+- Invite with email
 - Fix MSW
 - Replace Cypress with Playwright
 - Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
