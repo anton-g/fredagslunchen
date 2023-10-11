@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
-import { getUserId } from "~/auth.server"
+import { getUserId, authenticator } from "~/auth.server"
 import { createUser, getUserByEmail } from "~/models/user.server"
 import { safeRedirect, validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"
@@ -12,7 +12,6 @@ import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
-import { authenticator } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
