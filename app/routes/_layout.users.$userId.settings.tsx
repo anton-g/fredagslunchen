@@ -10,7 +10,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import type { User } from "~/models/user.server"
 import { changeUserPassword, checkIsAdmin, getFullUserById, updateUser } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { ThemePicker } from "~/components/ThemePicker"
 import { AvatarPicker } from "~/components/AvatarPicker"
 

@@ -3,7 +3,7 @@ import { json } from "@remix-run/node"
 import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
 import invariant from "tiny-invariant"
 
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { Link } from "react-router-dom"
 import { getGroupLocation } from "~/models/location.server"
 import styled from "styled-components"

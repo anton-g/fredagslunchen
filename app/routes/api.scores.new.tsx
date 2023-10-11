@@ -1,7 +1,7 @@
 import { redirect, type ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import { createScore } from "~/models/score.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { safeRedirect } from "~/utils"
 
 type ActionData = {
@@ -36,7 +36,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   if (score < 0 || score > 10) {
     return json<ActionData>(
       { ok: false, errors: { score: "Rating must be between 0 and 10" } },
-      { status: 400 }
+      { status: 400 },
     )
   }
 

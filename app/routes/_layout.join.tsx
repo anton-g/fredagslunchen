@@ -2,21 +2,18 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
-import { getUserId, createUserSession } from "~/session.server"
-import { parse } from "@conform-to/zod"
-import { useForm, conform } from "@conform-to/react"
+import { getUserId, authenticator } from "~/auth.server"
 import { createUser, getUserByEmail } from "~/models/user.server"
-import { safeRedirect } from "~/utils"
+import { safeRedirect, validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
-import { sendWelcomeEmail } from "~/services/email.server"
-import { z } from "zod"
+import { sendEmailVerificationEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
 
-export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
 
   if (userId) {
@@ -37,46 +34,63 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return json({})
 }
 
-const schema = z.object({
-  email: z.string().min(1, "Email is required").email("Email is invalid"),
-  password: z.string().min(8, "Password is too short"),
-  name: z.string().min(1, "Name is required"),
-  redirectTo: z.string().optional(),
-})
+interface ActionData {
+  errors: {
+    email?: string
+    password?: string
+    name?: string
+  }
+}
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
-
-  const submission = parse(formData, { schema })
-  if (!submission.value || submission.intent !== "submit") {
-    return json(submission, { status: 400 })
-  }
-
+  const email = formData.get("email")
+  const name = formData.get("name")
+  const password = formData.get("password")
+  const redirectTo = safeRedirect(formData.get("redirectTo"), "/")
   const url = new URL(request.url)
   const inviteToken = url.searchParams.get("token")
 
-  const existingUser = await getUserByEmail(submission.value.email)
-  if (existingUser) {
-    submission.error.email = ["This email already exists"]
-    return json(submission, { status: 400 })
+  if (!validateEmail(email)) {
+    return json<ActionData>({ errors: { email: "Email is invalid" } }, { status: 400 })
   }
 
-  const { user, groupId } = await createUser(
-    submission.value.email,
-    submission.value.name,
-    submission.value.password,
-    inviteToken,
-  )
+  if (typeof name !== "string" || name.length === 0) {
+    return json<ActionData>({ errors: { name: "Name is required" } }, { status: 400 })
+  }
+
+  if (typeof password !== "string" || password.length === 0) {
+    return json<ActionData>({ errors: { password: "Password is required" } }, { status: 400 })
+  }
+
+  if (password.length < 8) {
+    return json<ActionData>({ errors: { password: "Password is too short" } }, { status: 400 })
+  }
+
+  const existingUser = await getUserByEmail(email)
+
+  if (existingUser) {
+    return json<ActionData>({ errors: { email: "A user already exists with this email" } }, { status: 400 })
+  }
+
+  const { user, groupId } = await createUser(email, name, password, inviteToken)
 
   if (user.email?.verificationToken) {
-    await sendWelcomeEmail(user.email.email, user.email.verificationToken)
+    await sendEmailVerificationEmail(user.email.email, user.email.verificationToken)
   }
 
-  return createUserSession({
-    request,
-    userId: user.id,
-    redirectTo: groupId ? `/groups/${groupId}` : safeRedirect(submission.value.redirectTo, "/"),
-  })
+  try {
+    return await authenticator.authenticate("user-pass", request, {
+      successRedirect: groupId ? `/groups/${groupId}` : redirectTo,
+      throwOnError: true,
+      context: { formData },
+    })
+  } catch (error) {
+    if (error instanceof Response) return error
+
+    const message = (error as Error).message || "Unknown error"
+    return json<ActionData>({ errors: { password: message } }, { status: 400 })
+  }
 }
 
 export const meta: MetaFunction = mergeMeta(() => [
@@ -88,53 +102,75 @@ export const meta: MetaFunction = mergeMeta(() => [
 export default function Join() {
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
-  const lastSubmission = useActionData<typeof action>()
-  const [form, { email, password, name }] = useForm({
-    id: "signup-form",
-    lastSubmission,
-    shouldValidate: "onSubmit",
-    onValidate: ({ formData }) => parse(formData, { schema }),
-  })
-
+  const actionData = useActionData() as ActionData
+  const emailRef = React.useRef<HTMLInputElement>(null)
+  const passwordRef = React.useRef<HTMLInputElement>(null)
+  const nameRef = React.useRef<HTMLInputElement>(null)
   const location = useLocation()
+
+  React.useEffect(() => {
+    if (actionData?.errors?.email) {
+      emailRef.current?.focus()
+    } else if (actionData?.errors?.password) {
+      passwordRef.current?.focus()
+    }
+  }, [actionData])
 
   return (
     <Wrapper>
       <h2>Join the club</h2>
       {/* Workaround to include search to action: https://github.com/remix-run/remix/issues/3133 */}
-      <Form method="post" {...form.props} action={`${location.pathname}${location.search}`}>
+      <Form method="post" action={`${location.pathname}${location.search}`}>
         <Stack gap={16}>
           <div>
-            <label htmlFor={name.id}>Name</label>
+            <label htmlFor={"name"}>Name</label>
             <div>
               <Input
-                {...conform.input(name, { ariaAttributes: true })}
+                ref={nameRef}
+                id="name"
+                required
                 autoFocus={true}
+                name="name"
+                type="name"
                 autoComplete="name"
+                aria-invalid={actionData?.errors?.name ? true : undefined}
+                aria-describedby="name-error"
               />
-              {name.error && <div id={`${name.id}-error`}>{name.error}</div>}
+              {actionData?.errors?.name && <div id="name-error">{actionData.errors.name}</div>}
             </div>
           </div>
 
           <div>
-            <label htmlFor={email.id}>Email address</label>
+            <label htmlFor={"email"}>Email address</label>
             <div>
               <Input
-                {...conform.input(email, { type: "email", ariaAttributes: true })}
+                ref={emailRef}
+                id="email"
+                required
+                name="email"
+                type="email"
                 autoComplete="email"
+                aria-invalid={actionData?.errors?.email ? true : undefined}
+                aria-describedby="email-error"
               />
-              {email.error && <div id={`${email.id}-error`}>{email.error}</div>}
+              {actionData?.errors?.email && <div id="email-error">{actionData.errors.email}</div>}
             </div>
           </div>
 
           <div>
-            <label htmlFor={password.id}>Password</label>
+            <label htmlFor={"password"}>Password</label>
             <div>
               <Input
-                {...conform.input(password, { type: "password", ariaAttributes: true })}
+                id="password"
+                ref={passwordRef}
+                name="password"
+                type="password"
+                minLength={8}
                 autoComplete="new-password"
+                aria-invalid={actionData?.errors?.password ? true : undefined}
+                aria-describedby="password-error"
               />
-              {password.error && <div id={`${password.id}-error`}>{password.error}</div>}
+              {actionData?.errors?.password && <div id="password-error">{actionData.errors.password}</div>}
             </div>
           </div>
 

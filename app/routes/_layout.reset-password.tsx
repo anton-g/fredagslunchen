@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
 import { json, redirect } from "@remix-run/node"
 import { Form, useActionData, useSearchParams } from "@remix-run/react"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { changeUserPasswordWithToken as resetUserPassword } from "~/models/user.server"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"

@@ -8,7 +8,7 @@ import {
   type Group,
   type GroupPermissions,
 } from "~/models/group.server"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { Link } from "react-router-dom"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"

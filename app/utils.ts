@@ -15,7 +15,7 @@ const DEFAULT_REDIRECT = "/"
  */
 export function safeRedirect(
   to: FormDataEntryValue | string | null | undefined,
-  defaultRedirect: string = DEFAULT_REDIRECT
+  defaultRedirect: string = DEFAULT_REDIRECT,
 ) {
   if (!to || typeof to !== "string") {
     return defaultRedirect
@@ -57,7 +57,7 @@ export function useUser(): User {
   const maybeUser = useOptionalUser()
   if (!maybeUser) {
     throw new Error(
-      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead."
+      "No user found in root loader, but user is required by useUser. If user is optional, try useOptionalUser instead.",
     )
   }
   return maybeUser
@@ -175,4 +175,8 @@ export function optionalNumeric() {
 }
 export function numeric() {
   return z.preprocess((x) => (typeof x === "string" && x.length > 0 ? x : undefined), numericSchema)
+}
+
+export function validateEmail(email: unknown): email is string {
+  return typeof email === "string" && email.length > 3 && email.includes("@")
 }

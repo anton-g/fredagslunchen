@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import { deleteGroupMember, updateGroupMembership as updateGroupMember } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 type ActionData =
   | {

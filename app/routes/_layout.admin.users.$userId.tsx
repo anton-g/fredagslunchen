@@ -10,7 +10,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { forceCreateResetPasswordTokenForUserId, getUserForAdmin, updateUser } from "~/models/user.server"
 
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

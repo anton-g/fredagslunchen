@@ -10,6 +10,7 @@ module.exports = {
   ],
   rules: {
     "@typescript-eslint/no-non-null-assertion": "off",
+    "import/no-duplicates": "warn",
   },
   // we're using vitest which has a very similar API to jest
   // (so the linting plugins work nicely), but it means we have to explicitly
