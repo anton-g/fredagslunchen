@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
-import { getUserId, createUserSession } from "~/session.server"
+import { getUserId } from "~/session.server"
 import { createUser, getUserByEmail } from "~/models/user.server"
 import { safeRedirect, validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"
@@ -12,6 +12,7 @@ import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
+import { authenticator } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -79,11 +80,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     await sendEmailVerificationEmail(user.email.email, user.email.verificationToken)
   }
 
-  return createUserSession({
-    request,
-    userId: user.id,
-    redirectTo: groupId ? `/groups/${groupId}` : redirectTo,
-  })
+  try {
+    return await authenticator.authenticate("user-pass", request, {
+      successRedirect: groupId ? `/groups/${groupId}` : redirectTo,
+      throwOnError: true,
+      context: { formData },
+    })
+  } catch (error) {
+    if (error instanceof Response) return error
+
+    const message = (error as Error).message || "Unknown error"
+    return json<ActionData>({ errors: { password: message } }, { status: 400 })
+  }
 }
 
 export const meta: MetaFunction = mergeMeta(() => [
