@@ -1,8 +1,6 @@
 import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remix-run/node"
-import { json, redirect } from "@remix-run/node"
+import { json } from "@remix-run/node"
 import { Form, Link, useActionData, useSearchParams } from "@remix-run/react"
-import { createUserSession, getUserId } from "~/session.server"
-import { verifyLogin } from "~/models/user.server"
 import { safeRedirect, validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"
 import { Button } from "~/components/Button"
@@ -10,10 +8,13 @@ import styled from "styled-components"
 import { Input } from "~/components/Input"
 import { mergeMeta } from "~/merge-meta"
 import { useEffect, useRef } from "react"
+import { authenticator } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const userId = await getUserId(request)
-  if (userId) return redirect("/")
+  await authenticator.isAuthenticated(request, {
+    successRedirect: "/",
+  })
+
   return json({})
 }
 
@@ -43,17 +44,18 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json<ActionData>({ errors: { password: "Password is too short" } }, { status: 400 })
   }
 
-  const user = await verifyLogin(email, password)
+  try {
+    return await authenticator.authenticate("user-pass", request, {
+      successRedirect: redirectTo,
+      throwOnError: true,
+      context: { formData },
+    })
+  } catch (error) {
+    if (error instanceof Response) return error
 
-  if (!user) {
-    return json<ActionData>({ errors: { password: "Invalid email or password" } }, { status: 400 })
+    const message = (error as Error).message || "Unknown error"
+    return json<ActionData>({ errors: { password: message } }, { status: 400 })
   }
-
-  return createUserSession({
-    request,
-    userId: user.id,
-    redirectTo,
-  })
 }
 
 export const meta: MetaFunction = mergeMeta(() => [
