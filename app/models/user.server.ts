@@ -21,7 +21,7 @@ export const getUserPermissions = async ({
   currentUserId,
   user,
 }: {
-  currentUserId?: User["id"]
+  currentUserId?: User["id"] | null
   user: FullUser
 }): Promise<UserPermissions> => {
   const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
@@ -146,7 +146,13 @@ export async function getUserForAdmin({ id }: { id: User["id"] }) {
   })
 }
 
-export async function getFullUserById({ id, requestUserId }: { id: User["id"]; requestUserId?: User["id"] }) {
+export async function getFullUserById({
+  id,
+  requestUserId,
+}: {
+  id: User["id"]
+  requestUserId?: User["id"] | null
+}) {
   const user = await fetchUserDetails({ id })
 
   if (!user) return null

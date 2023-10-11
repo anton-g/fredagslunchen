@@ -5,7 +5,7 @@ import {
   type MetaFunction,
 } from "@remix-run/node"
 import { json } from "@remix-run/node"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import styled from "styled-components"
 import { Button } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"

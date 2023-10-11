@@ -10,7 +10,7 @@ import { Stack } from "~/components/Stack"
 import { getGroup, getGroupPermissions } from "~/models/group.server"
 import z from "zod"
 import { createGroupLocation } from "~/models/location.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { optionalNumeric, safeRedirect, useUser } from "~/utils"
 import { LocationAutocomplete } from "~/components/LocationAutocomplete"
 import type { LocationSuggestion } from "~/services/locationiq.server"
@@ -100,13 +100,13 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
           "": ["Something went wrong"],
         },
       },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
   const safeRedirectTo = safeRedirect(
     redirectTo + `?loc=${location.locationId}`,
-    `/groups/${groupId}/locations/${location.locationId}`
+    `/groups/${groupId}/locations/${location.locationId}`,
   )
 
   return redirect(safeRedirectTo)

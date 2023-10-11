@@ -11,6 +11,7 @@
 - Feedback
 - When someone leaves a club, create anonymous member instead of deleting all data?
 - Social login
+- On logout, reset theme
 
 # Before premium
 - Map designs for themes
@@ -52,3 +53,5 @@
   - Claiming anonymous user
 - Show map image before loading interactive map
 - Fix issues when JS is disabled
+- New themes
+  - Pastel Paradise

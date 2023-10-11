@@ -3,7 +3,7 @@ import { Prisma } from "@prisma/client"
 import { nanoid } from "nanoid"
 
 import { prisma } from "~/db.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
 import { checkIsAdmin } from "./user.server"
 
@@ -38,7 +38,7 @@ export const getGroupPermissions = async ({
   currentUserId,
   group,
 }: {
-  currentUserId?: User["id"]
+  currentUserId?: User["id"] | null
   group: FullGroup
 }): Promise<GroupPermissions> => {
   const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
@@ -619,7 +619,7 @@ type StatsType = {
 
 // holy reduce
 const generateGroupStats = (
-  group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>
+  group: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>,
 ): StatsType => {
   const allLunches = group.groupLocations.flatMap((l) => l.lunches.map((x) => ({ ...x, groupLocation: l })))
   const allScores = allLunches.flatMap((l) => l.scores)
@@ -664,7 +664,7 @@ const generateGroupStats = (
       {
         bestLocation: { score: -1, name: "", id: 0 },
         worstLocation: { score: 11, name: "", id: 0 },
-      }
+      },
     )
 
   const lunchStats = allLunches
@@ -690,7 +690,7 @@ const generateGroupStats = (
       {
         bestLunch: { score: -1, name: "", id: 0 },
         worstLunch: { score: 11, name: "", id: 0 },
-      }
+      },
     )
 
   const mostPositive = memberStats[0]
@@ -732,7 +732,7 @@ const generateGroupStats = (
 }
 
 const generateUserStats = (
-  member: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>["members"][0]
+  member: NonNullable<Prisma.PromiseReturnType<typeof fetchGroupDetails>>["members"][0],
 ) => {
   const lunchCount = member.user.scores.length
   const choiceCount = member.user.choosenLunches.length
@@ -751,7 +751,7 @@ const generateUserStats = (
 
       return acc
     },
-    null
+    null,
   )
 
   return {

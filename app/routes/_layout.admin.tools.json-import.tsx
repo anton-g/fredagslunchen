@@ -13,7 +13,7 @@ import { createLunch } from "~/models/lunch.server"
 import { createScore } from "~/models/score.server"
 import type { User } from "~/models/user.server"
 import { createAnonymousUser } from "~/models/user.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

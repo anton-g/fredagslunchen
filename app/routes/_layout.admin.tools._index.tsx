@@ -6,7 +6,7 @@ import { Button, LinkButton } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { recreateDemoGroup } from "~/models/admin.server"
 import { setAllUserAvatars } from "~/models/user.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

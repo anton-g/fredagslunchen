@@ -5,7 +5,7 @@ import { ResponsiveLine } from "@nivo/line"
 import { getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { format } from "date-fns"
 import { Card } from "~/components/Card"
 import {

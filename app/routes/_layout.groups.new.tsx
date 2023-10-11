@@ -8,7 +8,7 @@ import { Stack } from "~/components/Stack"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 import { createGroup } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 const schema = z.object({
   name: z.string().min(1, "Name is required"),

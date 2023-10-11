@@ -1,7 +1,7 @@
 import type { ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import { createScoreRequest } from "~/models/score.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 type ActionData = {
   ok: boolean
@@ -29,7 +29,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
         ok: false,
         errors: { userId: "Can't request rating from yourself" },
       },
-      { status: 400 }
+      { status: 400 },
     )
   }
 
@@ -51,7 +51,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
           userId: result.error,
         },
       },
-      { status: 400 }
+      { status: 400 },
     )
   }
 

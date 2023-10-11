@@ -7,7 +7,7 @@ import { getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.s
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { LinkButton } from "~/components/Button"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { mergeMeta } from "~/merge-meta"
 
 export const meta: MetaFunction<typeof loader> = mergeMeta(({ data }) => {

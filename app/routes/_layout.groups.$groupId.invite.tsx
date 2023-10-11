@@ -10,7 +10,7 @@ import { Stack } from "~/components/Stack"
 import { Tooltip } from "~/components/Tooltip"
 import { addUserEmailToGroup, getGroup, getGroupPermissions } from "~/models/group.server"
 
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)

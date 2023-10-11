@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 import styled from "styled-components"
 import { getAdminStats } from "~/models/admin.server"
 import { StatsGrid } from "~/components/StatsGrid"

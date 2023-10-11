@@ -2,7 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs, MetaFunction } from "@remi
 import { json, redirect } from "@remix-run/node"
 import { Form, Link, useActionData, useLocation, useSearchParams } from "@remix-run/react"
 import * as React from "react"
-import { getUserId } from "~/session.server"
+import { getUserId } from "~/auth.server"
 import { createUser, getUserByEmail } from "~/models/user.server"
 import { safeRedirect, validateEmail } from "~/utils"
 import { Stack } from "~/components/Stack"

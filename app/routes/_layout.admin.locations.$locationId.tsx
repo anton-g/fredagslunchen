@@ -8,7 +8,7 @@ import { Checkbox } from "~/components/Checkbox"
 import { Input } from "~/components/Input"
 import { Stack } from "~/components/Stack"
 import { getLocation, updateLocation } from "~/models/location.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

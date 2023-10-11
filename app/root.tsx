@@ -13,7 +13,7 @@ import {
   useLocation,
 } from "@remix-run/react"
 import GlobalStyle from "./styles/global"
-import { getUser } from "./session.server"
+import { getUser } from "./auth.server"
 import { ThemeProvider } from "styled-components"
 import { getEnv } from "./env.server"
 import { getDomainUrl, removeTrailingSlash } from "./utils"

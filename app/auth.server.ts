@@ -1,16 +1,16 @@
 import { Authenticator, AuthorizationError } from "remix-auth"
 import { sessionStorage } from "~/session.server"
 import { FormStrategy } from "remix-auth-form"
-import { verifyLogin } from "./models/user.server"
+import type { User } from "./models/user.server"
+import { checkIsAdmin, getUserById, verifyLogin } from "./models/user.server"
 import invariant from "tiny-invariant"
+import type { Theme } from "./styles/theme"
+import { redirect } from "@remix-run/node"
 
-// Create an instance of the authenticator, pass a generic with what
-// strategies will return and will store in the session
 export const authenticator = new Authenticator<string>(sessionStorage, {
   sessionKey: "userId",
 })
 
-// Tell the Authenticator to use the form strategy
 authenticator.use(
   new FormStrategy(async ({ form }) => {
     const email = form.get("email")
@@ -28,7 +28,51 @@ authenticator.use(
 
     return user.id
   }),
-  // each strategy has a name and can be changed to use another one
-  // same strategy multiple times, especially useful for the OAuth2 strategy.
   "user-pass",
 )
+
+export async function getUserId(request: Request): Promise<User["id"] | null> {
+  const userId = await authenticator.isAuthenticated(request)
+  return userId
+}
+
+export async function getUser(request: Request) {
+  const userId = await getUserId(request)
+  if (!userId) return null
+
+  const user = await getUserById(userId)
+  if (user) return { ...user, theme: user.theme as Theme }
+
+  throw await authenticator.logout(request, { redirectTo: "/" })
+}
+
+export async function requireUserId(request: Request, redirectTo: string = new URL(request.url).pathname) {
+  const userId = await getUserId(request)
+  if (!userId) {
+    const searchParams = new URLSearchParams([["redirectTo", redirectTo]])
+    throw redirect(`/login?${searchParams}`)
+  }
+  return userId
+}
+
+export async function requireAdminUserId(request: Request, redirectTo?: string) {
+  const userId = await requireUserId(request, redirectTo)
+  const isAdmin = await checkIsAdmin(userId)
+
+  if (!isAdmin) throw new Response("Not Found", { status: 404 })
+
+  return userId
+}
+
+export async function requireUser(request: Request) {
+  const userId = await requireUserId(request)
+
+  const user = await getUserById(userId)
+  if (user) return user
+
+  throw await authenticator.logout(request, { redirectTo: "/" })
+}
+
+export async function logout(request: Request) {
+  return await authenticator.logout(request, { redirectTo: "/" })
+}

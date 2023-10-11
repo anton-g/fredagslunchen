@@ -13,7 +13,7 @@ import { Form, Link, isRouteErrorResponse, useFetcher, useLoaderData, useRouteEr
 import invariant from "tiny-invariant"
 import { formatNumber, getAverageNumber, shorten, formatTimeAgo } from "~/utils"
 import { Cross2Icon, TrashIcon } from "@radix-ui/react-icons"
-import { getUserId, requireUserId } from "~/session.server"
+import { getUserId, requireUserId } from "~/auth.server"
 import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
 import { Stat } from "~/components/Stat"

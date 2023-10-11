@@ -1,7 +1,7 @@
 import { redirect, type ActionFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import { deleteGroupMember } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 type ActionData = {
   errors?: {
