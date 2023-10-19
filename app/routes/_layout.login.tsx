@@ -9,6 +9,8 @@ import { Input } from "~/components/Input"
 import { mergeMeta } from "~/merge-meta"
 import { useEffect, useRef } from "react"
 import { authenticator } from "~/auth.server"
+import { SocialsProvider } from "remix-auth-socials"
+import { SocialButton } from "../components/SocialButton"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await authenticator.isAuthenticated(request, {
@@ -67,6 +69,7 @@ export const meta: MetaFunction = mergeMeta(() => [
 export default function LoginPage() {
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") || "/"
+  const error = searchParams.get("error")
   const actionData = useActionData() as ActionData
   const emailRef = useRef<HTMLInputElement>(null)
   const passwordRef = useRef<HTMLInputElement>(null)
@@ -122,6 +125,9 @@ export default function LoginPage() {
           <ForgotPasswordLink to="/forgot-password">Forgot your password?</ForgotPasswordLink>
         </Stack>
       </Form>
+      <h2>Use your socials</h2>
+      {error && <p>{error}</p>}
+      <SocialButton provider={SocialsProvider.GOOGLE} label="Log in with Google" />
     </Wrapper>
   )
 }

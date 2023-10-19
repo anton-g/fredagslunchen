@@ -12,6 +12,8 @@ import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
+import { SocialButton } from "~/components/SocialButton"
+import { SocialsProvider } from "remix-auth-socials"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -181,6 +183,8 @@ export default function Join() {
           </div>
         </Stack>
       </Form>
+      <h2 style={{ marginTop: 48 }}>Use your socials</h2>
+      <SocialButton provider={SocialsProvider.GOOGLE} label="Sign up with Google" />
     </Wrapper>
   )
 }

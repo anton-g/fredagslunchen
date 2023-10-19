@@ -237,11 +237,9 @@ export async function getUserByEmail(email: Email["email"]) {
 export async function createUser(
   email: Email["email"],
   name: string,
-  password: string,
+  password?: string,
   inviteToken?: string | null,
 ) {
-  const hashedPassword = await hashPassword(password)
-
   const avatarId = getRandomAvatarId(email)
 
   const user = await prisma.user.create({
@@ -255,11 +253,13 @@ export async function createUser(
       },
       name,
       avatarId,
-      password: {
-        create: {
-          hash: hashedPassword,
-        },
-      },
+      password: password
+        ? {
+            create: {
+              hash: await hashPassword(password),
+            },
+          }
+        : undefined,
     },
     include: {
       email: {
@@ -757,3 +757,16 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
 }
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10)
+
+export async function forceVerifyUserEmail(email: string) {
+  return prisma.email.update({
+    where: {
+      email,
+    },
+    data: {
+      verificationRequestTime: null,
+      verificationToken: null,
+      verified: true,
+    },
+  })
+}

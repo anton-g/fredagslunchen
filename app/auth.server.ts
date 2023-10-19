@@ -2,14 +2,60 @@ import { Authenticator, AuthorizationError } from "remix-auth"
 import { sessionStorage } from "~/session.server"
 import { FormStrategy } from "remix-auth-form"
 import type { User } from "./models/user.server"
-import { checkIsAdmin, getUserById, verifyLogin } from "./models/user.server"
+import {
+  checkIsAdmin,
+  createUser,
+  forceVerifyUserEmail,
+  getUserByEmail,
+  getUserById,
+  verifyLogin,
+} from "./models/user.server"
 import invariant from "tiny-invariant"
 import type { Theme } from "./styles/theme"
 import { redirect } from "@remix-run/node"
+import { GoogleStrategy, SocialsProvider } from "remix-auth-socials"
+import { getEnv } from "./env.server"
 
 export const authenticator = new Authenticator<string>(sessionStorage, {
   sessionKey: "userId",
 })
+
+const getCallback = (provider: SocialsProvider) => {
+  return `http://localhost:3000/auth/${provider}/callback`
+}
+
+const env = getEnv()
+invariant(env.GOOGLE_CLIENT_ID, "GOOGLE_CLIENT_ID must be set")
+invariant(env.GOOGLE_CLIENT_SECRET, "GOOGLE_CLIENT_SECRET must be set")
+
+authenticator.use(
+  new GoogleStrategy(
+    {
+      clientID: env.GOOGLE_CLIENT_ID,
+      clientSecret: env.GOOGLE_CLIENT_SECRET,
+      callbackURL: getCallback(SocialsProvider.GOOGLE),
+    },
+    async ({ profile, context, extraParams, request }) => {
+      console.log(request.url)
+      console.log(extraParams)
+      if (profile._json.email_verified !== true) {
+        throw new AuthorizationError("You can only use a Google account with a verified email")
+      }
+
+      const email = profile.emails[0].value
+      const user = await getUserByEmail(email)
+
+      if (user) {
+        await forceVerifyUserEmail(email)
+        return user.id
+      }
+
+      const result = await createUser(email, profile.displayName)
+
+      return result.user.id
+    },
+  ),
+)
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {

@@ -8,6 +8,8 @@ function getEnv() {
     RESEND_API_KEY: process.env.RESEND_API_KEY,
     GOOGLE_PLACES_API_KEY: process.env.GOOGLE_PLACES_API_KEY,
     LOCATIONIQ_API_KEY: process.env.LOCATIONIQ_API_KEY,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
   }
 }
 
