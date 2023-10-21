@@ -14,7 +14,7 @@ import invariant from "tiny-invariant"
 import type { Theme } from "./styles/theme"
 import { redirect } from "@remix-run/node"
 import { getEnv } from "./env.server"
-import { GoogleStrategy } from "./auth-providers/GoogleProvider"
+import { GoogleStrategy } from "remix-auth-google"
 import Cache from "node-cache"
 
 export type AuthRedirectState = {
