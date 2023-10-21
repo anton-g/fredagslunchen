@@ -583,6 +583,34 @@ export async function changeUserPassword({
   })
 }
 
+export async function setUserPassword({ id, newPassword }: { id: User["id"]; newPassword: string }) {
+  const userWithoutPassword = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      password: true,
+    },
+  })
+
+  if (!userWithoutPassword) {
+    return null
+  }
+
+  const hashedPassword = await hashPassword(newPassword)
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  })
+}
+
 export async function changeUserPasswordWithToken({
   token,
   newPassword,
@@ -697,6 +725,16 @@ export async function updateUser(update: Partial<User>) {
       ...update,
     },
   })
+}
+
+export async function hasUserPassword(userId: User["id"]) {
+  const password = await prisma.password.findFirst({
+    where: {
+      userId,
+    },
+  })
+
+  return Boolean(password)
 }
 
 export async function setAllUserAvatars() {
