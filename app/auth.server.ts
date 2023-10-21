@@ -13,15 +13,23 @@ import {
 import invariant from "tiny-invariant"
 import type { Theme } from "./styles/theme"
 import { redirect } from "@remix-run/node"
-import { GoogleStrategy, SocialsProvider } from "remix-auth-socials"
 import { getEnv } from "./env.server"
+import { GoogleStrategy } from "./auth-providers/GoogleProvider"
+import Cache from "node-cache"
+
+export type AuthRedirectState = {
+  redirectTo?: string
+  from?: string
+  groupInviteToken?: string
+}
+export const stateCache = new Cache({ deleteOnExpire: true, stdTTL: 60 * 10 })
 
 export const authenticator = new Authenticator<string>(sessionStorage, {
   sessionKey: "userId",
 })
 
-const getCallback = (provider: SocialsProvider) => {
-  return `http://localhost:3000/auth/${provider}/callback`
+const getCallback = (provider: "google") => {
+  return `/auth/${provider}/callback`
 }
 
 const env = getEnv()
@@ -33,11 +41,9 @@ authenticator.use(
     {
       clientID: env.GOOGLE_CLIENT_ID,
       clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL: getCallback(SocialsProvider.GOOGLE),
+      callbackURL: getCallback("google"),
     },
-    async ({ profile, context, extraParams, request }) => {
-      console.log(request.url)
-      console.log(extraParams)
+    async ({ profile }) => {
       if (profile._json.email_verified !== true) {
         throw new AuthorizationError("You can only use a Google account with a verified email")
       }

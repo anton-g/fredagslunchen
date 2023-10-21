@@ -9,7 +9,6 @@ import { Input } from "~/components/Input"
 import { mergeMeta } from "~/merge-meta"
 import { useEffect, useRef } from "react"
 import { authenticator } from "~/auth.server"
-import { SocialsProvider } from "remix-auth-socials"
 import { SocialButton } from "../components/SocialButton"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -127,7 +126,7 @@ export default function LoginPage() {
       </Form>
       <h2>Use your socials</h2>
       {error && <p>{error}</p>}
-      <SocialButton provider={SocialsProvider.GOOGLE} label="Log in with Google" />
+      <SocialButton provider={"google"} label="Log in with Google" from="login" />
     </Wrapper>
   )
 }
