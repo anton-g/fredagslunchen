@@ -2,14 +2,66 @@ import { Authenticator, AuthorizationError } from "remix-auth"
 import { sessionStorage } from "~/session.server"
 import { FormStrategy } from "remix-auth-form"
 import type { User } from "./models/user.server"
-import { checkIsAdmin, getUserById, verifyLogin } from "./models/user.server"
+import {
+  checkIsAdmin,
+  createUser,
+  forceVerifyUserEmail,
+  getUserByEmail,
+  getUserById,
+  verifyLogin,
+} from "./models/user.server"
 import invariant from "tiny-invariant"
 import type { Theme } from "./styles/theme"
 import { redirect } from "@remix-run/node"
+import { GoogleStrategy } from "remix-auth-google"
+import Cache from "node-cache"
+
+export type AuthRedirectState = {
+  redirectTo?: string
+  from?: string
+  groupInviteToken?: string
+}
+export const stateCache = new Cache({ deleteOnExpire: true, stdTTL: 60 * 10 })
 
 export const authenticator = new Authenticator<string>(sessionStorage, {
   sessionKey: "userId",
 })
+
+const getCallback = (provider: "google") => {
+  return `/auth/${provider}/callback`
+}
+
+if (ENV.ENABLE_GOOGLE_LOGIN) {
+  invariant(ENV.GOOGLE_CLIENT_ID, "GOOGLE_CLIENT_ID must be set")
+  invariant(ENV.GOOGLE_CLIENT_SECRET, "GOOGLE_CLIENT_SECRET must be set")
+
+  authenticator.use(
+    new GoogleStrategy(
+      {
+        clientID: ENV.GOOGLE_CLIENT_ID,
+        clientSecret: ENV.GOOGLE_CLIENT_SECRET,
+        callbackURL: getCallback("google"),
+      },
+      async ({ profile }) => {
+        if (profile._json.email_verified !== true) {
+          throw new AuthorizationError("You can only use a Google account with a verified email")
+        }
+
+        const email = profile.emails[0].value
+        const user = await getUserByEmail(email)
+
+        if (user) {
+          await forceVerifyUserEmail(email)
+          return user.id
+        }
+
+        const result = await createUser(email, profile.displayName)
+
+        return result.user.id
+      },
+    ),
+  )
+}
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {

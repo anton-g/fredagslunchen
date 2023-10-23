@@ -12,6 +12,7 @@ import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendEmailVerificationEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
+import { SocialButton } from "~/components/SocialButton"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -102,6 +103,7 @@ export const meta: MetaFunction = mergeMeta(() => [
 export default function Join() {
   const [searchParams] = useSearchParams()
   const redirectTo = searchParams.get("redirectTo") ?? undefined
+  const error = searchParams.get("error")
   const actionData = useActionData() as ActionData
   const emailRef = React.useRef<HTMLInputElement>(null)
   const passwordRef = React.useRef<HTMLInputElement>(null)
@@ -181,6 +183,13 @@ export default function Join() {
           </div>
         </Stack>
       </Form>
+      {ENV.ENABLE_GOOGLE_LOGIN && (
+        <>
+          <h2 style={{ marginTop: 48 }}>Use your socials</h2>
+          {error && <p>{error}</p>}
+          <SocialButton provider={"google"} label="Sign up with Google" from={"join"} />
+        </>
+      )}
     </Wrapper>
   )
 }

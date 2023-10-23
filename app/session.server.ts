@@ -13,3 +13,5 @@ export const sessionStorage = createCookieSessionStorage({
     secure: process.env.NODE_ENV === "production",
   },
 })
+
+export let { getSession, commitSession } = sessionStorage

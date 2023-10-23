@@ -237,11 +237,9 @@ export async function getUserByEmail(email: Email["email"]) {
 export async function createUser(
   email: Email["email"],
   name: string,
-  password: string,
+  password?: string,
   inviteToken?: string | null,
 ) {
-  const hashedPassword = await hashPassword(password)
-
   const avatarId = getRandomAvatarId(email)
 
   const user = await prisma.user.create({
@@ -255,11 +253,13 @@ export async function createUser(
       },
       name,
       avatarId,
-      password: {
-        create: {
-          hash: hashedPassword,
-        },
-      },
+      password: password
+        ? {
+            create: {
+              hash: await hashPassword(password),
+            },
+          }
+        : undefined,
     },
     include: {
       email: {
@@ -583,6 +583,34 @@ export async function changeUserPassword({
   })
 }
 
+export async function setUserPassword({ id, newPassword }: { id: User["id"]; newPassword: string }) {
+  const userWithoutPassword = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      password: true,
+    },
+  })
+
+  if (!userWithoutPassword) {
+    return null
+  }
+
+  const hashedPassword = await hashPassword(newPassword)
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      password: {
+        create: {
+          hash: hashedPassword,
+        },
+      },
+    },
+  })
+}
+
 export async function changeUserPasswordWithToken({
   token,
   newPassword,
@@ -699,6 +727,16 @@ export async function updateUser(update: Partial<User>) {
   })
 }
 
+export async function hasUserPassword(userId: User["id"]) {
+  const password = await prisma.password.findFirst({
+    where: {
+      userId,
+    },
+  })
+
+  return Boolean(password)
+}
+
 export async function setAllUserAvatars() {
   const users = await prisma.user.findMany()
 
@@ -757,3 +795,16 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
 }
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10)
+
+export async function forceVerifyUserEmail(email: string) {
+  return prisma.email.update({
+    where: {
+      email,
+    },
+    data: {
+      verificationRequestTime: null,
+      verificationToken: null,
+      verified: true,
+    },
+  })
+}
