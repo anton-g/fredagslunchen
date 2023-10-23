@@ -183,9 +183,13 @@ export default function Join() {
           </div>
         </Stack>
       </Form>
-      <h2 style={{ marginTop: 48 }}>Use your socials</h2>
-      {error && <p>{error}</p>}
-      <SocialButton provider={"google"} label="Sign up with Google" from={"join"} />
+      {ENV.ENABLE_GOOGLE_LOGIN && (
+        <>
+          <h2 style={{ marginTop: 48 }}>Use your socials</h2>
+          {error && <p>{error}</p>}
+          <SocialButton provider={"google"} label="Sign up with Google" from={"join"} />
+        </>
+      )}
     </Wrapper>
   )
 }

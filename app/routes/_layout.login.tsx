@@ -124,9 +124,13 @@ export default function LoginPage() {
           <ForgotPasswordLink to="/forgot-password">Forgot your password?</ForgotPasswordLink>
         </Stack>
       </Form>
-      <h2>Use your socials</h2>
-      {error && <p>{error}</p>}
-      <SocialButton provider={"google"} label="Log in with Google" from="login" />
+      {ENV.ENABLE_GOOGLE_LOGIN && (
+        <>
+          <h2>Use your socials</h2>
+          {error && <p>{error}</p>}
+          <SocialButton provider={"google"} label="Log in with Google" from="login" />
+        </>
+      )}
     </Wrapper>
   )
 }

@@ -13,7 +13,6 @@ import {
 import invariant from "tiny-invariant"
 import type { Theme } from "./styles/theme"
 import { redirect } from "@remix-run/node"
-import { getEnv } from "./env.server"
 import { GoogleStrategy } from "remix-auth-google"
 import Cache from "node-cache"
 
@@ -32,36 +31,37 @@ const getCallback = (provider: "google") => {
   return `/auth/${provider}/callback`
 }
 
-const env = getEnv()
-invariant(env.GOOGLE_CLIENT_ID, "GOOGLE_CLIENT_ID must be set")
-invariant(env.GOOGLE_CLIENT_SECRET, "GOOGLE_CLIENT_SECRET must be set")
+if (ENV.ENABLE_GOOGLE_LOGIN) {
+  invariant(ENV.GOOGLE_CLIENT_ID, "GOOGLE_CLIENT_ID must be set")
+  invariant(ENV.GOOGLE_CLIENT_SECRET, "GOOGLE_CLIENT_SECRET must be set")
 
-authenticator.use(
-  new GoogleStrategy(
-    {
-      clientID: env.GOOGLE_CLIENT_ID,
-      clientSecret: env.GOOGLE_CLIENT_SECRET,
-      callbackURL: getCallback("google"),
-    },
-    async ({ profile }) => {
-      if (profile._json.email_verified !== true) {
-        throw new AuthorizationError("You can only use a Google account with a verified email")
-      }
+  authenticator.use(
+    new GoogleStrategy(
+      {
+        clientID: ENV.GOOGLE_CLIENT_ID,
+        clientSecret: ENV.GOOGLE_CLIENT_SECRET,
+        callbackURL: getCallback("google"),
+      },
+      async ({ profile }) => {
+        if (profile._json.email_verified !== true) {
+          throw new AuthorizationError("You can only use a Google account with a verified email")
+        }
 
-      const email = profile.emails[0].value
-      const user = await getUserByEmail(email)
+        const email = profile.emails[0].value
+        const user = await getUserByEmail(email)
 
-      if (user) {
-        await forceVerifyUserEmail(email)
-        return user.id
-      }
+        if (user) {
+          await forceVerifyUserEmail(email)
+          return user.id
+        }
 
-      const result = await createUser(email, profile.displayName)
+        const result = await createUser(email, profile.displayName)
 
-      return result.user.id
-    },
-  ),
-)
+        return result.user.id
+      },
+    ),
+  )
+}
 
 authenticator.use(
   new FormStrategy(async ({ form }) => {

@@ -1,6 +1,7 @@
 function getEnv() {
   return {
     NODE_ENV: process.env.NODE_ENV,
+    ENABLE_GOOGLE_LOGIN: process.env.ENABLE_GOOGLE_LOGIN === "true",
     ENABLE_MAPS: process.env.ENABLE_MAPS === "true",
     ENABLE_PREMIUM: process.env.ENABLE_PREMIUM === "true",
     FATHOM_SITE_ID: process.env.FATHOM_SITE_ID,
