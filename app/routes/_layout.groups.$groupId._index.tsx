@@ -272,6 +272,7 @@ const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 16px;
+  flex-wrap: wrap;
 `
 
 const Subtitle = styled.h3`
