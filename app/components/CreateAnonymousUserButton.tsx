@@ -38,10 +38,12 @@ export const CreateAnonymousUserButton = ({ groupId }: { groupId: Group["id"] })
           <Dialog.Close />
           <Dialog.Title>Create anonymous user</Dialog.Title>
           <DialogDescription>
-            <p>Anonymous users are users without an account.</p>
+            <p>
+              Anonymous users are users <strong>without</strong> an account.
+            </p>
             <p>
               They are perfect for your friend that doesn't have a computer, your lazy boss or anyone else
-              that still want to follow along on your lunch journeys without a Fredagslunchen account.
+              that want to follow along on your lunch journeys without a Fredagslunchen account.
             </p>
             <p>
               You can transfer the anonymous users data to them if they decide to create an account later on.

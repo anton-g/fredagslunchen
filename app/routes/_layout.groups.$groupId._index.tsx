@@ -129,31 +129,19 @@ export default function GroupDetailsPage() {
         defaultSort={{ label: "Name", key: (row) => row.user.name }}
       >
         {(member) => (
-          <tr key={member.userId}>
+          <SortableTable.LinkRow key={member.userId} to={`/users/${member.userId}`}>
             <SortableTable.Cell>
               <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
             </SortableTable.Cell>
             <SortableTable.Cell numeric>{member.stats.lunchCount}</SortableTable.Cell>
             <SortableTable.Cell numeric>{formatNumber(member.stats.averageScore)}</SortableTable.Cell>
             <SortableTable.Cell>
-              {member.stats.highestScore ? (
-                <Link to={`/groups/${details.group.id}/lunches/${member.stats.highestScore.id}`}>
-                  {member.stats.highestScore.name}
-                </Link>
-              ) : (
-                "-"
-              )}
+              {member.stats.highestScore ? member.stats.highestScore.name : "-"}
             </SortableTable.Cell>
             <SortableTable.Cell>
-              {member.stats.lowestScore ? (
-                <Link to={`/groups/${details.group.id}/lunches/${member.stats.lowestScore.id}`}>
-                  {member.stats.lowestScore.name}
-                </Link>
-              ) : (
-                "-"
-              )}
+              {member.stats.lowestScore ? member.stats.lowestScore.name : "-"}
             </SortableTable.Cell>
-          </tr>
+          </SortableTable.LinkRow>
         )}
       </SortableTable>
       {permissions.recommendations && (
