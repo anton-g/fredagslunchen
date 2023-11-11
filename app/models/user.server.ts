@@ -21,7 +21,7 @@ export const getUserPermissions = async ({
   currentUserId,
   user,
 }: {
-  currentUserId?: User["id"]
+  currentUserId?: User["id"] | null
   user: FullUser
 }): Promise<UserPermissions> => {
   const isAdmin = currentUserId ? await checkIsAdmin(currentUserId) : false
@@ -44,6 +44,7 @@ const fetchUserDetails = async ({ id }: { id: User["id"] }) => {
         select: {
           verified: true,
           email: true,
+          verificationRequestTime: true,
         },
       },
       groups: {
@@ -130,7 +131,11 @@ export async function getUserForAdmin({ id }: { id: User["id"] }) {
     select: {
       id: true,
       name: true,
-      passwordResetToken: true,
+      password: {
+        select: {
+          passwordResetToken: true,
+        },
+      },
       email: {
         select: {
           verified: true,
@@ -141,7 +146,13 @@ export async function getUserForAdmin({ id }: { id: User["id"] }) {
   })
 }
 
-export async function getFullUserById({ id, requestUserId }: { id: User["id"]; requestUserId?: User["id"] }) {
+export async function getFullUserById({
+  id,
+  requestUserId,
+}: {
+  id: User["id"]
+  requestUserId?: User["id"] | null
+}) {
   const user = await fetchUserDetails({ id })
 
   if (!user) return null
@@ -152,7 +163,7 @@ export async function getFullUserById({ id, requestUserId }: { id: User["id"]; r
       if (score.lunch.groupLocation.group.public) return true
 
       return score.lunch.groupLocation.group.members.some(
-        (x) => x.userId === requestUserId || score.lunch.groupLocation.group.public
+        (x) => x.userId === requestUserId || score.lunch.groupLocation.group.public,
       )
     }),
   }
@@ -226,11 +237,9 @@ export async function getUserByEmail(email: Email["email"]) {
 export async function createUser(
   email: Email["email"],
   name: string,
-  password: string,
-  inviteToken?: string | null
+  password?: string,
+  inviteToken?: string | null,
 ) {
-  const hashedPassword = await hashPassword(password)
-
   const avatarId = getRandomAvatarId(email)
 
   const user = await prisma.user.create({
@@ -244,11 +253,13 @@ export async function createUser(
       },
       name,
       avatarId,
-      password: {
-        create: {
-          hash: hashedPassword,
-        },
-      },
+      password: password
+        ? {
+            create: {
+              hash: await hashPassword(password),
+            },
+          }
+        : undefined,
     },
     include: {
       email: {
@@ -464,28 +475,43 @@ export async function verifyLogin(email: Email["email"], password: Password["has
 }
 
 export async function forceCreateResetPasswordTokenForUserId(id: User["id"]) {
-  const user = await prisma.user.update({
-    where: { id },
+  const password = await prisma.password.update({
+    where: {
+      userId: id,
+    },
     data: {
       passwordResetTime: null,
       passwordResetToken: null,
     },
-    select: { email: { select: { email: true } } },
+    select: {
+      user: {
+        select: {
+          email: {
+            select: {
+              email: true,
+            },
+          },
+        },
+      },
+    },
   })
 
-  if (!user.email) return ""
+  if (!password.user.email) return ""
 
-  return createResetPasswordToken(user.email.email)
+  return createResetPasswordToken(password.user.email.email)
 }
 
 export async function createResetPasswordToken(email: Email["email"]) {
   // TODO investigate value in hashing the tokens
+  // Maybe hash tokens and store hash in db, then include both token and salt in email link ??
   const token = nanoid()
 
-  const users = await prisma.user.updateMany({
+  const passwords = await prisma.password.updateMany({
     where: {
-      email: {
-        email,
+      user: {
+        email: {
+          email,
+        },
       },
       OR: [
         {
@@ -504,11 +530,11 @@ export async function createResetPasswordToken(email: Email["email"]) {
     },
   })
 
-  if (users.count === 0) {
+  if (passwords.count === 0) {
     return null
   }
 
-  if (users.count > 1) {
+  if (passwords.count > 1) {
     throw "something went really wrong"
   }
 
@@ -546,10 +572,38 @@ export async function changeUserPassword({
       id,
     },
     data: {
-      passwordResetTime: null,
-      passwordResetToken: null,
       password: {
         update: {
+          passwordResetTime: null,
+          passwordResetToken: null,
+          hash: hashedPassword,
+        },
+      },
+    },
+  })
+}
+
+export async function setUserPassword({ id, newPassword }: { id: User["id"]; newPassword: string }) {
+  const userWithoutPassword = await prisma.user.findUnique({
+    where: { id },
+    include: {
+      password: true,
+    },
+  })
+
+  if (!userWithoutPassword) {
+    return null
+  }
+
+  const hashedPassword = await hashPassword(newPassword)
+
+  return await prisma.user.update({
+    where: {
+      id,
+    },
+    data: {
+      password: {
+        create: {
           hash: hashedPassword,
         },
       },
@@ -564,7 +618,7 @@ export async function changeUserPasswordWithToken({
   token: string
   newPassword: string
 }) {
-  const userWithPasswordResetToken = await prisma.user.findFirst({
+  const password = await prisma.password.findFirst({
     where: {
       passwordResetToken: token,
       passwordResetTime: {
@@ -573,7 +627,7 @@ export async function changeUserPasswordWithToken({
     },
   })
 
-  if (!userWithPasswordResetToken || !userWithPasswordResetToken.passwordResetToken) {
+  if (!password || !password.passwordResetToken) {
     return null
   }
 
@@ -581,13 +635,13 @@ export async function changeUserPasswordWithToken({
 
   return await prisma.user.update({
     where: {
-      id: userWithPasswordResetToken.id,
+      id: password.userId,
     },
     data: {
-      passwordResetTime: null,
-      passwordResetToken: null,
       password: {
         update: {
+          passwordResetTime: null,
+          passwordResetToken: null,
           hash: hashedPassword,
         },
       },
@@ -673,6 +727,16 @@ export async function updateUser(update: Partial<User>) {
   })
 }
 
+export async function hasUserPassword(userId: User["id"]) {
+  const password = await prisma.password.findFirst({
+    where: {
+      userId,
+    },
+  })
+
+  return Boolean(password)
+}
+
 export async function setAllUserAvatars() {
   const users = await prisma.user.findMany()
 
@@ -731,3 +795,16 @@ function generateUserStats(user: NonNullable<Prisma.PromiseReturnType<typeof fet
 }
 
 const hashPassword = (password: string) => bcrypt.hash(password, 10)
+
+export async function forceVerifyUserEmail(email: string) {
+  return prisma.email.update({
+    where: {
+      email,
+    },
+    data: {
+      verificationRequestTime: null,
+      verificationToken: null,
+      verified: true,
+    },
+  })
+}

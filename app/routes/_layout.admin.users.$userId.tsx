@@ -10,7 +10,7 @@ import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import { forceCreateResetPasswordTokenForUserId, getUserForAdmin, updateUser } from "~/models/user.server"
 
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)
@@ -127,8 +127,8 @@ export default function AdminUserSettingsPage() {
             id="reset-link"
             disabled
             value={
-              user.passwordResetToken
-                ? `https://fredagslunchen.club/reset-password?token=${user.passwordResetToken}`
+              user.password?.passwordResetToken
+                ? `https://fredagslunchen.club/reset-password?token=${user.password.passwordResetToken}`
                 : ""
             }
           />

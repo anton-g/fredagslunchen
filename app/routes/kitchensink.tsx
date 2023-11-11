@@ -36,12 +36,12 @@ export const meta: MetaFunction = mergeMeta(() => [
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   return json({
-    ENV: getEnv(),
+    ENABLE_MAPS: getEnv().ENABLE_MAPS,
   })
 }
 
 export default function Kitchensink() {
-  const { ENV } = useLoaderData<typeof loader>()
+  const { ENABLE_MAPS } = useLoaderData<typeof loader>()
 
   return (
     <div style={{ padding: 24 }}>
@@ -83,7 +83,7 @@ export default function Kitchensink() {
           </Tooltip>
         </Component>
         <Component title="Map">
-          {ENV.ENABLE_MAPS ? <Map locations={locationsMock} /> : <span>Maps disabled</span>}
+          {ENABLE_MAPS ? <Map locations={locationsMock} /> : <span>Maps disabled</span>}
         </Component>
         <Component title="Hover Card">
           <HoverCard>

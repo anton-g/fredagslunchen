@@ -10,7 +10,7 @@ import { useFeatureFlags } from "~/FeatureFlagContext"
 import { mergeMeta } from "~/merge-meta"
 
 import { getAllLocationsStats } from "~/models/location.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { formatNumber } from "~/utils"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

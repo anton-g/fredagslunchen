@@ -8,7 +8,7 @@ import { Card } from "~/components/Card"
 import { Spacer } from "~/components/Spacer"
 
 import { getUserGroups } from "~/models/group.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { formatTimeAgo } from "~/utils"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

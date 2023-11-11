@@ -18,7 +18,16 @@ export function EmailRoot({ children, title }: { children: ReactNode; title: str
         <meta name="supported-color-schemes" content="light only"></meta>
         <EmailStyle />
       </E.Head>
-      <E.Container className="root" style={{ backgroundColor: "#fff", background: "#fff", height: "100%" }}>
+      <E.Container
+        className="root"
+        style={{
+          backgroundColor: "#fff",
+          background: "#fff",
+          height: "100%",
+          marginTop: "48px",
+          marginBottom: "128px",
+        }}
+      >
         {children}
       </E.Container>
     </E.Html>

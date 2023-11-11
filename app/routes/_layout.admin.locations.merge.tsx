@@ -8,7 +8,7 @@ import { Button } from "~/components/Button"
 import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { Stack } from "~/components/Stack"
 import { getAllLocations, mergeLocations } from "~/models/location.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

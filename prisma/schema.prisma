@@ -28,9 +28,7 @@ model User {
 
   role String @default("USER") // USER, ADMIN, ANONYMOUS
 
-  password           Password?
-  passwordResetToken String?
-  passwordResetTime  DateTime?
+  password Password?
 
   theme    String @default("light")
   avatarId Int
@@ -46,6 +44,9 @@ model User {
 
 model Password {
   hash String
+
+  passwordResetToken String?
+  passwordResetTime  DateTime?
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   userId String @unique

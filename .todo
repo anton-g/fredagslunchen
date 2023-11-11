@@ -9,8 +9,10 @@
 - Themes
   - Improve dark theme map
 - Feedback
-- Replace Cypress with Playwright
-- Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
+- When someone leaves a club, create anonymous member instead of deleting all data?
+- Social login
+- On logout, reset theme
+- Replace autocompletes with selects where appropriate
 
 # Before premium
 - Map designs for themes
@@ -25,15 +27,19 @@
 - Check security of all models
 
 # Later
+- Invite with email
+- Fix MSW
+- Replace Cypress with Playwright
+- Set up Sentry https://docs.sentry.io/platforms/javascript/guides/remix/
 - Integrations
   - Slack notification when adding lunch, getting request?
   - Only Supporters?
 - Delete user
-- Social login
 - Restructure api routes
 - Investigate how to reduce db calls when on a deeply nested route
 - Export club data
 - Premium / Supporter?
+  - Require confirmed email
   - Select color schemes
   - Select avatar
   - Discover?
@@ -41,7 +47,6 @@
   - Should be able to host docker container on fly for like $4/m
 - Discover / Inspiration page
   - Top locations
-- When someone leaves a club, create anonymous member instead of deleting all data?
 - Write tests
   - New lunch from location
   - Invite user with link
@@ -49,3 +54,5 @@
   - Claiming anonymous user
 - Show map image before loading interactive map
 - Fix issues when JS is disabled
+- New themes
+  - Pastel Paradise

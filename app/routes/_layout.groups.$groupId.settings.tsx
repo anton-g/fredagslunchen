@@ -18,7 +18,7 @@ import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import z from "zod"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 import { useEffect, useRef, useState } from "react"
 import { Table } from "~/components/Table"
 import { optionalNumeric, type RecursivelyConvertDatesToStrings } from "~/utils"
@@ -389,7 +389,7 @@ const InactiveMemberAction = ({ member }: InactiveMemberActionProps) => {
       {
         method: "post",
         action: "/api/groups/member",
-      }
+      },
     )
   }
 

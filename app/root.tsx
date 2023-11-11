@@ -13,7 +13,7 @@ import {
   useLocation,
 } from "@remix-run/react"
 import GlobalStyle from "./styles/global"
-import { getUser } from "./session.server"
+import { getUser } from "./auth.server"
 import { ThemeProvider } from "styled-components"
 import { getEnv } from "./env.server"
 import { getDomainUrl, removeTrailingSlash } from "./utils"
@@ -108,6 +108,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     user,
     // Do not include tokens with sensitive data
     ENV: {
+      ENABLE_GOOGLE_LOGIN: env.ENABLE_GOOGLE_LOGIN,
       ENABLE_MAPS: env.ENABLE_MAPS,
       ENABLE_PREMIUM: env.ENABLE_PREMIUM,
       FATHOM_SITE_ID: env.FATHOM_SITE_ID,

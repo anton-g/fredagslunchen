@@ -5,7 +5,7 @@ import { useLoaderData } from "@remix-run/react"
 import { ExternalLinkButton, LinkButton } from "~/components/Button"
 import { Table } from "~/components/Table"
 import { getAllLocations } from "~/models/location.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

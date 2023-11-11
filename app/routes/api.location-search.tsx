@@ -2,7 +2,7 @@ import type { LoaderFunctionArgs } from "@remix-run/server-runtime"
 import { json } from "@remix-run/server-runtime"
 import type { LocationSuggestion } from "~/services/locationiq.server"
 import { autocomplete } from "~/services/locationiq.server"
-import { requireUserId } from "~/session.server"
+import { requireUserId } from "~/auth.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await requireUserId(request)

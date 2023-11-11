@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { Table } from "~/components/Table"
 import { getAllAnonymousUsers, getAllUsers } from "~/models/user.server"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 import { format } from "date-fns"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {

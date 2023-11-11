@@ -6,7 +6,7 @@ import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { SortableTable } from "~/components/SortableTable"
 import { createEmailVerificationToken, getFullUserById, getUserPermissions } from "~/models/user.server"
-import { getUserId, requireUserId } from "~/session.server"
+import { getUserId, requireUserId } from "~/auth.server"
 import invariant from "tiny-invariant"
 import { UserAvatar } from "~/components/Avatar"
 import { Stat } from "~/components/Stat"
@@ -14,6 +14,8 @@ import { StatsGrid } from "~/components/StatsGrid"
 import { Button, LinkButton } from "~/components/Button"
 import { Stack } from "~/components/Stack"
 import { sendEmailVerificationEmail } from "~/services/email.server"
+import { BrandText } from "~/components/BrandText"
+import { isAfter, sub } from "date-fns"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -34,6 +36,10 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   return json({
     user,
     isYou: userId === params.userId,
+    emailVerificationPending:
+      !user.email?.verified &&
+      user.email?.verificationRequestTime &&
+      isAfter(user.email.verificationRequestTime, sub(new Date(), { hours: 1 })),
     permissions,
     noPublicData,
   })
@@ -55,13 +61,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 }
 
 export default function Index() {
-  const { user, isYou, permissions, noPublicData } = useLoaderData<typeof loader>()
+  const { user, isYou, permissions, noPublicData, emailVerificationPending } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
 
   const sortedScores = user.scores.sort(
     (a, b) => new Date(b.lunch.date).getTime() - new Date(a.lunch.date).getTime(),
   )
 
+  const verificationPending = Boolean(actionData?.ok || emailVerificationPending)
   return (
     <Wrapper>
       <Section>
@@ -75,8 +82,12 @@ export default function Index() {
           {isYou && !user.email?.verified && (
             <Form method="post">
               <Stack gap={8} axis="horizontal">
-                <Button disabled={actionData?.ok}>Verify your email</Button>
-                {actionData?.ok && <span>Check your email (and spam folder)</span>}
+                <Button disabled={verificationPending}>Verify your email</Button>
+                {verificationPending && (
+                  <span>
+                    Check your email (and <BrandText>spam folder</BrandText>)
+                  </span>
+                )}
               </Stack>
             </Form>
           )}

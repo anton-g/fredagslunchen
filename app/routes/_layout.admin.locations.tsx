@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { NavLink } from "~/components/Button"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
-import { requireAdminUserId } from "~/session.server"
+import { requireAdminUserId } from "~/auth.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   await requireAdminUserId(request)

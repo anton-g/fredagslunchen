@@ -9,8 +9,15 @@ import { Input } from "~/components/Input"
 import { Spacer } from "~/components/Spacer"
 import { Stack } from "~/components/Stack"
 import type { User } from "~/models/user.server"
-import { changeUserPassword, checkIsAdmin, getFullUserById, updateUser } from "~/models/user.server"
-import { requireUserId } from "~/session.server"
+import {
+  changeUserPassword,
+  checkIsAdmin,
+  getFullUserById,
+  hasUserPassword,
+  setUserPassword,
+  updateUser,
+} from "~/models/user.server"
+import { requireUserId } from "~/auth.server"
 import { ThemePicker } from "~/components/ThemePicker"
 import { AvatarPicker } from "~/components/AvatarPicker"
 
@@ -33,8 +40,11 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Not Found", { status: 404 })
   }
 
+  const hasPassword = await hasUserPassword(user.id)
+
   return json({
     user,
+    hasPassword,
   })
 }
 
@@ -45,6 +55,7 @@ type ActionData = {
     newPassword?: string
     theme?: string
     avatar?: string
+    confirmNewPassword?: string
   }
 }
 
@@ -68,6 +79,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
       return await updateDetails(formData, userId)
     case "changePassword":
       return await updatePassword(formData, userId)
+    case "setPassword":
+      return await setPassword(formData, userId)
   }
 }
 
@@ -148,12 +161,48 @@ const updatePassword = async (formData: FormData, userId: User["id"]) => {
   return redirect(`/users/${userOrError.id}`)
 }
 
+const setPassword = async (formData: FormData, userId: User["id"]) => {
+  const newPassword = formData.get("new-password")
+  const confirmNewPassword = formData.get("confirm-new-password")
+
+  if (typeof newPassword !== "string" || newPassword.length === 0) {
+    return json<ActionData>({ errors: { newPassword: "New password is required" } }, { status: 400 })
+  }
+
+  if (typeof confirmNewPassword !== "string" || confirmNewPassword.length === 0) {
+    return json<ActionData>(
+      { errors: { confirmNewPassword: "You must confirm your new password" } },
+      { status: 400 },
+    )
+  }
+
+  if (newPassword.length < 8) {
+    return json<ActionData>({ errors: { newPassword: "Password is too short" } }, { status: 400 })
+  }
+
+  if (newPassword !== confirmNewPassword) {
+    return json<ActionData>({ errors: { confirmNewPassword: "Passwords do not match" } }, { status: 400 })
+  }
+
+  const user = await setUserPassword({
+    id: userId,
+    newPassword,
+  })
+
+  if (!user) {
+    return json<ActionData>({ errors: { password: "Something went wrong" } }, { status: 400 })
+  }
+
+  return redirect(`/users/${user.id}`)
+}
+
 export default function UserSettingsPage() {
-  const { user } = useLoaderData<typeof loader>()
+  const { user, hasPassword } = useLoaderData<typeof loader>()
   const actionData = useActionData() as ActionData
   const nameRef = useRef<HTMLInputElement>(null)
   const currentPasswordRef = useRef<HTMLInputElement>(null)
   const newPasswordRef = useRef<HTMLInputElement>(null)
+  const confirmNewPasswordRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (actionData?.errors?.name) {
@@ -208,46 +257,91 @@ export default function UserSettingsPage() {
         <Spacer size={16} />
         <Button style={{ marginLeft: "auto" }}>Save changes</Button>
       </Form>
-      <Form method="post">
-        <input type="hidden" name="action" value="changePassword" />
-        <Subtitle>Change password</Subtitle>
-        <Stack gap={16}>
-          <div>
-            <label htmlFor="current-password">Current password</label>
+      {hasPassword && (
+        <Form method="post">
+          <input type="hidden" name="action" value="changePassword" />
+          <Subtitle>Change password</Subtitle>
+          <Stack gap={16}>
             <div>
-              <Input
-                id="current-password"
-                ref={currentPasswordRef}
-                name="current-password"
-                type="password"
-                aria-invalid={actionData?.errors?.password ? true : undefined}
-                aria-describedby="current-password-error"
-              />
-              {actionData?.errors?.password && (
-                <div id="current-password-error">{actionData.errors.password}</div>
-              )}
+              <label htmlFor="current-password">Current password</label>
+              <div>
+                <Input
+                  id="current-password"
+                  ref={currentPasswordRef}
+                  name="current-password"
+                  type="password"
+                  aria-invalid={actionData?.errors?.password ? true : undefined}
+                  aria-describedby="current-password-error"
+                />
+                {actionData?.errors?.password && (
+                  <div id="current-password-error">{actionData.errors.password}</div>
+                )}
+              </div>
             </div>
-          </div>
-          <div>
-            <label htmlFor="new-password">New password</label>
             <div>
-              <Input
-                id="new-password"
-                ref={newPasswordRef}
-                name="new-password"
-                minLength={8}
-                type="password"
-                aria-invalid={actionData?.errors?.newPassword ? true : undefined}
-                aria-describedby="new-password-error"
-              />
-              {actionData?.errors?.newPassword && (
-                <div id="new-password-error">{actionData.errors.newPassword}</div>
-              )}
+              <label htmlFor="new-password">New password</label>
+              <div>
+                <Input
+                  id="new-password"
+                  ref={newPasswordRef}
+                  name="new-password"
+                  minLength={8}
+                  type="password"
+                  aria-invalid={actionData?.errors?.newPassword ? true : undefined}
+                  aria-describedby="new-password-error"
+                />
+                {actionData?.errors?.newPassword && (
+                  <div id="new-password-error">{actionData.errors.newPassword}</div>
+                )}
+              </div>
             </div>
-          </div>
-          <Button style={{ marginLeft: "auto" }}>Change password</Button>
-        </Stack>
-      </Form>
+            <Button style={{ marginLeft: "auto" }}>Change password</Button>
+          </Stack>
+        </Form>
+      )}
+      {!hasPassword && (
+        <Form method="post">
+          <input type="hidden" name="action" value="setPassword" />
+          <Subtitle style={{ marginBottom: 0 }}>Set password</Subtitle>
+          <p style={{ marginTop: 0 }}>You can set a password to enable logging in with email and password.</p>
+          <Stack gap={16}>
+            <div>
+              <label htmlFor="new-password">New password</label>
+              <div>
+                <Input
+                  id="new-password"
+                  ref={newPasswordRef}
+                  name="new-password"
+                  type="password"
+                  aria-invalid={actionData?.errors?.newPassword ? true : undefined}
+                  aria-describedby="new-password-error"
+                />
+                {actionData?.errors?.newPassword && (
+                  <div id="new-password-error">{actionData.errors.newPassword}</div>
+                )}
+              </div>
+            </div>
+            <div>
+              <label htmlFor="confirm-new-password">Confirm password</label>
+              <div>
+                <Input
+                  id="confirm-new-password"
+                  ref={confirmNewPasswordRef}
+                  name="confirm-new-password"
+                  minLength={8}
+                  type="password"
+                  aria-invalid={actionData?.errors?.confirmNewPassword ? true : undefined}
+                  aria-describedby="confirm-new-password-error"
+                />
+                {actionData?.errors?.confirmNewPassword && (
+                  <div id="confirm-new-password-error">{actionData.errors.confirmNewPassword}</div>
+                )}
+              </div>
+            </div>
+            <Button style={{ marginLeft: "auto" }}>Set password</Button>
+          </Stack>
+        </Form>
+      )}
       <ThemePicker />
     </div>
   )
