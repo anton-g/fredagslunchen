@@ -38,7 +38,7 @@ const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
   justify-content: space-between;
   border-radius: 4px;
   border: 2px solid ${({ theme }) => theme.colors.primary};
-  padding: 0 15px;
+  padding: 0 8px;
   font-size: 16px;
   line-height: 1px;
   height: 35px;

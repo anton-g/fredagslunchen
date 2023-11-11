@@ -18,7 +18,6 @@ import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
 import { Stat } from "~/components/Stat"
 import { Input } from "~/components/Input"
-import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
 import { Stack } from "~/components/Stack"
 import { Button, LoadingButton, UnstyledButton } from "~/components/Button"
@@ -435,7 +434,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
         <Stack gap={16} style={{ width: "100%" }}>
           <Stack gap={0}>
             <span>From</span>
-            <Select name="userId">
+            <Select name="userId" defaultValue={users.find((x) => x.id === userId) ? userId : undefined}>
               <Select.Group>
                 {users.map((user) => (
                   <Select.Item value={user.id} key={user.id}>
@@ -445,22 +444,6 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
                 ))}
               </Select.Group>
             </Select>
-            {/* <ComboBox
-              label="From"
-              name="user"
-              defaultItems={users}
-              menuTrigger="focus"
-              inputRef={userRef}
-              defaultSelectedKey={userId}
-            >
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox> */}
             {scoreFetcher.data?.errors?.userId && (
               <div id="userId-error">{scoreFetcher.data.errors.userId}</div>
             )}
@@ -543,18 +526,20 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
       <input type="hidden" name="groupId" value={groupId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
-          <Stack gap={4}>
-            <ComboBox label="From" name="user" defaultItems={users} menuTrigger="focus" inputRef={userRef}>
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
+          <Stack gap={0}>
+            <span>From</span>
+            <Select name="userId">
+              <Select.Group>
+                {users.map((user) => (
+                  <Select.Item value={user.id} key={user.id}>
+                    <Select.ItemText>{user.name}</Select.ItemText>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select>
             {requestFetcher.data?.errors?.userId && (
-              <div id="user-error">{requestFetcher.data.errors.userId}</div>
+              <div id="userId-error">{requestFetcher.data.errors.userId}</div>
             )}
           </Stack>
         </Stack>
