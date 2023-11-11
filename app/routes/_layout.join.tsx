@@ -10,7 +10,7 @@ import { Button } from "~/components/Button"
 import { Input } from "~/components/Input"
 import styled from "styled-components"
 import { addUserToGroupWithInviteToken } from "~/models/group.server"
-import { sendEmailVerificationEmail } from "~/services/email.server"
+import { sendWelcomeEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
 import { SocialButton } from "~/components/SocialButton"
 
@@ -77,7 +77,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const { user, groupId } = await createUser(email, name, password, inviteToken)
 
   if (user.email?.verificationToken) {
-    await sendEmailVerificationEmail(user.email.email, user.email.verificationToken)
+    await sendWelcomeEmail(user.email.email, user.email.verificationToken)
   }
 
   try {
