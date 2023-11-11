@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { LinkButton } from "~/components/Button"
 import { Header } from "~/components/Header"
 import { Spacer } from "~/components/Spacer"
+import { Stack } from "~/components/Stack"
 import { ThreePeopleVibing } from "~/illustrations/ThreePeopleVibing"
 
 export function Landing() {
@@ -17,14 +18,20 @@ export function Landing() {
           with your friends, colleagues or family, have a lovely time, rate your lunch, soak in the
           statistics. And then do it all again.
         </p>
-        <Spacer size={36} />
+        <Spacer size={64} />
         <LinkButton to="/join" size="huge" variant="inverted">
           Join the club
         </LinkButton>
-        <Spacer size={16} />
-        <Link to="/groups/demo" style={{ textDecoration: "underline" }}>
-          Show me an example
-        </Link>
+        <Spacer size={32} />
+        <Stack axis="horizontal" gap={8}>
+          <Link to="/groups/demo" style={{ textDecoration: "underline" }}>
+            Show me an example
+          </Link>
+          <span>/</span>
+          <Link to="/privacy" style={{ textDecoration: "underline" }}>
+            Privacy Policy
+          </Link>
+        </Stack>
       </Content>
       <Footer>
         <ThreePeopleVibing />

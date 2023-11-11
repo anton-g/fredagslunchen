@@ -12,6 +12,7 @@
 - When someone leaves a club, create anonymous member instead of deleting all data?
 - Social login
 - On logout, reset theme
+- Replace autocompletes with selects where appropriate
 
 # Before premium
 - Map designs for themes
