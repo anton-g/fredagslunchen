@@ -6,11 +6,12 @@ import styled, { css } from "styled-components"
 type SelectProps = {
   defaultValue?: string
   children: ReactNode
+  name?: string
 }
 
-const Select = ({ defaultValue, children }: SelectProps) => (
-  <SelectPrimitive.Root defaultValue={defaultValue}>
-    <SelectTrigger aria-label="Food">
+const Select = ({ defaultValue, name, children }: SelectProps) => (
+  <SelectRoot defaultValue={defaultValue} name={name}>
+    <SelectTrigger>
       <SelectValue />
       <SelectIcon>
         <ChevronDownIcon />
@@ -25,14 +26,16 @@ const Select = ({ defaultValue, children }: SelectProps) => (
         <ChevronDownIcon />
       </SelectScrollDownButton>
     </SelectContent>
-  </SelectPrimitive.Root>
+  </SelectRoot>
 )
+
+const SelectRoot = styled(SelectPrimitive.Root)``
 
 const SelectTrigger = styled(SelectPrimitive.SelectTrigger)`
   all: unset;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   border-radius: 4px;
   border: 2px solid ${({ theme }) => theme.colors.primary};
   padding: 0 15px;
@@ -50,6 +53,7 @@ const SelectContent = styled(SelectPrimitive.Content)`
   background-color: ${({ theme }) => theme.colors.secondary};
   border: 2px solid ${({ theme }) => theme.colors.primary};
   border-radius: 6px;
+  z-index: 99999;
   /* box-shadow: 0px 10px 38px -10px rgba(22, 23, 24, 0.35),
     0px 10px 20px -15px rgba(22, 23, 24, 0.2); */
 `

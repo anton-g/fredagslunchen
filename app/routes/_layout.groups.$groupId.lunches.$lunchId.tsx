@@ -30,6 +30,7 @@ import { Popover } from "~/components/Popover"
 import { SortableTable } from "~/components/SortableTable"
 import type { action as newScoreAction } from "~/routes/api.scores.new"
 import type { action as scoreRequestAction } from "~/routes/api.scores.request"
+import { Select } from "~/components/Select"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -408,7 +409,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
     }
 
     const errors = scoreFetcher.data?.errors
-    if (errors?.user) {
+    if (errors?.userId) {
       userRef.current?.focus()
     } else if (errors?.score) {
       scoreRef.current?.focus()
@@ -432,8 +433,19 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
-          <Stack gap={4}>
-            <ComboBox
+          <Stack gap={0}>
+            <span>From</span>
+            <Select name="userId">
+              <Select.Group>
+                {users.map((user) => (
+                  <Select.Item value={user.id} key={user.id}>
+                    <Select.ItemText>{user.name}</Select.ItemText>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select>
+            {/* <ComboBox
               label="From"
               name="user"
               defaultItems={users}
@@ -448,8 +460,10 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
                   </div>
                 </Item>
               )}
-            </ComboBox>
-            {scoreFetcher.data?.errors?.user && <div id="user-error">{scoreFetcher.data.errors.user}</div>}
+            </ComboBox> */}
+            {scoreFetcher.data?.errors?.userId && (
+              <div id="userId-error">{scoreFetcher.data.errors.userId}</div>
+            )}
           </Stack>
           <label>
             <span>Rating</span>
