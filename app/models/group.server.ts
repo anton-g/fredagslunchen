@@ -475,7 +475,7 @@ export async function deleteGroupMember({
 
   let createdAnonymousUserId: string | null = null
   if (!deleteScores) {
-    const createdAnonymousUser = await createAnonymousUser("name", groupId, requestedByUserId)
+    const createdAnonymousUser = await createAnonymousUser(`Anonymous user`, groupId, requestedByUserId)
     if (!createdAnonymousUser) {
       return { error: "Something went wrong" }
     }

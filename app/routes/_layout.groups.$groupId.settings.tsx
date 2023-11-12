@@ -294,6 +294,9 @@ type RemoveMemberActionProps = {
 }
 const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
   const fetcher = useFetcher()
+  const [deleteScores, setDeleteScores] = useState(false)
+
+  const isAnonymousUser = member.user.role === "ANONYMOUS"
 
   return (
     <Dialog>
@@ -303,11 +306,28 @@ const RemoveMemberAction = ({ member }: RemoveMemberActionProps) => {
       <Dialog.Content>
         <Dialog.Close />
         <Dialog.Title>Are you sure you want to remove {member.user.name} from the club?</Dialog.Title>
-        <DialogDescription>
-          This will delete all their scores and comments. This action <strong>cannot be undone</strong>!
-        </DialogDescription>
-        <Spacer size={16} />
         <fetcher.Form action="/api/groups/member" method="post">
+          <DialogDescription>
+            This will delete {isAnonymousUser ? "all their scores and comments" : "the user"}. This action{" "}
+            <strong>cannot be undone</strong>!
+            <Spacer size={16} />
+            {!isAnonymousUser && (
+              <Stack gap={8} axis="horizontal" align="center">
+                <Checkbox
+                  id="deleteScores"
+                  name="deleteScores"
+                  checked={deleteScores}
+                  onCheckedChange={(checked) => setDeleteScores(checked === true)}
+                />
+                <label htmlFor="deleteScores">Delete scores from group</label>
+                <Help>
+                  This also deletes their scores and comments from the group. This action is{" "}
+                  <strong>permanent</strong>.
+                </Help>
+              </Stack>
+            )}
+          </DialogDescription>
+          <Spacer size={16} />
           <input name="userId" value={member.userId} type="hidden" />
           <input name="groupId" value={member.groupId} type="hidden" />
           <input name="action" value={"delete"} type="hidden" />

@@ -35,10 +35,16 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   }
 
   if (action === "delete") {
+    const deleteScores = formData.get("deleteScores")
+    if (deleteScores && typeof deleteScores !== "string") {
+      return json<ActionData>({ ok: false, errors: { error: "Something went wrong" } }, { status: 400 })
+    }
+
     await deleteGroupMember({
       groupId,
       userId,
       requestedByUserId: currentUserId,
+      deleteScores: deleteScores === "on",
     })
     return json<ActionData>({ ok: true })
   }
