@@ -39,6 +39,16 @@ export default function PrivacyPage() {
         basis as per the GDPR is "Article 6(1)(f); where our legitimate interests are to improve our website
         and business continually." As per the explanation, no personal data is stored over time.
       </p>
+      <Subtitle>Information We Receive From Others</Subtitle>
+      <p>
+        In addition to the information you may provide us directly, we receive information about you from
+        others, including:
+      </p>
+      <p>
+        <strong>Social Media:</strong> You may decide to share information with us through your social media
+        account, for instance if you decide to create and log into your Fredagslunchen account via your social
+        media or other account (e.g. Facebook, Google or Apple).
+      </p>
       <Subtitle>Security</Subtitle>
       <p>
         The security of your personal information is important to us, but remember that no method of
@@ -61,7 +71,7 @@ export default function PrivacyPage() {
       <Subtitle>Contact Information</Subtitle>
       <p>
         For any questions or concerns regarding the privacy policy, please send us an email to
-        info@fredagslunchen.club.
+        fredagslunchen[at]rymdkrog.world.
       </p>
     </main>
   )
