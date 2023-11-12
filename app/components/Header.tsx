@@ -2,9 +2,11 @@ import { Form, Link } from "@remix-run/react"
 import styled from "styled-components"
 import { useOptionalUser } from "~/utils"
 import { NavLink } from "./Button"
+import { useThemeContext } from "~/styles/theme"
 
 export const Header = ({ isAdmin }: { isAdmin: boolean }) => {
   const user = useOptionalUser()
+  const { setTheme } = useThemeContext()
 
   return (
     <Wrapper>
@@ -18,7 +20,7 @@ export const Header = ({ isAdmin }: { isAdmin: boolean }) => {
             <NavLink to={"/groups"}>clubs</NavLink>
             {isAdmin && <NavLink to={"/admin"}>admin</NavLink>}
             {/* <NavLink to={"/discover"}>discover</NavLink> */}
-            <StyledForm action="/logout" method="post">
+            <StyledForm action="/logout" method="post" onClick={() => setTheme("light")}>
               {/* TODO logout on mobile*/}
               <LinkButton type="submit">logout</LinkButton>
             </StyledForm>
