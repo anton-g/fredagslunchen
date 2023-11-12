@@ -808,3 +808,66 @@ export async function forceVerifyUserEmail(email: string) {
     },
   })
 }
+
+export async function deleteUserGroupScores({
+  groupId,
+  userId,
+}: {
+  groupId: Group["id"]
+  userId: User["id"]
+}) {
+  await prisma.score.deleteMany({
+    where: {
+      lunch: {
+        groupLocationGroupId: groupId,
+      },
+      userId,
+    },
+  })
+}
+
+export async function transferUserGroupScores({
+  fromUserId,
+  toUserId,
+  groupId,
+}: {
+  fromUserId: User["id"]
+  toUserId: User["id"]
+  groupId: Group["id"]
+}) {
+  await prisma.score.updateMany({
+    where: {
+      lunch: {
+        groupLocationGroupId: groupId,
+      },
+      userId: fromUserId,
+    },
+    data: {
+      userId: toUserId,
+    },
+  })
+}
+
+export async function deleteUserGroupScoreRequests({
+  groupId,
+  userId,
+}: {
+  groupId: Group["id"]
+  userId: User["id"]
+}) {
+  await prisma.scoreRequest.deleteMany({
+    where: {
+      lunch: {
+        groupLocationGroupId: groupId,
+      },
+      OR: [
+        {
+          requestedByUserId: userId,
+        },
+        {
+          userId,
+        },
+      ],
+    },
+  })
+}

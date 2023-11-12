@@ -5,7 +5,13 @@ import { nanoid } from "nanoid"
 import { prisma } from "~/db.server"
 import { requireUserId } from "~/auth.server"
 import { cleanEmail, formatNumber, getAverageNumber } from "~/utils"
-import { checkIsAdmin } from "./user.server"
+import {
+  checkIsAdmin,
+  createAnonymousUser,
+  deleteUserGroupScoreRequests,
+  deleteUserGroupScores,
+  transferUserGroupScores,
+} from "./user.server"
 
 export type { Group, GroupMember } from "@prisma/client"
 
@@ -439,10 +445,12 @@ export async function updateGroup({
 export async function deleteGroupMember({
   groupId,
   userId,
+  deleteScores,
   requestedByUserId,
 }: {
   groupId: Group["id"]
   userId: User["id"]
+  deleteScores: boolean
   requestedByUserId: User["id"]
 }) {
   const group = await prisma.group.findUnique({
@@ -465,6 +473,15 @@ export async function deleteGroupMember({
     return { error: "Something went wrong" }
   }
 
+  let createdAnonymousUserId: string | null = null
+  if (!deleteScores) {
+    const createdAnonymousUser = await createAnonymousUser("name", groupId, requestedByUserId)
+    if (!createdAnonymousUser) {
+      return { error: "Something went wrong" }
+    }
+    createdAnonymousUserId = createdAnonymousUser.id
+  }
+
   // TODO transaction
   const groupMember = await prisma.groupMember.delete({
     where: {
@@ -482,37 +499,19 @@ export async function deleteGroupMember({
     },
   })
 
-  await prisma.score.deleteMany({
-    where: {
-      lunch: {
-        groupLocationGroupId: groupId,
-      },
-      userId,
-    },
-  })
-
-  await prisma.scoreRequest.deleteMany({
-    where: {
-      lunch: {
-        groupLocationGroupId: groupId,
-      },
-      OR: [
-        {
-          requestedByUserId: userId,
-        },
-        {
-          userId,
-        },
-      ],
-    },
-  })
+  if (createdAnonymousUserId) {
+    await transferUserGroupScores({ fromUserId: userId, toUserId: createdAnonymousUserId, groupId })
+  } else {
+    await deleteUserGroupScores({ userId, groupId })
+  }
+  await deleteUserGroupScoreRequests({ userId, groupId })
 
   await prisma.groupLocation.updateMany({
     where: {
       discoveredById: userId,
     },
     data: {
-      discoveredById: null,
+      discoveredById: createdAnonymousUserId ? createdAnonymousUserId : null,
     },
   })
 
@@ -521,7 +520,7 @@ export async function deleteGroupMember({
       choosenByUserId: userId,
     },
     data: {
-      choosenByUserId: null,
+      choosenByUserId: createdAnonymousUserId ? createdAnonymousUserId : null,
     },
   })
 
