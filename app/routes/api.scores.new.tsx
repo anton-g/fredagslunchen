@@ -8,7 +8,7 @@ type ActionData = {
   ok: boolean
   errors?: {
     score?: string
-    user?: string
+    userId?: string
     lunchId?: string
     groupId?: string
   }
@@ -21,12 +21,11 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   const scoreString = formData.get("score")
   const score = scoreString ? parseFloat(scoreString.toString()) : null
   const comment = formData.get("comment")
-  const user = formData.get("user")
-  const userId = formData.get("user-key")
+  const userId = formData.get("userId")
   const lunchId = formData.get("lunchId")
 
-  if (typeof user !== "string" || user.length === 0) {
-    return json<ActionData>({ ok: false, errors: { user: "User is required" } }, { status: 400 })
+  if (typeof userId !== "string" || userId.length === 0) {
+    return json<ActionData>({ ok: false, errors: { userId: "User is required" } }, { status: 400 })
   }
 
   if (score === null || score === undefined || isNaN(score)) {

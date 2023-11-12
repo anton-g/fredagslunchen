@@ -25,11 +25,11 @@ export const Stat = forwardRef<HTMLDivElement, StatProps>(
           ) : (
             <Value size={size}>{value}</Value>
           )}
-          {detail && <Detail>{detail}</Detail>}
+          {detail !== undefined && <Detail>{detail}</Detail>}
         </div>
       </StatWrapper>
     )
-  }
+  },
 )
 
 Stat.displayName = "Stat"

@@ -16,7 +16,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   const currentUserId = await requireUserId(request, "/")
 
   const formData = await request.formData()
-  const userId = formData.get("user-key")
+  const userId = formData.get("userId")
   const lunchId = formData.get("lunchId")
 
   if (typeof userId !== "string" || userId.length === 0) {

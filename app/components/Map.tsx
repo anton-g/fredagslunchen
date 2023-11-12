@@ -95,6 +95,7 @@ export const Map = ({ locations, lat, lon, groupId }: MapProps) => {
       </Source>
       {selectedLocation && (
         <StyledPopup
+          key={selectedLocation.id}
           latitude={parseFloat(selectedLocation.lat!)}
           longitude={parseFloat(selectedLocation.lon!)}
           onClose={() => setSelectedLocation(null)}

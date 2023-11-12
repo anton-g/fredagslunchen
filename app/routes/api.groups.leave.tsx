@@ -14,14 +14,20 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
   const formData = await request.formData()
   const groupId = formData.get("groupId")
+  const deleteScores = formData.get("deleteScores")
 
   if (typeof groupId !== "string" || groupId.length === 0) {
     return json<ActionData>({ errors: { group: "Club is required" } }, { status: 400 })
   }
 
+  if (deleteScores && typeof deleteScores !== "string") {
+    return json<ActionData>({ errors: { group: "Something went wrong" } }, { status: 400 })
+  }
+
   await deleteGroupMember({
     groupId,
     userId,
+    deleteScores: deleteScores === "on",
     requestedByUserId: userId,
   })
   return redirect("/groups")

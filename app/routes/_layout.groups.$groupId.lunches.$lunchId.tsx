@@ -18,7 +18,6 @@ import { deleteLunch, getGroupLunch } from "~/models/lunch.server"
 import { Spacer } from "~/components/Spacer"
 import { Stat } from "~/components/Stat"
 import { Input } from "~/components/Input"
-import { ComboBox, Item, Label } from "~/components/ComboBox"
 import { TextArea } from "~/components/TextArea"
 import { Stack } from "~/components/Stack"
 import { Button, LoadingButton, UnstyledButton } from "~/components/Button"
@@ -30,6 +29,7 @@ import { Popover } from "~/components/Popover"
 import { SortableTable } from "~/components/SortableTable"
 import type { action as newScoreAction } from "~/routes/api.scores.new"
 import type { action as scoreRequestAction } from "~/routes/api.scores.request"
+import { Select } from "~/components/Select"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -408,7 +408,7 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
     }
 
     const errors = scoreFetcher.data?.errors
-    if (errors?.user) {
+    if (errors?.userId) {
       userRef.current?.focus()
     } else if (errors?.score) {
       scoreRef.current?.focus()
@@ -432,24 +432,21 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
       <input type="hidden" name="lunchId" value={lunchId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
-          <Stack gap={4}>
-            <ComboBox
-              label="From"
-              name="user"
-              defaultItems={users}
-              menuTrigger="focus"
-              inputRef={userRef}
-              defaultSelectedKey={userId}
-            >
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
-            {scoreFetcher.data?.errors?.user && <div id="user-error">{scoreFetcher.data.errors.user}</div>}
+          <Stack gap={0}>
+            <span>From</span>
+            <Select name="userId" defaultValue={users.find((x) => x.id === userId) ? userId : undefined}>
+              <Select.Group>
+                {users.map((user) => (
+                  <Select.Item value={user.id} key={user.id}>
+                    <Select.ItemText>{user.name}</Select.ItemText>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select>
+            {scoreFetcher.data?.errors?.userId && (
+              <div id="userId-error">{scoreFetcher.data.errors.userId}</div>
+            )}
           </Stack>
           <label>
             <span>Rating</span>
@@ -529,18 +526,20 @@ const RequestScoreForm = ({ users, lunchId, groupId, userId }: RequestScoreFormP
       <input type="hidden" name="groupId" value={groupId} />
       <Stack gap={24} axis="horizontal" style={{ width: "100%" }}>
         <Stack gap={16} style={{ width: "100%" }}>
-          <Stack gap={4}>
-            <ComboBox label="From" name="user" defaultItems={users} menuTrigger="focus" inputRef={userRef}>
-              {(item) => (
-                <Item textValue={item.name}>
-                  <div>
-                    <Label>{item.name}</Label>
-                  </div>
-                </Item>
-              )}
-            </ComboBox>
+          <Stack gap={0}>
+            <span>From</span>
+            <Select name="userId">
+              <Select.Group>
+                {users.map((user) => (
+                  <Select.Item value={user.id} key={user.id}>
+                    <Select.ItemText>{user.name}</Select.ItemText>
+                    <Select.ItemIndicator />
+                  </Select.Item>
+                ))}
+              </Select.Group>
+            </Select>
             {requestFetcher.data?.errors?.userId && (
-              <div id="user-error">{requestFetcher.data.errors.userId}</div>
+              <div id="userId-error">{requestFetcher.data.errors.userId}</div>
             )}
           </Stack>
         </Stack>

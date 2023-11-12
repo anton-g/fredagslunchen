@@ -18,7 +18,7 @@ import { Map } from "~/components/Map"
 import { Card } from "~/components/Card"
 import { useOnScreen } from "~/hooks/useOnScreen"
 import type { ReactNode } from "react"
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Tooltip } from "~/components/Tooltip"
 import { ExitIcon, GearIcon } from "@radix-ui/react-icons"
 import { Stack } from "~/components/Stack"
@@ -28,6 +28,8 @@ import { useFeatureFlags } from "~/FeatureFlagContext"
 import { Popover } from "~/components/Popover"
 import { CreateAnonymousUserButton } from "~/components/CreateAnonymousUserButton"
 import { SortableTable } from "~/components/SortableTable"
+import { Checkbox } from "~/components/Checkbox"
+import { Help } from "~/components/Help"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -129,31 +131,19 @@ export default function GroupDetailsPage() {
         defaultSort={{ label: "Name", key: (row) => row.user.name }}
       >
         {(member) => (
-          <tr key={member.userId}>
+          <SortableTable.LinkRow key={member.userId} to={`/users/${member.userId}`}>
             <SortableTable.Cell>
               <Link to={`/users/${member.userId}`}>{member.user.name}</Link>
             </SortableTable.Cell>
             <SortableTable.Cell numeric>{member.stats.lunchCount}</SortableTable.Cell>
             <SortableTable.Cell numeric>{formatNumber(member.stats.averageScore)}</SortableTable.Cell>
             <SortableTable.Cell>
-              {member.stats.highestScore ? (
-                <Link to={`/groups/${details.group.id}/lunches/${member.stats.highestScore.id}`}>
-                  {member.stats.highestScore.name}
-                </Link>
-              ) : (
-                "-"
-              )}
+              {member.stats.highestScore ? member.stats.highestScore.name : "-"}
             </SortableTable.Cell>
             <SortableTable.Cell>
-              {member.stats.lowestScore ? (
-                <Link to={`/groups/${details.group.id}/lunches/${member.stats.lowestScore.id}`}>
-                  {member.stats.lowestScore.name}
-                </Link>
-              ) : (
-                "-"
-              )}
+              {member.stats.lowestScore ? member.stats.lowestScore.name : "-"}
             </SortableTable.Cell>
-          </tr>
+          </SortableTable.LinkRow>
         )}
       </SortableTable>
       {permissions.recommendations && (
@@ -272,6 +262,7 @@ const ActionBar = styled.div`
   display: flex;
   justify-content: flex-end;
   gap: 16px;
+  flex-wrap: wrap;
 `
 
 const Subtitle = styled.h3`
@@ -317,6 +308,7 @@ type GroupActionBarProps = {
 
 const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps) => {
   const fetcher = useFetcher()
+  const [deleteScores, setDeleteScores] = useState(false)
 
   return (
     <Wrapper axis="horizontal" gap={16}>
@@ -345,10 +337,34 @@ const GroupActionBar = ({ groupId, groupName, permissions }: GroupActionBarProps
           <Dialog.Content>
             <Dialog.Close />
             <Dialog.Title>Are you sure you want to leave the club {groupName}?</Dialog.Title>
-            <Spacer size={16} />
-            This will delete all your scores and comments. This action <strong>cannot be undone.</strong>
-            <Spacer size={16} />
             <fetcher.Form method="post" action="/api/groups/leave">
+              <Spacer size={16} />
+              You will not be able to see your scores or comments when you leave the group. This action{" "}
+              <strong>cannot be undone.</strong>
+              <Spacer size={16} />
+              <Stack gap={8} axis="horizontal" align="center">
+                <Checkbox
+                  id="deleteScores"
+                  name="deleteScores"
+                  checked={deleteScores}
+                  onCheckedChange={(checked) => setDeleteScores(checked === true)}
+                />
+                <label htmlFor="deleteScores">Delete scores from group</label>
+                <Help>
+                  This also deletes your scores and comments from the group. This action is{" "}
+                  <strong>permanent</strong>.
+                </Help>
+              </Stack>
+              {deleteScores && (
+                <>
+                  <Spacer size={16} />
+                  <span>
+                    This will <strong>delete</strong> all your scores and comments from lunches with{" "}
+                    {groupName} permanently.
+                  </span>
+                </>
+              )}
+              <Spacer size={16} />
               <input type="hidden" name="groupId" value={groupId} />
               <Button size="large" style={{ marginLeft: "auto" }}>
                 I am sure

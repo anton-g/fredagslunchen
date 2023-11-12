@@ -114,7 +114,7 @@ export default function Index() {
               }
             />
             <Stat
-              label="Lowest rating"
+              label="Worst lunch"
               value={user.stats.lowestScore?.name || "-"}
               detail={user.stats.lowestScore?.score}
               to={
@@ -124,7 +124,7 @@ export default function Index() {
               }
             />
             <Stat
-              label="Highest rating"
+              label="Favorite lunch"
               value={user.stats.highestScore?.name || "-"}
               detail={user.stats.highestScore?.score}
               to={

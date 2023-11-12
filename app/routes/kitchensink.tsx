@@ -358,10 +358,16 @@ const SelectExample = () => {
         <Select.Item value="beef">
           <Select.ItemText>Beef</Select.ItemText>
           <Select.ItemIndicator />
+        </Select.Item>
+        <Select.Item value="chicken">
           <Select.ItemText>Chicken</Select.ItemText>
           <Select.ItemIndicator />
+        </Select.Item>
+        <Select.Item value="lamb">
           <Select.ItemText>Lamb</Select.ItemText>
           <Select.ItemIndicator />
+        </Select.Item>
+        <Select.Item value="pork">
           <Select.ItemText>Pork</Select.ItemText>
           <Select.ItemIndicator />
         </Select.Item>

@@ -9,10 +9,10 @@
 - Themes
   - Improve dark theme map
 - Feedback
-- When someone leaves a club, create anonymous member instead of deleting all data?
 - Social login
 - On logout, reset theme
 - Replace autocompletes with selects where appropriate
+- Fix dark mode map popup
 
 # Before premium
 - Map designs for themes
