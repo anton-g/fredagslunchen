@@ -58,7 +58,7 @@ export default function PrivacyPage() {
       </p>
       <Subtitle>Changes To This Privacy Policy</Subtitle>
       <p>
-        This Privacy Policy is effective as of 2022-08-01 and will remain in effect except with respect to any
+        This Privacy Policy is effective as of 2023-11-12 and will remain in effect except with respect to any
         changes in its provisions in the future, which will be in effect immediately after being posted on
         this page.
       </p>
