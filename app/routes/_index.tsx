@@ -175,8 +175,7 @@ const ScoreRequestCard = ({ request }: { request: ScoreRequest }) => {
             <TextArea name="comment" />
           </CommentLabel>
         </div>
-        <input type="hidden" name="user" value={request.userId} />
-        <input type="hidden" name="user-key" value={request.userId} />
+        <input type="hidden" name="userId" value={request.userId} />
         <input type="hidden" name="lunchId" value={request.lunchId} />
         <input type="hidden" name="groupId" value={request.lunch.groupLocation.group.id} />
         <input
