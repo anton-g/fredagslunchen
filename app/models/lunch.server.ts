@@ -129,10 +129,21 @@ export async function deleteLunch({
 }
 
 export type LunchStat = FullLunch & { stats: { avg: number | null } }
-export async function getGroupLunchStats({ id }: Pick<Group, "id">): Promise<LunchStat[]> {
+export async function getGroupLunchStats({
+  id,
+  from,
+  to,
+}: Pick<Group, "id"> & {
+  from?: Date
+  to?: Date
+}): Promise<LunchStat[]> {
   const lunches = await prisma.lunch.findMany({
     where: {
       groupLocationGroupId: id,
+      date: {
+        gte: from,
+        lte: to,
+      },
     },
     ...fullLunch,
   })
@@ -144,6 +155,10 @@ export async function getGroupLunchStats({ id }: Pick<Group, "id">): Promise<Lun
     },
     where: {
       lunch: {
+        date: {
+          gte: from,
+          lte: to,
+        },
         groupLocationGroupId: id,
       },
     },
@@ -163,7 +178,11 @@ export async function getGroupLunchStats({ id }: Pick<Group, "id">): Promise<Lun
 }
 
 export type GroupMembersWithScores = NonNullable<Prisma.PromiseReturnType<typeof getGroupLunchStatsPerMember>>
-export async function getGroupLunchStatsPerMember({ id }: Pick<Group, "id">) {
+export async function getGroupLunchStatsPerMember({
+  id,
+  from,
+  to,
+}: Pick<Group, "id"> & { from?: Date; to?: Date }) {
   const users = await prisma.user.findMany({
     where: {
       groups: {
@@ -176,6 +195,10 @@ export async function getGroupLunchStatsPerMember({ id }: Pick<Group, "id">) {
       scores: {
         where: {
           lunch: {
+            date: {
+              gte: from,
+              lte: to,
+            },
             groupLocationGroupId: id,
           },
         },
