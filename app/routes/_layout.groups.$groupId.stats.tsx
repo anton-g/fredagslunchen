@@ -1,8 +1,8 @@
 import { json, type LoaderFunctionArgs } from "@remix-run/node"
-import { isRouteErrorResponse, useLoaderData, useRouteError } from "@remix-run/react"
+import { isRouteErrorResponse, useLoaderData, useRouteError, useSearchParams } from "@remix-run/react"
 import invariant from "tiny-invariant"
 import { ResponsiveLine } from "@nivo/line"
-import { getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.server"
+import { getGroupDetailedStats, getGroupDetails, getGroupPermissionsForRequest } from "~/models/group.server"
 import styled from "styled-components"
 import { Spacer } from "~/components/Spacer"
 import { getUserId } from "~/auth.server"
@@ -16,8 +16,12 @@ import {
   type LunchStat,
 } from "~/models/lunch.server"
 import { Stack } from "~/components/Stack"
-import type { RecursivelyConvertDatesToStrings } from "~/utils"
+import { formatNumber, type RecursivelyConvertDatesToStrings } from "~/utils"
 import type { ComponentProps } from "react"
+import { StatsGrid } from "~/components/StatsGrid"
+import { Stat } from "~/components/Stat"
+import { Input } from "~/components/Input"
+import { Button } from "~/components/Button"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   await getUserId(request)
@@ -37,21 +41,111 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
     throw new Response("Unauthorized", { status: 401 })
   }
 
-  const groupLunches = await getGroupLunchStats({ id: params.groupId })
+  const url = new URL(request.url)
+  const from = url.searchParams.get("from")
+  const to = url.searchParams.get("to")
+  const fromDate = from ? new Date(from) : undefined
+  const toDate = to ? new Date(to) : undefined
+  const groupLunches = await getGroupLunchStats({ id: params.groupId, from: fromDate, to: toDate })
   const groupMemberScores = await getGroupLunchStatsPerMember({
     id: params.groupId,
+    from: fromDate,
+    to: toDate,
   })
+  const groupDetailStats = await getGroupDetailedStats({ id: params.groupId, from: fromDate, to: toDate })
 
-  return json({ groupLunches, groupMemberScores })
+  if (!groupDetailStats) {
+    throw new Response("Not Found", { status: 404 })
+  }
+
+  return json({ groupLunches, groupMemberScores, details: groupDetailStats })
 }
 
 export default function GroupStatsPage() {
-  const { groupLunches, groupMemberScores } = useLoaderData<typeof loader>()
+  const { groupLunches, groupMemberScores, details } = useLoaderData<typeof loader>()
+
+  const [searchParams] = useSearchParams()
+  const from = searchParams.get("from")
+  const to = searchParams.get("to")
 
   return (
     <div>
       <Title>Statistics</Title>
-      <Spacer size={8} />
+      <Spacer size={24} />
+      <form>
+        <Stack axis="horizontal" gap={16}>
+          <div>
+            <label
+            //  htmlFor={name.id}
+            >
+              From
+            </label>
+            <div>
+              <Input
+                type="date"
+                name="from"
+                defaultValue={from || undefined}
+                // {...conform.input(name, { ariaAttributes: true })}
+              />
+              {/* {name.error && <div id={`${name.id}-error`}>{name.error}</div>} */}
+            </div>
+          </div>
+          <div>
+            <label
+            //  htmlFor={name.id}
+            >
+              To
+            </label>
+            <div>
+              <Input
+                type="date"
+                name="to"
+                defaultValue={to || undefined}
+                // {...conform.input(name, { ariaAttributes: true })}
+              />
+              {/* {name.error && <div id={`${name.id}-error`}>{name.error}</div>} */}
+            </div>
+          </div>
+          <Button type="submit">Filter</Button>
+        </Stack>
+      </form>
+      <Spacer size={24} />
+      <StatsGrid>
+        <Stat label="Average rating" value={details.stats.averageScore} />
+        <Stat
+          label="Best lunch"
+          value={`${details.stats.bestLunch.name || "-"}`}
+          detail={details.stats.bestLunch.name ? formatNumber(details.stats.bestLunch.score, 10) : undefined}
+          to={details.stats.bestLunch ? `lunches/${details.stats.bestLunch.id}` : undefined}
+        />
+        <Stat
+          label="Worst lunch"
+          value={`${details.stats.worstLunch.name || "-"}`}
+          detail={
+            details.stats.worstLunch.name ? formatNumber(details.stats.worstLunch.score, 10) : undefined
+          }
+          to={details.stats.worstLunch ? `lunches/${details.stats.worstLunch.id}` : undefined}
+        />
+        <Stat
+          label="Most positive"
+          value={`${details.stats.mostPositive ? details.stats.mostPositive.name : "-"}`}
+          detail={details.stats.mostPositive ? formatNumber(details.stats.mostPositive.score) : undefined}
+          to={details.stats.mostPositive ? `/users/${details.stats.mostPositive.id}` : undefined}
+        />
+        <Stat
+          label="Most negative"
+          value={`${details.stats.mostNegative ? details.stats.mostNegative.name : "-"}`}
+          detail={details.stats.mostNegative ? formatNumber(details.stats.mostNegative.score) : undefined}
+          to={details.stats.mostNegative ? `/users/${details.stats.mostNegative.id}` : undefined}
+        />
+        <Stat
+          label="Most average"
+          value={`${details.stats.mostAvarage ? details.stats.mostAvarage.name : "-"}`}
+          detail={details.stats.mostAvarage ? formatNumber(details.stats.mostAvarage.score) : undefined}
+          to={details.stats.mostAvarage ? `/users/${details.stats.mostAvarage.id}` : undefined}
+        />
+      </StatsGrid>
+      <Spacer size={24} />
       <Subtitle>All lunches</Subtitle>
       <GroupLunchesLineGraph data={groupLunches} />
       <Spacer size={24} />

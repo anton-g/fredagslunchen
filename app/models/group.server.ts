@@ -107,8 +107,12 @@ export function getGroup({ id }: Pick<Group, "id">) {
   })
 }
 
-type GetGroupDetailsInput = Pick<Group, "id">
-async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
+type GetGroupDetailsInput = Pick<Group, "id"> & {
+  from?: Date
+  to?: Date
+}
+async function fetchGroupDetails({ id, from, to }: GetGroupDetailsInput) {
+  console.log({ from })
   return await prisma.group.findUnique({
     where: { id },
     include: {
@@ -116,6 +120,12 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
         include: {
           location: true,
           lunches: {
+            where: {
+              date: {
+                gte: from,
+                lte: to,
+              },
+            },
             include: {
               groupLocation: true,
               choosenBy: true,
@@ -134,6 +144,10 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
               choosenLunches: {
                 where: {
                   groupLocationGroupId: id,
+                  date: {
+                    gte: from,
+                    lte: to,
+                  },
                 },
                 orderBy: {
                   date: "desc",
@@ -146,6 +160,10 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
                 where: {
                   lunch: {
                     groupLocationGroupId: id,
+                    date: {
+                      gte: from,
+                      lte: to,
+                    },
                   },
                 },
                 include: {
@@ -166,6 +184,31 @@ async function fetchGroupDetails({ id }: GetGroupDetailsInput) {
       },
     },
   })
+}
+
+export async function getGroupDetailedStats({ id, from, to }: { id: Group["id"]; from?: Date; to?: Date }) {
+  const group = await fetchGroupDetails({ id, from, to })
+  if (!group) return null
+
+  const stats = generateGroupStats(group)
+
+  // const membersWithStats = group.members.map((member) => {
+  //   const stats = generateUserStats(member)
+  //   return { ...member, stats }
+  // })
+
+  return {
+    stats: {
+      averageScore: formatNumber(stats.averageScore),
+      bestLocation: stats.bestLocation,
+      worstLocation: stats.worstLocation,
+      bestLunch: stats.bestLunch,
+      worstLunch: stats.worstLunch,
+      mostPositive: stats.mostPositive,
+      mostNegative: stats.mostNegative,
+      mostAvarage: stats.mostAverage,
+    },
+  }
 }
 
 export async function getGroupDetails({ id }: GetGroupDetailsInput) {
