@@ -11,6 +11,8 @@ import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
 import { z } from "zod"
 import { mergeMeta } from "~/merge-meta"
+import { HoneypotInputs } from "~/components/honeypot"
+import { checkHoneypot } from "~/honeypot.server"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -37,6 +39,7 @@ const schema = z
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
+  checkHoneypot(formData)
   const submission = parse(formData, { schema })
   if (!submission.value || submission.intent !== "submit") {
     return json(submission, { status: 400 })
@@ -71,6 +74,7 @@ export default function ResetPasswordPage() {
     <>
       <h2>Reset password</h2>
       <Form method="post" {...form.props}>
+        <HoneypotInputs />
         <Stack gap={16}>
           {resetToken && (
             <>
