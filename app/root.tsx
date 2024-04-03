@@ -20,6 +20,8 @@ import { getDomainUrl, removeTrailingSlash } from "./utils"
 import { availableThemes, InternalThemeProvider, useThemeContext } from "./styles/theme"
 import { FeatureFlagProvider } from "./FeatureFlagContext"
 import { SSRProvider } from "@react-aria/ssr"
+import { honeypot } from "./honeypot.server"
+import { HoneypotProvider } from "./components/honeypot"
 
 declare global {
   interface Window {
@@ -104,8 +106,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const env = getEnv()
 
+  const honeyProps = honeypot.getInputProps()
+
   return json({
     user,
+    honeyProps,
     // Do not include tokens with sensitive data
     ENV: {
       ENABLE_GOOGLE_LOGIN: env.ENABLE_GOOGLE_LOGIN,
@@ -138,18 +143,20 @@ export default function App() {
         {typeof document === "undefined" ? "__STYLES__" : null}
       </head>
       <body>
-        <SSRProvider>
-          <FeatureFlagProvider
-            defaultValue={{
-              premium: data.ENV.ENABLE_PREMIUM,
-              maps: data.ENV.ENABLE_MAPS,
-            }}
-          >
-            <InternalThemeProvider defaultTheme={data.theme}>
-              <Content />
-            </InternalThemeProvider>
-          </FeatureFlagProvider>
-        </SSRProvider>
+        <HoneypotProvider {...data.honeyProps}>
+          <SSRProvider>
+            <FeatureFlagProvider
+              defaultValue={{
+                premium: data.ENV.ENABLE_PREMIUM,
+                maps: data.ENV.ENABLE_MAPS,
+              }}
+            >
+              <InternalThemeProvider defaultTheme={data.theme}>
+                <Content />
+              </InternalThemeProvider>
+            </FeatureFlagProvider>
+          </SSRProvider>
+        </HoneypotProvider>
         <ScrollRestoration />
         {ENV.NODE_ENV === "development" ? null : (
           <script

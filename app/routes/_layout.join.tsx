@@ -13,6 +13,8 @@ import { addUserToGroupWithInviteToken } from "~/models/group.server"
 import { sendWelcomeEmail } from "~/services/email.server"
 import { mergeMeta } from "~/merge-meta"
 import { SocialButton } from "~/components/SocialButton"
+import { HoneypotInputs } from "~/components/honeypot"
+import { checkHoneypot } from "~/honeypot.server"
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -45,6 +47,7 @@ interface ActionData {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData()
+  checkHoneypot(formData)
   const email = formData.get("email")
   const name = formData.get("name")
   const password = formData.get("password")
@@ -123,6 +126,7 @@ export default function Join() {
       <h2>Join the club</h2>
       {/* Workaround to include search to action: https://github.com/remix-run/remix/issues/3133 */}
       <Form method="post" action={`${location.pathname}${location.search}`}>
+        <HoneypotInputs />
         <Stack gap={16}>
           <div>
             <label htmlFor={"name"}>Name</label>
