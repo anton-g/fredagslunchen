@@ -101,6 +101,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       groupId: group.id,
       locationId: location.locationId,
       requestedByUserId: userId,
+      isTakeaway: false,
     })
 
     for (const score of lunch.scores) {
