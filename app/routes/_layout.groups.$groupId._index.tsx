@@ -146,7 +146,7 @@ export default function GroupDetailsPage() {
           </SortableTable.LinkRow>
         )}
       </SortableTable>
-      {permissions.recommendations && (
+      {!details.group.hideRecommendations && permissions.recommendations && (
         <>
           <Spacer size={48} />
           <Subtitle>Recommendations</Subtitle>

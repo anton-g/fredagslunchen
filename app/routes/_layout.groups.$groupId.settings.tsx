@@ -55,6 +55,7 @@ const updateSchema = z.object({
   lat: optionalNumeric(),
   lon: optionalNumeric(),
   public: z.preprocess((x) => x === "on", z.boolean()),
+  hideRecommendations: z.preprocess((x) => x === "on", z.boolean()),
   action: z.literal("update", {
     required_error: "Action is required",
   }),
@@ -92,7 +93,7 @@ const updateGroupAction = async (requestedByUserId: User["id"], formData: FormDa
     return json(submission, { status: 400 })
   }
 
-  const { name, lat, lon, public: isGroupPublic } = submission.value
+  const { name, lat, lon, public: isGroupPublic, hideRecommendations } = submission.value
 
   await updateGroup({
     id: groupId,
@@ -100,6 +101,7 @@ const updateGroupAction = async (requestedByUserId: User["id"], formData: FormDa
     lat,
     lon,
     public: isGroupPublic,
+    hideRecommendations,
     requestedByUserId,
   })
 
@@ -193,6 +195,18 @@ export default function GroupSettingsPage() {
             </Help>
           </Stack>
           {publicSetting.error && <div id="public-error">{publicSetting.error}</div>}
+        </div>
+        <Spacer size={16} />
+        <div>
+          <Stack axis="horizontal" gap={8} align="center">
+            <Checkbox
+              name={conform.input(publicSetting).name.replace("public", "hideRecommendations")}
+              id="hideRecommendations"
+              defaultChecked={group.hideRecommendations}
+            />
+            <label htmlFor="hideRecommendations">Hide recommendations</label>
+            <Help>When enabled, the recommendations section will be hidden from the group page.</Help>
+          </Stack>
         </div>
         <Spacer size={16} />
         <input type="hidden" name="action" value="update" />
