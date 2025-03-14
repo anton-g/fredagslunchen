@@ -459,6 +459,13 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
               type="number"
               required
               ref={scoreRef}
+              onBlur={(e) => {
+                const value = parseFloat(e.target.value)
+                if (!isNaN(value)) {
+                  const rounded = Math.round(value * 4) / 4
+                  e.target.value = rounded.toString()
+                }
+              }}
               aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
               aria-errormessage={scoreFetcher.data?.errors?.score ? "score-error" : undefined}
             />
