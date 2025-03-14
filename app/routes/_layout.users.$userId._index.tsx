@@ -16,6 +16,7 @@ import { Stack } from "~/components/Stack"
 import { sendEmailVerificationEmail } from "~/services/email.server"
 import { BrandText } from "~/components/BrandText"
 import { isAfter, sub } from "date-fns"
+import { ExitIcon } from "@radix-ui/react-icons"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -167,10 +168,11 @@ export default function Index() {
                 to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}
                 key={score.id}
               >
-                <SortableTable.Cell>
+                <SortableTable.Cell style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Link to={`/groups/${score.lunch.groupLocation.groupId}/lunches/${score.lunchId}`}>
                     {formatTimeAgo(new Date(score.lunch.date))}
                   </Link>
+                  {score.lunch.isTakeaway && <ExitIcon style={{ width: 12, height: 14, paddingTop: 2 }} />}
                 </SortableTable.Cell>
                 <SortableTable.Cell>{score.lunch.groupLocation.location.name}</SortableTable.Cell>
                 <SortableTable.Cell numeric>{score.score}</SortableTable.Cell>

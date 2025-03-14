@@ -115,8 +115,9 @@ model Location {
 }
 
 model Lunch {
-  id   Int      @id @default(autoincrement())
-  date DateTime
+  id         Int      @id @default(autoincrement())
+  date       DateTime
+  isTakeaway Boolean  @default(false)
 
   scores Score[]
 
