@@ -146,7 +146,7 @@ export default function GroupDetailsPage() {
           </SortableTable.LinkRow>
         )}
       </SortableTable>
-      {permissions.recommendations && (
+      {!details.group.hideRecommendations && permissions.recommendations && (
         <>
           <Spacer size={48} />
           <Subtitle>Recommendations</Subtitle>
@@ -200,10 +200,11 @@ export default function GroupDetailsPage() {
       >
         {(lunch) => (
           <SortableTable.LinkRow to={`/groups/${details.group.id}/lunches/${lunch.id}`} key={lunch.id}>
-            <SortableTable.Cell>
+            <SortableTable.Cell style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Link to={`/groups/${details.group.id}/lunches/${lunch.id}`}>
                 {formatTimeAgo(new Date(lunch.date))}
               </Link>
+              {lunch.isTakeaway && <ExitIcon style={{ width: 12, height: 14, paddingTop: 2 }} />}
             </SortableTable.Cell>
             <SortableTable.Cell>{lunch.loc.location.name}</SortableTable.Cell>
             <SortableTable.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</SortableTable.Cell>

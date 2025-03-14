@@ -15,6 +15,7 @@ import { requireUserId } from "~/auth.server"
 import { numeric, useUser } from "~/utils"
 import { parse } from "@conform-to/zod"
 import { useForm, conform } from "@conform-to/react"
+import { Checkbox } from "~/components/Checkbox"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await requireUserId(request)
@@ -49,6 +50,7 @@ const schema = z.object({
   "choosenBy-key": z.string().min(1, "Choosen by is required"),
   location: z.string().min(1, "Location is required"),
   "location-key": numeric(),
+  isTakeaway: z.boolean().optional(),
 })
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -62,7 +64,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     return json(submission, { status: 400 })
   }
 
-  const { "choosenBy-key": choosenById, date, "location-key": locationId } = submission.value
+  const { "choosenBy-key": choosenById, date, "location-key": locationId, isTakeaway } = submission.value
 
   const lunch = await createLunch({
     choosenByUserId: choosenById,
@@ -70,6 +72,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     locationId,
     groupId,
     requestedByUserId: currentUserId,
+    isTakeaway: isTakeaway ?? false,
   })
 
   return redirect(`/groups/${groupId}/lunches/${lunch.id}`)
@@ -129,6 +132,10 @@ export default function NewLunchPage() {
         }}
       >
         <Stack gap={16}>
+          <Stack gap={8} axis="horizontal" align="center">
+            <Checkbox id="isTakeaway" name="isTakeaway" />
+            <label htmlFor="isTakeaway">Takeaway</label>
+          </Stack>
           <div>
             <label>
               <span>Date</span>

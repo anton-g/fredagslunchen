@@ -112,7 +112,6 @@ type GetGroupDetailsInput = Pick<Group, "id"> & {
   to?: Date
 }
 async function fetchGroupDetails({ id, from, to }: GetGroupDetailsInput) {
-  console.log({ from })
   return await prisma.group.findUnique({
     where: { id },
     include: {

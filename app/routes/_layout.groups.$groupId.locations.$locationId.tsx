@@ -12,6 +12,7 @@ import { Spacer } from "~/components/Spacer"
 import { formatNumber, formatTimeAgo } from "~/utils"
 import { getGroupPermissions } from "~/models/group.server"
 import { SortableTable } from "~/components/SortableTable"
+import { ExitIcon } from "@radix-ui/react-icons"
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -65,10 +66,11 @@ export default function LocationDetailsPage() {
             to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}
             key={lunch.id}
           >
-            <SortableTable.Cell>
+            <SortableTable.Cell style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <Link to={`/groups/${lunch.groupLocationGroupId}/lunches/${lunch.id}`}>
                 {formatTimeAgo(new Date(lunch.date))}
               </Link>
+              {lunch.isTakeaway && <ExitIcon style={{ width: 12, height: 14, paddingTop: 2 }} />}
             </SortableTable.Cell>
             <SortableTable.Cell>{lunch.choosenBy ? lunch.choosenBy.name : "-"}</SortableTable.Cell>
             <SortableTable.Cell numeric>

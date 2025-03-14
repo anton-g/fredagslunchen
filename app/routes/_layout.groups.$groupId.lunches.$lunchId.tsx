@@ -106,15 +106,31 @@ export default function LunchDetailsPage() {
     .filter((x) => !groupLunch.scoreRequests.find((r) => r.userId !== userId && r.userId === x.userId))
     .map((x) => x.user)
 
+  const dateAgo = formatTimeAgo(new Date(groupLunch.date))
+  const dateTitle = groupLunch.date.split("T")[0]
+
   return (
     <div>
       <Title>
-        <span title={groupLunch.date.split("T")[0]}>{formatTimeAgo(new Date(groupLunch.date))}</span> at{" "}
-        <Link
-          to={`/groups/${groupLunch.groupLocationGroupId}/locations/${groupLunch.groupLocationLocationId}`}
-        >
-          {groupLunch.groupLocation.location.name}
-        </Link>
+        {groupLunch.isTakeaway ? (
+          <>
+            Takeaway <span title={dateTitle}>{dateAgo}</span> from{" "}
+            <Link
+              to={`/groups/${groupLunch.groupLocationGroupId}/locations/${groupLunch.groupLocationLocationId}`}
+            >
+              {groupLunch.groupLocation.location.name}
+            </Link>
+          </>
+        ) : (
+          <>
+            <span title={dateTitle}>{dateAgo}</span> at{" "}
+            <Link
+              to={`/groups/${groupLunch.groupLocationGroupId}/locations/${groupLunch.groupLocationLocationId}`}
+            >
+              {groupLunch.groupLocation.location.name}
+            </Link>
+          </>
+        )}
       </Title>
       <Spacer size={24} />
       <StatsGrid>
@@ -459,6 +475,13 @@ const NewScoreForm = ({ users, lunchId, groupId, userId }: NewScoreFormProps) =>
               type="number"
               required
               ref={scoreRef}
+              onBlur={(e) => {
+                const value = parseFloat(e.target.value)
+                if (!isNaN(value)) {
+                  const rounded = Math.round(value * 4) / 4
+                  e.target.value = rounded.toString()
+                }
+              }}
               aria-invalid={scoreFetcher.data?.errors?.score ? true : undefined}
               aria-errormessage={scoreFetcher.data?.errors?.score ? "score-error" : undefined}
             />

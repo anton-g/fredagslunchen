@@ -62,6 +62,7 @@ type CreateLunchInput = {
   locationId: Location["id"]
   groupId: Group["id"]
   requestedByUserId: User["id"]
+  isTakeaway: boolean
 }
 
 export async function createLunch({
@@ -70,6 +71,7 @@ export async function createLunch({
   locationId,
   groupId,
   requestedByUserId,
+  isTakeaway,
 }: CreateLunchInput) {
   const groupLocation = await prisma.groupLocation.findFirst({
     where: {
@@ -93,6 +95,7 @@ export async function createLunch({
       choosenByUserId,
       groupLocationGroupId: groupId,
       groupLocationLocationId: locationId,
+      isTakeaway,
     },
   })
 }
