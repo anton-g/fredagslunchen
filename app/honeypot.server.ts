@@ -11,6 +11,10 @@ export interface HoneypotConfig {
   nameFieldName?: string
   validFromFieldName?: string | null
   encryptionSeed?: string
+  /** Minimum time in ms between rendering the form and submitting it */
+  minFillDuration?: number
+  /** Maximum time in ms a rendered form stays valid, prevents replaying a harvested token */
+  maxAge?: number
 }
 
 export class SpamError extends Error {}
@@ -38,8 +42,6 @@ export class Honeypot {
       if (actualName) nameFieldName = actualName
     }
 
-    if (!this.shouldCheckHoneypot(formData, nameFieldName)) return
-
     if (!formData.has(nameFieldName)) {
       throw new SpamError("Missing honeypot input")
     }
@@ -61,6 +63,15 @@ export class Honeypot {
 
     if (this.isFuture(Number(time))) {
       throw new SpamError("Honeypot valid from is in future")
+    }
+
+    let elapsed = Date.now() - Number(time)
+    if (this.config.minFillDuration && elapsed < this.config.minFillDuration) {
+      throw new SpamError("Form submitted too fast")
+    }
+
+    if (this.config.maxAge && elapsed > this.config.maxAge) {
+      throw new SpamError("Honeypot valid from has expired")
     }
   }
 
@@ -88,12 +99,6 @@ export class Honeypot {
     }
   }
 
-  protected shouldCheckHoneypot(formData: FormData, nameFieldName: string): boolean {
-    return (
-      formData.has(nameFieldName) || Boolean(this.validFromFieldName && formData.has(this.validFromFieldName))
-    )
-  }
-
   protected randomValue() {
     return CryptoJS.lib.WordArray.random(128 / 8).toString()
   }
@@ -103,7 +108,11 @@ export class Honeypot {
   }
 
   protected decrypt(value: string) {
-    return CryptoJS.AES.decrypt(value, this.encryptionSeed).toString(CryptoJS.enc.Utf8)
+    try {
+      return CryptoJS.AES.decrypt(value, this.encryptionSeed).toString(CryptoJS.enc.Utf8)
+    } catch {
+      return ""
+    }
   }
 
   protected isFuture(timestamp: number) {
@@ -121,6 +130,8 @@ export class Honeypot {
 export const honeypot = new Honeypot({
   validFromFieldName: process.env.TESTING ? null : undefined,
   encryptionSeed: process.env.HONEYPOT_SECRET,
+  minFillDuration: 3 * 1000,
+  maxAge: 24 * 60 * 60 * 1000,
 })
 
 export function checkHoneypot(formData: FormData) {
