@@ -15,6 +15,9 @@ import { mergeMeta } from "~/merge-meta"
 import { SocialButton } from "~/components/SocialButton"
 import { HoneypotInputs } from "~/components/honeypot"
 import { checkHoneypot } from "~/honeypot.server"
+import { getClientIp, signupLimiter } from "~/rate-limit.server"
+
+const URL_PATTERN = /https?:\/\/|www\.|\.(com|net|org|ru|xyz|top|info|io)\b/i
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const userId = await getUserId(request)
@@ -63,6 +66,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     return json<ActionData>({ errors: { name: "Name is required" } }, { status: 400 })
   }
 
+  if (name.length > 100) {
+    return json<ActionData>({ errors: { name: "Name is too long" } }, { status: 400 })
+  }
+
+  if (URL_PATTERN.test(name)) {
+    return json<ActionData>({ errors: { name: "Name can not contain links" } }, { status: 400 })
+  }
+
   if (typeof password !== "string" || password.length === 0) {
     return json<ActionData>({ errors: { password: "Password is required" } }, { status: 400 })
   }
@@ -75,6 +86,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   if (existingUser) {
     return json<ActionData>({ errors: { email: "A user already exists with this email" } }, { status: 400 })
+  }
+
+  if (!signupLimiter.consume(getClientIp(request))) {
+    return json<ActionData>(
+      { errors: { email: "Too many accounts created, please try again later" } },
+      { status: 429 },
+    )
   }
 
   const { user, groupId } = await createUser(email, name, password, inviteToken)
